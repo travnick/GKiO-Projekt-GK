@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<materials>
+  <mat0>
+    <diffuseColor>
+      <r>63</r>
+      <g>230</g>
+      <b>27</b>
+    </diffuseColor>
+    <reflection>0.55</reflection>
+  </mat0>
+  <mat1>
+    <diffuseColor>
+      <r>72</r>
+      <g>208</g>
+      <b>230</b>
+    </diffuseColor>
+    <reflection>1</reflection>
+  </mat1>
+  <mat2>
+    <diffuseColor>
+      <r>230</r>
+      <g>0</g>
+      <b>0</b>
+    </diffuseColor>
+    <reflection>0.4</reflection>
+  </mat2>
+  <mat3>
+    <diffuseColor>
+      <r>230</r>
+      <g>105</g>
+      <b>0</b>
+    </diffuseColor>
+    <reflection>0.2</reflection>
+  </mat3>
+  <mat4>
+    <diffuseColor>
+      <r>230</r>
+      <g>230</g>
+      <b>0</b>
+    </diffuseColor>
+    <reflection>0.4</reflection>
+  </mat4>
+  <mat5>
+    <diffuseColor>
+      <r>135</r>
+      <g>208</g>
+      <b>230</b>
+    </diffuseColor>
+    <reflection>0.25</reflection>
+  </mat5>
+  <mat6>
+    <diffuseColor>
+      <r>66</r>
+      <g>131</g>
+      <b>153</b>
+    </diffuseColor>
+    <reflection>0.05</reflection>
+  </mat6>
+</materials>
+<lights>
+  
+ <!-- TOP -->
+  <light1>
+    <x>20</x>
+    <y>-80</y>
+    <z>60</z>
+    <color>
+      <r>160</r>
+      <g>160</g>
+      <b>160</b>
+    </color>
+  </light1>
+ <!-- CENTER -->
+  <light2>
+    <x>0</x>
+    <y>-13</y>
+    <z>70</z>
+    <color>
+      <r>90</r>
+      <g>90</g>
+      <b>90</b>
+    </color>
+  </light2>
+ 
+  <light3>
+    <x>-35</x>
+    <y>-25</y>
+    <z>50</z>
+    <color>
+      <r>250</r>
+      <g>250</g>
+      <b>250</b>
+    </color>
+  </light3>
+  
+   <light4>
+    <x>30</x>
+    <y>-13</y>
+    <z>53</z>
+    <color>
+      <r>75</r>
+      <g>75</g>
+      <b>75</b>
+    </color>
+  </light4>
+
+  <light5>
+    <x>30</x>
+    <y>-45</y>
+    <z>100</z>
+    <color>
+      <r>75</r>
+      <g>75</g>
+      <b>75</b>
+    </color>
+  </light5>
+
+  <light6>
+    <x>30</x>
+    <y>-13</y>
+    <z>120</z>
+    <color>
+      <r>50</r>
+      <g>50</g>
+      <b>50</b>
+    </color>
+  </light7>
+  
+</lights>
+<objects>
+  <camera>
+    <x>0</x>
+    <y>-30</y>
+    <z>-45</z>
+    <screenWidth>10</screenWidth>
+    <FOV>48</FOV> <!-- 48 - human like FOV -->
+    <viewDistance>2000000</viewDistance>
+<!--     <type>orthogonal</type> -->
+    <type>conic</type>
+  </camera>
+  <!-- TOP -->
+  <sphere>
+    <x>-45</x>
+    <y>-60</y>
+    <z>50</z>
+    <r>1.0</r>
+    <material>5</material>
+    <multiplyX>7</multiplyX>
+    <multiplyY>1</multiplyY>
+    <multiplyZ>7</multiplyZ>
+    <offset>15</offset>
+  </sphere>
+  <!-- BACK -->
+  <sphere>
+    <x>43</x>
+    <y>-3</y>
+    <z>140</z>
+    <r>2.0</r>
+    <material>3</material>
+    <multiplyX>15</multiplyX>
+    <multiplyY>8</multiplyY>
+    <multiplyZ>1</multiplyZ>
+    <offset>-6</offset>
+  </sphere>
+  <!-- LEFT -->
+  <sphere>
+    <x>-47</x>
+    <y>-3</y>
+    <z>140</z>
+    <r>2.0</r>
+    <material>3</material>
+    <multiplyX>1</multiplyX>
+    <multiplyY>15</multiplyY>
+    <multiplyZ>22</multiplyZ>
+    <offset>-4</offset>
+  </sphere>
+  <!-- RIGHT -->
+  <sphere>
+    <x>47</x>
+    <y>-3</y>
+    <z>140</z>
+    <r>2.0</r>
+    <material>3</material>
+    <multiplyX>1</multiplyX>
+    <multiplyY>15</multiplyY>
+    <multiplyZ>22</multiplyZ>
+    <offset>-4</offset>
+  </sphere>
+  <!-- BOTTOM -->
+  <sphere>
+    <x>-45</x>
+    <y>0</y>
+    <z>50</z>
+    <r>2.0</r>
+    <material>6</material>
+    <multiplyX>31</multiplyX>
+    <multiplyY>1</multiplyY>
+    <multiplyZ>31</multiplyZ>
+    <offset>3</offset>
+  </sphere>
+  
+  <!-- CUBE -->
+  <sphere>
+    <x>15</x>
+    <y>-3</y>
+    <z>70</z>
+    <r>1.0</r>
+    <material>2</material>
+    <multiplyX>3</multiplyX>
+    <multiplyY>3</multiplyY>
+    <multiplyZ>3</multiplyZ>
+    <offset>-6</offset>
+  </sphere>
+  
+  <sphere>
+    <x>-30</x>
+    <y>-35</y>
+    <z>65</z>
+    <r>6.0</r>
+    <material>0</material>
+  </sphere>
+  
+  <sphere>
+    <x>-33</x>
+    <y>-10</y>
+    <z>65</z>
+    <r>10.0</r>
+    <material>1</material>
+  </sphere>
+  
+  <sphere>
+    <x>-25</x>
+    <y>-13</y>
+    <z>120</z>
+    <r>13.0</r>
+    <material>4</material>
+  </sphere>
+  <!-- -->
+  <sphere>
+    <x>42</x>
+    <y>-15</y>
+    <z>75</z>
+    <r>3.1</r>
+    <material>6</material>
+  </sphere>
+  
+  <sphere>
+    <x>-13</x>
+    <y>-7</y>
+    <z>110</z>
+    <r>5.0</r>
+    <material>2</material>
+  </sphere>
+  
+  <sphere>
+    <x>40</x>
+    <y>-40</y>
+    <z>60</z>
+    <r>5.0</r>
+    <material>4</material>
+  </sphere>
+  
+  <sphere>
+    <x>0</x>
+    <y>-20</y>
+    <z>150</z>
+    <r>20.0</r>
+    <material>0</material>
+  </sphere>
+  
+  <sphere>
+    <x>30</x>
+    <y>-7</y>
+    <z>70</z>
+    <r>7.0</r>
+    <material>4</material>
+  </sphere>
+  
+  <sphere>
+    <x>5</x>
+    <y>-45</y>
+    <z>60</z>
+    <r>5.0</r>
+    <material>6</material>
+  </sphere>
+</objects>

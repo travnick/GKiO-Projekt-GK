@@ -1,10 +1,9 @@
 /// @file Main/Model/SceneFileManager.cpp
-/// @date 22-12-2011
-/// @author Mikołaj Milej
+/// @date 29-03-2012
+/// @author Piotr Jawniak
 
-#include <boost/foreach.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
+#include <QIODevice>
+#include <stdexcept>
 
 #include "Model/ModelDefines.h"
 #include "Model/SceneFileManager.h"
@@ -18,284 +17,232 @@
 
 namespace Model {
 
-  void SceneFileManager::loadScene (std::istream & is, Scene &scene) throw (std::exception){
+  void SceneFileManager::loadScene (QIODevice & io, Scene &scene) throw (std::exception)
+  {
     Objects::ObjectType objectType = Objects::None;
-    using boost::property_tree::ptree;
-    ptree pt;
-    read_xml(is, pt, boost::property_tree::xml_parser::no_comments);
+    QString tmpname;
+    QDomNode node;
+    QDomElement root;
+    QDomDocument d;
 
-    BOOST_FOREACH( ptree::value_type const &value, pt.get_child(Materials::MATERIALS_NAME))
-    {
-      QSharedPointer <Material> material(new Material);
-      Color color;
-      worldUnit reflection;
+    d.setContent(&io);
+    root = d.documentElement();
 
-      std::string childName = Materials::MATERIALS_NAME + "." + value.first;
-      ptree child;
+    // Wczytywanie materiałów
+    tmpname = QString::fromStdString(Materials::MATERIALS_NAME);	// potrzebny QString, a jest std::string
+    node = root.elementsByTagName(tmpname).item(0).firstChild();
 
-      ptree::value_type const &colorNode =
-          find(pt, child, childName.c_str(), "diffuseColor").dereference();
-      getColor(colorNode, color);
+	for ( ; !node.isNull(); node = node.nextSibling())
+	{
+		if(!node.isElement())
+			continue;
 
-      reflection = value.second.get <worldUnit>("reflection");
-      if (reflection < 0.0f || reflection > 1.0f)
+		QSharedPointer <Material> material(new Material());
+		Color color;
+		worldUnit reflection;
+		bool ok;
+		QDomElement elem = node.toElement();
+
+		reflection = static_cast<worldUnit>(elem.attribute("reflection").toFloat(&ok));
+
+		if(!ok || reflection < 0.0f || reflection > 1.0f)
+			throw std::logic_error("Wartość odbicia jest spoza zakresu.");
+
+		getColor(node.firstChildElement("diffuseColor").toElement(), color);
+
+		( *material->getColor()) = (color);
+		material->setReflection(reflection);
+
+		scene.addMaterial(material);
+	}
+
+	if (scene.getMaterials().empty())
+		throw std::logic_error("Brak zdefiniowanych materiałów");
+
+	// Wczytywanie świateł
+	tmpname = QString::fromStdString(Lights::LIGHTS_NAME);
+	node = root.elementsByTagName(tmpname).item(0).firstChild();
+
+	for ( ; !node.isNull(); node = node.nextSibling())
+	{
+		if(!node.isElement())
+			continue;
+
+		QSharedPointer <Light> object(new Light());
+		Point point;
+		Color color;
+		QDomElement elem = node.toElement();
+
+		getColor(node.firstChildElement("color").toElement(), color);
+		getVPCommon(node.firstChildElement("position").toElement(), point);
+
+		object->setPosition(point);
+		( *object) = (color);
+
+		scene.addLight(object);
+	}
+
+	// Wczytywanie obiektów
+	tmpname = QString::fromStdString(Objects::OBJECTS_NAME);
+	node = root.elementsByTagName(tmpname).item(0).firstChild();
+
+	for ( ; !node.isNull(); node = node.nextSibling())
+	{
+		if(!node.isElement())
+			continue;
+
+	  QDomElement elem = node.toElement();
+      objectType = Object::getObjectType(elem.tagName().toStdString());
+
+	  switch (objectType) {
+      case Objects::Sphere:
       {
-#ifdef Q_OS_LINUX
-        throw std::exception();
-#else
-        throw std::exception("Wartoć odbicia jest spoza dozwolonego zakresu.");
-#endif
-      }
+        QSharedPointer <Sphere> mainbject;
+        Point point;
+        worldUnit radius;
+        worldUnit offset;
+        bool ok;
+        int material;
+        int multiplyX = 1, multiplyY = 1, multiplyZ = 1;
+        int multiplyXSign = 1, multiplyYSign = 1, multiplyZSign = 1;
 
-      ( *material->getColor()) = (color);
-      material->setReflection(reflection);
+        getVPCommon(node.firstChildElement("position").toElement(), point);
+        radius = elem.attribute("r").toFloat(&ok);
 
-      scene.addMaterial(material);
-    }
+        if(!ok || !(radius > 0)) {
+          throw std::logic_error("Promień musi być dodatni.");
+        }
 
-    BOOST_FOREACH(
-        ptree::value_type const &value, pt.get_child(Lights::LIGHTS_NAME))
-    {
-      QSharedPointer <Light> object(new Light());
-      Point point;
-      Color color;
+        offset = radius * 2;
+        if(elem.hasAttribute("offset")) {
+        	offset = static_cast<worldUnit>(elem.attribute("offset").toFloat(&ok));
+        }
 
-      std::string childName = Lights::LIGHTS_NAME + "." + value.first;
-      ptree child;
+        material = elem.attribute("material").toInt(&ok, 10);
 
-      ptree::value_type const &colorNode =
-          find(pt, child, childName.c_str(), "color").dereference();
+        if(!ok || material >= scene.getMaterials().size() || material < 0)
+          throw std::logic_error("Nie ma takiego materiału. Sprawdź obiekty.");
 
-      getVPCommon(value, point);
-      getColor(colorNode, color);
+        QDomNode mul = node.firstChildElement("multiply");
+        if(mul.isElement()) {
+          QDomElement mulelem = mul.toElement();
+          multiplyX = mulelem.attribute("x").toInt(&ok);
+          multiplyY = mulelem.attribute("y").toInt(&ok);
+          multiplyZ = mulelem.attribute("z").toInt(&ok);
+        }
 
-      object->setPosition(point);
-      ( *object) = (color);
+        mainbject = QSharedPointer <Sphere>(new Sphere(radius));
+        mainbject->setPosition(point);
+        mainbject->setMaterial(material);
 
-      scene.addLight(object);
-    }
-
-    if (scene.getMaterials().empty())
-    {
-#ifdef Q_OS_LINUX
-      throw std::exception();
-#else
-      throw std::exception("Brak zdefiniowanych materiałów");
-#endif
-    }
-
-    BOOST_FOREACH( ptree::value_type const &value, pt.get_child(Objects::OBJECTS_NAME))
-    {
-      objectType = Object::getObjectType(value.first);
-
-      switch (objectType) {
-        case Objects::Sphere:
+        if (multiplyX < 0)
         {
-          QSharedPointer <Sphere> mainbject;
-          Point point;
-          worldUnit radius;
-          int material;
-          int multiplyX;
-          int multiplyY;
-          int multiplyZ;
-          int multiplyXSign = 1;
-          int multiplyYSign = 1;
-          int multiplyZSign = 1;
-          worldUnit offset;
+          multiplyXSign = -1;
+          multiplyX = -multiplyX;
+        }
 
-          getVPCommon(value, point);
-          radius = value.second.get <worldUnit>("r");
-          if ( !(radius > 0))
+        if (multiplyY < 0)
+        {
+          multiplyYSign = -1;
+          multiplyY = -multiplyY;
+        }
+
+        if (multiplyZ < 0)
+        {
+          multiplyZSign = -1;
+          multiplyZ = -multiplyZ;
+        }
+
+        for (int i = 0; i < multiplyX; ++i)
+        {
+          for (int j = 0; j < multiplyY; ++j)
           {
-#ifdef Q_OS_LINUX
-            throw std::exception();
-#else
-            throw std::exception("Promień musi być dodatni.");
-#endif
-          }
-          material = value.second.get <int>("material");
-          if (material >= scene.getMaterials().size() || material < 0)
-          {
-#ifdef Q_OS_LINUX
-            throw std::exception();
-#else
-            throw std::exception("Nie ma takiego materiału. Sprawdź obiekty.");
-#endif
-          }
-
-          multiplyX = value.second.get <int>("multiplyX", 1);
-          multiplyY = value.second.get <int>("multiplyY", 1);
-          multiplyZ = value.second.get <int>("multiplyZ", 1);
-          offset = value.second.get <worldUnit>("offset", radius * 2);
-
-          mainbject = QSharedPointer <Sphere>(new Sphere(radius));
-
-          mainbject->setPosition(point);
-          mainbject->setMaterial(material);
-
-          if (multiplyX < 0)
-          {
-            multiplyXSign = -1;
-            multiplyX = -multiplyX;
-          }
-
-          if (multiplyY < 0)
-          {
-            multiplyYSign = -1;
-            multiplyY = -multiplyY;
-          }
-
-          if (multiplyZ < 0)
-          {
-            multiplyZSign = -1;
-            multiplyZ = -multiplyZ;
-          }
-
-          for (int i = 0; i < multiplyX; ++i)
-          {
-            for (int j = 0; j < multiplyY; ++j)
+            for (int k = 0; k < multiplyZ; ++k)
             {
-              for (int k = 0; k < multiplyZ; ++k)
-              {
-                QSharedPointer <VisibleObject> object(new Sphere( *mainbject));
-                point = object->getPosition();
+              QSharedPointer <VisibleObject> object(new Sphere( *mainbject));
+              point = object->getPosition();
 
-                point.coords [PX] += offset * i * multiplyXSign;
-                point.coords [PY] += offset * j * multiplyYSign;
-                point.coords [PZ] += offset * k * multiplyZSign;
+              point.coords [PX] += offset * i * multiplyXSign;
+              point.coords [PY] += offset * j * multiplyYSign;
+              point.coords [PZ] += offset * k * multiplyZSign;
 
-                object->setPosition(point);
+              object->setPosition(point);
 
-                scene.addVisibleObject(object);
+              scene.addVisibleObject(object);
               }
             }
           }
         }
-          break;
-        case Objects::Camera:
+
+        break;
+      case Objects::Camera:
+      {
+        if ( !(scene.getCamera().isNull()))
         {
-          if ( !(scene.getCamera().isNull()))
-          {
-#ifdef Q_OS_LINUX
-            throw std::exception();
-#else
-            throw std::exception("Może być zdefiniowana tylko jedna kamera.");
-#endif
-          }
-
-          QSharedPointer <Camera> object(new Camera());
-          Point point;
-          Vector vector;
-          Point::dataType screenWidth;
-          worldUnit viewDistance;
-          Camera::unitType FOV;
-          std::string cameraType;
-
-          /**
-           * Camera rotating not yet implemented
-           */
-          vector.set(0, 0, 3);
-          //              ptree::value_type const &dir =
-          //                  pt.get_child(Objects::OBJECTS_NAME + "." + value.first).find("dir").dereference();
-          //              getVPCommon(dir, vector);
-
-          getVPCommon(value, point);
-
-          screenWidth = value.second.get <worldUnit>("screenWidth");
-          if ( !(screenWidth > 0))
-          {
-#ifdef Q_OS_LINUX
-            throw std::exception();
-#else
-            throw std::exception("Parametr screenWidth musi być większy od 0.");
-#endif
-          }
-          FOV = value.second.get <Camera::unitType>("FOV");
-          if ( !(FOV > 0 && FOV < 180))
-          {
-#ifdef Q_OS_LINUX
-            throw std::exception();
-#else
-            throw std::exception("Parametr FOV musi być z zakresu (0;180)");
-#endif
-          }
-          viewDistance = value.second.get <worldUnit>("viewDistance");
-          if ( !(viewDistance > 0))
-          {
-#ifdef Q_OS_LINUX
-            throw std::exception();
-#else
-            throw std::exception("Parametr viewDistance musi być większy od 0.");
-#endif
-          }
-          cameraType = value.second.get <std::string>("type");
-
-          object->setFOV(FOV);
-          object->setViewDistance(viewDistance);
-          object->setScreenWidth(screenWidth);
-          object->setPosition(point);
-          object->setDirection(vector);
-          object->setType(cameraType);
-
-          scene.setCamera(object);
+          throw std::logic_error("Może być zdefiniowana tylko jedna kamera.");
         }
-          break;
-        default:
-          break;
+
+        QSharedPointer<Camera> object(new Camera());
+        Point point;
+        Vector vector;
+        Point::dataType screenWidth;
+        worldUnit viewDistance;
+        Camera::unitType FOV;
+        std::string cameraType;
+        bool ok;
+
+        /**
+         * Camera rotating not yet implemented
+         */
+        vector.set(0, 0, 3);
+        getVPCommon(node.firstChildElement("position").toElement(), point);
+
+        screenWidth = static_cast<Point::dataType>(elem.attribute("screenWidth").toFloat(&ok));
+        if ( !ok || !(screenWidth > 0))
+          throw std::logic_error("Parametr screenWidth musi być większy od 0.");
+
+        FOV = static_cast<Camera::unitType>(elem.attribute("fov").toDouble(&ok));
+        if ( !ok || !(FOV > 0 && FOV < 180))
+          throw std::logic_error("Parametr FOV musi być z zakresu (0;180)");
+
+        viewDistance = static_cast<worldUnit>(elem.attribute("viewDistance").toFloat(&ok));
+        if ( !ok || !(viewDistance > 0))
+         throw std::logic_error("Parametr viewDistance musi być większy od 0.");
+
+        cameraType = elem.attribute("type").toStdString();
+        object->setFOV(FOV);
+        object->setViewDistance(viewDistance);
+        object->setScreenWidth(screenWidth);
+        object->setPosition(point);
+        object->setDirection(vector);
+        object->setType(cameraType);
+
+        scene.setCamera(object);
       }
-    }
+        break;
+      default:
+        break;
+      }
+	}
 
-    if (scene.getCamera().isNull())
-    {
-#ifdef Q_OS_LINUX
-      throw std::exception();
-#else
-      throw std::exception("Brak kamery w scenie");
-#endif
-    }
+	 if (scene.getCamera().isNull())
+	  throw std::logic_error("Brak kamery w scenie");
 
-    if (scene.getLights().empty())
-    {
-#ifdef Q_OS_LINUX
-      throw std::exception();
-#else
-      throw std::exception("Brak świateł w scenie");
-#endif
-    }
+	if (scene.getLights().empty())
+	  throw std::logic_error("Brak świateł w scenie");
   }
 
-  void SceneFileManager::getColor (const boost::property_tree::ptree::value_type & value,
-                                   Color &color){
-    color.red = (value.second.get <Color::colorValueDataType>("r"));
-    color.green = (value.second.get <Color::colorValueDataType>("g"));
-    color.blue = (value.second.get <Color::colorValueDataType>("b"));
+  void SceneFileManager::getColor (const QDomElement & value, Color &color){
+	bool dummy;
+    color.red = value.attribute("r").toInt(&dummy, 10);
+    color.green = value.attribute("g").toInt(&dummy, 10);
+    color.blue = value.attribute("b").toInt(&dummy, 10);
   }
 
-  void SceneFileManager::getVPCommon (const boost::property_tree::ptree::value_type & value,
-                                      VPCommon &object){
-    object.coords [PX] = value.second.get <VPCommon::dataType>("x");
-    object.coords [PY] = value.second.get <VPCommon::dataType>("y");
-    object.coords [PZ] = value.second.get <VPCommon::dataType>("z");
+  void SceneFileManager::getVPCommon (const QDomElement & value, VPCommon &object) {
+	bool dummy;
+    object.coords [PX] = value.attribute("x").toFloat(&dummy);
+    object.coords [PY] = value.attribute("y").toFloat(&dummy);
+    object.coords [PZ] = value.attribute("z").toFloat(&dummy);
   }
-
-  boost::property_tree::ptree::assoc_iterator SceneFileManager::find (const boost::property_tree::ptree &root,
-                                                                      boost::property_tree::ptree &child,
-                                                                      const char *childName,
-                                                                      const char *fieldName){
-    using boost::property_tree::ptree;
-
-    child = root.get_child(childName);
-    ptree::assoc_iterator node = child.find(fieldName);
-    if (node == child.not_found())
-    {
-      std::string message = "Brakuje sekcji ";
-      message.append(fieldName).append(" w:<br>").append(childName);
-#ifdef Q_OS_LINUX
-      throw std::exception();
-#else
-      throw std::exception(message.c_str());
-#endif
-    }
-    return node;
-  }
-} /* namespace Model */
+}/* namespace Model */

@@ -7,8 +7,7 @@
 #include <QScrollArea>
 #include <QPaintEvent>
 #include <QApplication>
-
-#include "View/ImageViewer.h"
+#include "ImageViewer.h"
 
 namespace View {
 

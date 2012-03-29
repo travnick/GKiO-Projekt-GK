@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include <boost/property_tree/ptree.hpp>
-
 #include "Controller/GlobalDefines.h"
+#include <QtXml>
 
 namespace Model {
   //Forward declarations -->
@@ -20,7 +19,7 @@ namespace Model {
    */
   class SceneFileManager {
     public:
-      inline SceneFileManager (){
+      inline SceneFileManager () {
       }
 
       /**Loads scene from stream
@@ -28,7 +27,7 @@ namespace Model {
        * @param is stream to load data from
        * @param scene scene to load data in
        */
-      void loadScene (std::istream &is, Scene &scene) throw (std::exception);
+      void loadScene (QIODevice & io, Scene &scene) throw (std::exception);
 
     private:
       /**Loads color from value to color obejct
@@ -36,7 +35,7 @@ namespace Model {
        * @param value xml value
        * @param color color object
        */
-      void getColor (boost::property_tree::ptree::value_type const &value, Color &color);
+      void getColor (QDomElement const &value, Color &color);
 
       /**Loads data from value to VPcommon object
        * VPcommon is class with commod data for Vector and Point
@@ -44,11 +43,6 @@ namespace Model {
        * @param value xml value
        * @param object object to load data in
        */
-      void getVPCommon (boost::property_tree::ptree::value_type const &value, VPCommon &object);
-
-      boost::property_tree::ptree::assoc_iterator find (const boost::property_tree::ptree &root,
-                                                        boost::property_tree::ptree &child,
-                                                        const char *childName,
-                                                        const char *fieldName);
+      void getVPCommon (QDomElement const &value, VPCommon &object);
   };
 } /* namespace Model */

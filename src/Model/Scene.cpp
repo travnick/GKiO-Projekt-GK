@@ -3,9 +3,8 @@
 /// @author Mikołaj Milej
 
 #include <string>
-#include <fstream>
-#include <iostream>
-#include <assert.h>
+#include <exception>
+#include <QFile>
 
 #include "Model/Scene.h"
 #include "Model/SceneFileManager.h"
@@ -22,35 +21,27 @@ namespace Model {
     loaded = false;
   }
 
-  bool Scene::init (string &filename, bool reload) throw (std::exception){
+  bool Scene::init (const string &filename, bool reload) throw (std::exception){
     bool result = false;
-    ifstream infile;
+    QFile infile(QString::fromStdString(filename));
 
     if (loaded && !reload)
     {
       return loaded;
     }
 
-    infile.open(filename.c_str(), ifstream::in);
-
-    if (infile.good())
+    if (infile.exists())
     {
       camera.clear();
       lights.clear();
       materials.clear();
       objects.clear();
 
-      SceneFileManager fileManager;
-      fileManager.loadScene(infile, *this);
-
-      result = true;
+	  SceneFileManager fileManager;
+	  fileManager.loadScene(infile, *this);
+	  infile.close();
+	  result = true;
     }
-    else
-    {
-      result = false;
-    }
-    infile.close();
-
     loaded = result;
 
     return result;

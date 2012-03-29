@@ -61,7 +61,7 @@ namespace Model {
        * @return if scene is loaded properly or not
        * @throws std::exception from rapidxml
        */
-      bool init (std::string &filename, bool reload = false) throw (std::exception);
+      bool init (const std::string &filename, bool reload = false) throw (std::exception);
 
       /**Returns camera
        *

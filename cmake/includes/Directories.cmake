@@ -4,7 +4,7 @@ set(SOURCE_DIR ${MAIN_DIR}/src)
 set(PROJECT_SOURCE_DIR ${SOURCE_DIR})
 set(SOURCE_VIEW_DIR ${SOURCE_DIR}/View)
 
-include_directories (${SOURCE_DIR} ${MAIN_DIR}/LibUsable/include)
+include_directories (${SOURCE_DIR})
 
 if(UNIX)
   set(BIN_DIR ${MAIN_DIR}/bin/linux)

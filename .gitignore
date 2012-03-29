@@ -52,3 +52,4 @@ ui_*
 cmake/build-*
 bin/*
 lib/*
+ide/*

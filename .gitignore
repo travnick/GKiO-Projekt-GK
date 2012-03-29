@@ -49,7 +49,6 @@ moc_*
 ui_*
 
 
-cmake/build-*
+ide/*
 bin/*
 lib/*
-ide/*

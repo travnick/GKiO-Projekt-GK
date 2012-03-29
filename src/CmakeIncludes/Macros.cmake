@@ -21,7 +21,7 @@ MACRO (QT4_MAKE_OUTPUT_FILE_CUSTOM infile prefix ext outfile )
   ENDIF(WIN32 AND rel MATCHES "^[a-zA-Z]:")
 
   STRING(REPLACE "../" "" rel ${rel})
-  SET(_outfile "${MAIN_DIR}/${rel}")
+  SET(_outfile "${SOURCE_DIR}/${rel}")
   GET_FILENAME_COMPONENT(outpath ${_outfile} PATH)
   GET_FILENAME_COMPONENT(_outfile ${_outfile} NAME_WE)
 

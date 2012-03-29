@@ -20,14 +20,11 @@ import subprocess
 # Script should be run from inside the repo.
 REPO = CWD = os.getcwd()
 
-# Main repo directory - erase anything after (Engine|Other|Tools) in CWD
-#REPO = re.sub(r'(/|\\)(Engine|Other|Tools).*', '', CWD)
-
 # Make it outside repository.
 TMP_DIR = REPO + '/ide_cmake/'
 
 SRC_DIR = REPO + '/src/'
-CMAKE_INC_DIR = REPO + '/cmake/includes/'
+CMAKE_INC_DIR = REPO + '/src/CmakeIncludes/'
 
 TARGETS = (
         'Model',

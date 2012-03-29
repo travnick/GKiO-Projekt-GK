@@ -1,4 +1,4 @@
-include(includes/Macros.cmake)
+include(CmakeIncludes/Macros.cmake)
 
 set(HDRS_View
   ${SOURCE_DIR}/View/ImageViewer.h

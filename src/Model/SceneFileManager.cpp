@@ -182,6 +182,7 @@ namespace Model {
 			QSharedPointer<Plane> object(new Plane());
 			Vector angles;
 			bool ok;
+			int material;
 
 			// TODO tymczasowo dopisywanie rzez coords
 			angles.coords[PX] = elem.attribute("angleX").toFloat(&ok);
@@ -189,10 +190,13 @@ namespace Model {
 			angles.coords[PZ] = elem.attribute("angleZ").toFloat(&ok);
 			angles.coords[PW] = elem.attribute("d").toFloat(&ok);
 
+			material = elem.attribute("material").toInt(&ok, 10);
+
 			if(!ok)
 			  throw std::logic_error("Błąd wczytywania płasczyzny");
 
 			object->setAngles(angles);
+			object->setMaterial(material);
 			scene.addVisibleObject(object);
 		}
 		break;

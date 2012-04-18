@@ -13,6 +13,7 @@
 #include "Model/Light.h"
 #include "Model/Object.h"
 #include "Model/Sphere.h"
+#include "Model/Plane.h"
 #include "Model/Material.h"
 #include "Model/Vector.h"
 
@@ -174,8 +175,28 @@ namespace Model {
             }
           }
         }
-
         break;
+ 
+		case Objects::Plane:
+		{
+			QSharedPointer<Plane> object(new Plane());
+			Vector angles;
+			bool ok;
+
+			// TODO tymczasowo dopisywanie rzez coords
+			angles.coords[PX] = elem.attribute("angleX").toFloat(&ok);
+			angles.coords[PY] = elem.attribute("angleY").toFloat(&ok);
+			angles.coords[PZ] = elem.attribute("angleZ").toFloat(&ok);
+			angles.coords[PW] = elem.attribute("d").toFloat(&ok);
+
+			if(!ok)
+			  throw std::logic_error("Błąd wczytywania płasczyzny");
+
+			object->setAngles(angles);
+			scene.addVisibleObject(object);
+		}
+		break;
+
       case Objects::Camera:
       {
         if ( !(scene.getCamera().isNull()))

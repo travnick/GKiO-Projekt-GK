@@ -22,6 +22,7 @@ namespace Model {
       objectTypes [Objects::CAMERA_NAME] = Objects::Camera;
       objectTypes [Objects::LIGHT_NAME] = Objects::Light;
       objectTypes [Objects::SPHERE_NAME] = Objects::Sphere;
+      objectTypes [Objects::PLANE_NAME] = Objects::Plane;
     }
 
     iterator = objectTypes.find(typeName);

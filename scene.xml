@@ -69,10 +69,8 @@
 	  <camera screenWidth="10" viewDistance="2000000" fov="68" type="conic">
 	  	<position x="0" y="-30" z="-45" />
 	  </camera>
-
-	 <sphere r="20.0" material="0">
-	  	<position x="0" y="-35" z="-27" />
-	 </sphere>
+	 
+	 <plane angleX="0" angleY="2" angleZ="0" d="1" />
 	  <!-- TOP
 	  <sphere r="1.0" material="5" offset="15">
 	  	<position x="-45" y="-60" z="50" />

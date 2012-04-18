@@ -39,7 +39,7 @@ namespace Model {
      *
      */
     enum ObjectType {
-      None, Camera, Light, Sphere
+      None, Camera, Light, Sphere, Plane
     };
 
     /**String representation of object types
@@ -49,6 +49,7 @@ namespace Model {
     const std::string CAMERA_NAME = "camera";
     const std::string LIGHT_NAME = "light";
     const std::string SPHERE_NAME = "sphere";
+    const std::string PLANE_NAME = "plane";
   }
 
   namespace Cameras {

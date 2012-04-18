@@ -45,6 +45,10 @@ void Plane::setAngles (Vector newAngles){
   calculateNormal();
 }
 
+void Plane::setNormal (Vector newNormal){
+  normal = newNormal;
+}
+
 void Plane::calculateNormal (){
   normal = angles;
 }

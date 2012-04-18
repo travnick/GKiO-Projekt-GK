@@ -8,7 +8,7 @@
 
 namespace Model {
 
-  /*
+  /*Plane class
    *
    */
   class Plane: public Model::VisibleObject {
@@ -17,8 +17,15 @@ namespace Model {
         A = 0, B = 1, C = 2, D = 3
       };
 
+      /**Creates plane
+       *
+       */
       Plane ();
 
+      /**Creates copy of another plane
+       *
+       * @param newAngles
+       */
       Plane (Vector newAngles);
 
       /**Creates new plane and copies data from other
@@ -27,12 +34,24 @@ namespace Model {
        */
       Plane (const Plane &other);
 
+      /**Destructor of the plane
+       *
+       */
       inline virtual ~Plane (){
       }
 
+      /**Set angles of the plane
+       * It calculates normal of the plane
+       *
+       * @param newAngles angles of the plane
+       */
       void setAngles (Vector newAngles);
 
-      void setNormal (Vector newAngle);
+      /**Set normal vector of the plane
+       *
+       * @param newNormal normal of the plane
+       */
+      void setNormal (Vector newNormal);
 
       /**Checks if given ray intersects with plane
        *
@@ -47,6 +66,9 @@ namespace Model {
       Vector normal;
       Vector angles;
 
+      /**Calculates normal vector of the plane
+       *
+       */
       void calculateNormal ();
   };
 

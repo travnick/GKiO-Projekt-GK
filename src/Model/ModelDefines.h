@@ -5,15 +5,30 @@
 #pragma once
 
 #include <string>
+#include <cmath>
 
 //Constants -->
 #define PI 3.14159265
+
+#define INTERSECTION_ERROR_TOLERANCE 0.01f
 // <-- Constants
 
 //Macros -->
 #define RAD(x) (x*(PI/180))
-#define SQRT(x) sqrtf(x) // set sqrt() for worldUnit == double or sqrtf() for worldUnit == float
 // <--Macros
+
+//Template -->
+template <typename T>
+T SQRT (T value){
+  return sqrt(value);
+}
+
+//inline is important because of "multiple definition of" error
+template <>
+inline float SQRT (float value){
+  return sqrtf(value);
+}
+// <--Template
 
 namespace Model {
   //Defines world unit for all project

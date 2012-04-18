@@ -5,7 +5,8 @@
 #pragma once
 
 #include "Controller/GlobalDefines.h"
-#include <QtXml>
+
+class QDomElement;
 
 namespace Model {
   //Forward declarations -->

@@ -92,21 +92,6 @@ namespace Model {
       result [PW] = -1;
     }
 
-    /**Normalizes vector
-     *
-     * @param vector vector to normalize
-     */
-    inline void normalize (worldUnit *vector){
-      vector [PW] =
-          SQRT(vector [PX] * vector [PX] + vector [PY] * vector [PY] + vector [PZ] * vector [PZ]);
-
-      worldUnit constant = 1.0f / vector [PW];
-
-      vector [PX] *= constant;
-      vector [PY] *= constant;
-      vector [PZ] *= constant;
-    }
-
     /**Calculates dot product of two vectors
      * You should give here VPCommon::coords
      *
@@ -118,6 +103,40 @@ namespace Model {
      */
     inline worldUnit dotProduct (const worldUnit *vector1, const worldUnit *vector2){
       return vector1 [PX] * vector2 [PX] + vector1 [PY] * vector2 [PY] + vector1 [PZ] * vector2 [PZ];
+    }
+
+    /**Calculates dot product of vector
+     * You should give here VPCommon::coords
+     *
+     * dotProduct = vector.x * vector.x + vector.y * vector.y + vector.z + vector.z
+     *
+     * @param vector1 worldUnit[4]
+     * @return dotProduct
+     */
+    inline worldUnit dotProduct (worldUnit *vector1){
+      return vector1 [PW] = vector1 [PX] * vector1 [PX] + vector1 [PY] * vector1 [PY]
+          + vector1 [PZ] * vector1 [PZ];
+    }
+
+    /**Calculate lenght of vector
+     *
+     * @param vector vector to calculate length of
+     */
+    inline worldUnit length (worldUnit *vector){
+      return vector [PW] = SQRT(dotProduct(vector));
+    }
+
+    /**Normalizes vector
+     *
+     * @param vector vector to normalize
+     */
+    inline void normalize (worldUnit *vector){
+
+      worldUnit constant = 1.0f / length(vector);
+
+      vector [PX] *= constant;
+      vector [PY] *= constant;
+      vector [PZ] *= constant;
     }
   }
 }

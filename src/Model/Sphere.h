@@ -20,7 +20,7 @@ namespace Model {
        */
       Sphere (worldUnit radius);
 
-      /**Creates new sphere and copies data from othed sphere
+      /**Creates new sphere and copies data from other sphere
        *
        * @param other sphere to copy data from
        */

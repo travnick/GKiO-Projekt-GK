@@ -25,24 +25,40 @@ namespace Model {
 
     worldUnit a = PVOperations::dotProduct(ray.getDir().coords, e.coords);
 
-    if (a - size > range)
+    if ((a - size - INTERSECTION_ERROR_TOLERANCE) > range)
     {
       return false;
     }
 
-    worldUnit D = squareRadius - PVOperations::dotProduct(e.coords, e.coords) + a * a;
+    worldUnit D = squareRadius - PVOperations::dotProduct(e.coords) + a * a;
 
-    if (D < 0.0f)
+    //    if (D < 0.0f)
+    //    {
+    //      return false;
+    //    }
+
+    worldUnit t = SQRT(D);
+
+    if (e.coords [PW] >= squareRadius)
+    //We are outside sphere
     {
-      return false;
+      t = a - t;
+      if ((t > INTERSECTION_ERROR_TOLERANCE) && (t < range))
+      {
+        range = t;
+        return true;
+      }
     }
-
-    worldUnit t = a - SQRT(D);
-
-    if ((t > 0.0f) && (t < range))
+    else
+    //We are inside sphere
     {
-      range = t;
-      return true;
+      t += a;
+
+      if ((t > INTERSECTION_ERROR_TOLERANCE) && (t < range))
+      {
+        range = t;
+        return true;
+      }
     }
 
     return false;

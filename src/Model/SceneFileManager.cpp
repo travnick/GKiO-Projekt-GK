@@ -3,6 +3,7 @@
 /// @author Piotr Jawniak
 
 #include <QIODevice>
+#include <QtXml>
 #include <stdexcept>
 
 #include "Model/ModelDefines.h"

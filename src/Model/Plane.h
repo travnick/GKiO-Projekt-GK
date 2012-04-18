@@ -5,6 +5,7 @@
 #pragma once
 
 #include <Model/VisibleObject.h>
+#include <Model/Vector.h>
 
 namespace Model {
 

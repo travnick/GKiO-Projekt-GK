@@ -7,6 +7,7 @@ SOURCE_GROUP("Header Files" FILES
   ${SOURCE_DIR}/Model/Material.h
   ${SOURCE_DIR}/Model/ModelDefines.h
   ${SOURCE_DIR}/Model/Object.h
+  ${SOURCE_DIR}/Model/Plane.h
   ${SOURCE_DIR}/Model/Point.h
   ${SOURCE_DIR}/Model/Point2D.h
   ${SOURCE_DIR}/Model/PointAndVectorOperations.h
@@ -24,6 +25,7 @@ SOURCE_GROUP("Source Files" FILES
   ${SOURCE_DIR}/Model/Camera.cpp
   ${SOURCE_DIR}/Model/Material.cpp
   ${SOURCE_DIR}/Model/Object.cpp
+  ${SOURCE_DIR}/Model/Plane.cpp
   ${SOURCE_DIR}/Model/Renderer.cpp
   ${SOURCE_DIR}/Model/Scene.cpp
   ${SOURCE_DIR}/Model/SceneFileManager.cpp

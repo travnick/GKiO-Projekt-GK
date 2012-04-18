@@ -27,7 +27,7 @@ bool Plane::checkRay (const Ray& ray, worldUnit& range, Vector& tmpDist) const{
   if (dn < 0)
   //We are in front of plane
   {
-    worldUnit t = (normal.coords [normalParams::D]
+    worldUnit t = (normal.coords [D]
         - PVOperations::dotProduct(ray.getStart().coords, normal.coords)) / dn;
 
     if ((t > 0.0f) && (t < range))
@@ -42,6 +42,7 @@ bool Plane::checkRay (const Ray& ray, worldUnit& range, Vector& tmpDist) const{
 
 void Plane::setAngles (Vector newAngles){
   angles = newAngles;
+  calculateNormal();
 }
 
 void Plane::calculateNormal (){

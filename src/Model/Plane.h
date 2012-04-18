@@ -2,10 +2,9 @@
 /// @date 18-04-2012
 /// @author Mikołaj Milej
 
-#ifndef PLANE_H_
-#define PLANE_H_
+#pragma once
 
-#include <VisibleObject.h>
+#include <Model/VisibleObject.h>
 
 namespace Model {
 
@@ -52,4 +51,3 @@ namespace Model {
   };
 
 } /* namespace Model */
-#endif /* PLANE_H_ */

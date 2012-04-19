@@ -70,7 +70,7 @@
 	  	<position x="0" y="-30" z="-45" />
 	  </camera>
 	 
-	 <plane angleX="1" angleY="2" angleZ="1" d="50" material="6" />
+	 <plane angleX="2" angleY="2" angleZ="2" d="50" material="6" />
 	  <!-- TOP
 	  <sphere r="1.0" material="5" offset="15">
 	  	<position x="-45" y="-60" z="50" />

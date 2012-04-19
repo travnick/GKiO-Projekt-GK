@@ -7,6 +7,7 @@
 #include "Controller/GlobalDefines.h"
 
 class QDomElement;
+class QString;
 
 namespace Model {
   //Forward declarations -->
@@ -28,7 +29,7 @@ namespace Model {
        * @param is stream to load data from
        * @param scene scene to load data in
        */
-      void loadScene (QIODevice & io, Scene &scene) throw (std::exception);
+      void loadScene (QIODevice & io, Scene &scene);
 
     private:
       /**Loads color from value to color obejct
@@ -36,7 +37,7 @@ namespace Model {
        * @param value xml value
        * @param color color object
        */
-      void getColor (QDomElement const &value, Color &color);
+      static void getColor (QDomElement const &value, Color &color);
 
       /**Loads data from value to VPcommon object
        * VPcommon is class with commod data for Vector and Point
@@ -44,6 +45,10 @@ namespace Model {
        * @param value xml value
        * @param object object to load data in
        */
-      void getVPCommon (QDomElement const &value, VPCommon &object);
+      static void getVPCommon (QDomElement const &value, VPCommon &object);
+
+      static int getInt(const QDomElement &elem, const QString &name);
+      static float getFloat(const QDomElement &elem, const QString &name);
+      static double getDouble(const QDomElement &elem, const QString &name);
   };
 } /* namespace Model */

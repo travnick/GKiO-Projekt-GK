@@ -19,7 +19,7 @@
 
 namespace Model {
 
-  void SceneFileManager::loadScene (QIODevice & io, Scene &scene) throw (std::exception)
+  void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
   {
     Objects::ObjectType objectType = Objects::None;
     QString tmpname;
@@ -42,17 +42,16 @@ namespace Model {
 		QSharedPointer <Material> material(new Material());
 		Color color;
 		worldUnit reflection;
-		bool ok;
 		QDomElement elem = node.toElement();
 
-		reflection = static_cast<worldUnit>(elem.attribute("reflection").toFloat(&ok));
+		reflection = static_cast<worldUnit>(getFloat(elem, "reflection"));
 
-		if(!ok || reflection < 0.0f || reflection > 1.0f)
+		if(reflection < 0.0f || reflection > 1.0f)
 			throw std::logic_error("Wartość odbicia jest spoza zakresu.");
 
 		getColor(node.firstChildElement("diffuseColor").toElement(), color);
 
-		( *material->getColor()) = (color);
+		( *material->getColor()) = color;
 		material->setReflection(reflection);
 
 		scene.addMaterial(material);
@@ -103,34 +102,33 @@ namespace Model {
         Point point;
         worldUnit radius;
         worldUnit offset;
-        bool ok;
         int material;
         int multiplyX = 1, multiplyY = 1, multiplyZ = 1;
         int multiplyXSign = 1, multiplyYSign = 1, multiplyZSign = 1;
 
         getVPCommon(node.firstChildElement("position").toElement(), point);
-        radius = elem.attribute("r").toFloat(&ok);
+        radius = getFloat(elem, "r");
 
-        if(!ok || !(radius > 0)) {
+        if(!(radius > 0)) {
           throw std::logic_error("Promień musi być dodatni.");
         }
 
         offset = radius * 2;
         if(elem.hasAttribute("offset")) {
-        	offset = static_cast<worldUnit>(elem.attribute("offset").toFloat(&ok));
+        	offset = static_cast<worldUnit>(getFloat(elem, "offset"));
         }
 
-        material = elem.attribute("material").toInt(&ok, 10);
+        material = getInt(elem, "material");
 
-        if(!ok || material >= scene.getMaterials().size() || material < 0)
+        if(material >= scene.getMaterials().size() || material < 0)
           throw std::logic_error("Nie ma takiego materiału. Sprawdź obiekty.");
 
         QDomNode mul = node.firstChildElement("multiply");
         if(mul.isElement()) {
           QDomElement mulelem = mul.toElement();
-          multiplyX = mulelem.attribute("x").toInt(&ok);
-          multiplyY = mulelem.attribute("y").toInt(&ok);
-          multiplyZ = mulelem.attribute("z").toInt(&ok);
+          multiplyX = getInt(mulelem, "x");
+          multiplyY = getInt(mulelem, "y");
+          multiplyZ = getInt(mulelem, "z");
         }
 
         mainbject = QSharedPointer <Sphere>(new Sphere(radius));
@@ -169,7 +167,6 @@ namespace Model {
               point.coords [PZ] += offset * k * multiplyZSign;
 
               object->setPosition(point);
-
               scene.addVisibleObject(object);
               }
             }
@@ -181,19 +178,14 @@ namespace Model {
 		{
 			QSharedPointer<Plane> object(new Plane());
 			Vector angles;
-			bool ok;
 			int material;
 
 			// TODO tymczasowo dopisywanie rzez coords
-			angles.coords[PX] = elem.attribute("angleX").toFloat(&ok);
-			angles.coords[PY] = elem.attribute("angleY").toFloat(&ok);
-			angles.coords[PZ] = elem.attribute("angleZ").toFloat(&ok);
-			angles.coords[PW] = elem.attribute("d").toFloat(&ok);
-
-			material = elem.attribute("material").toInt(&ok, 10);
-
-			if(!ok)
-			  throw std::logic_error("Błąd wczytywania płasczyzny");
+			angles.coords[PX] = getFloat(elem, "angleX");
+			angles.coords[PY] = getFloat(elem, "angleY");
+			angles.coords[PZ] = getFloat(elem, "angleZ");
+			angles.coords[PW] = getFloat(elem, "d");
+			material = getInt(elem, "material");
 
 			object->setAngles(angles);
 			object->setMaterial(material);
@@ -215,7 +207,6 @@ namespace Model {
         worldUnit viewDistance;
         Camera::unitType FOV;
         std::string cameraType;
-        bool ok;
 
         /**
          * Camera rotating not yet implemented
@@ -223,16 +214,16 @@ namespace Model {
         vector.set(0, 0, 3);
         getVPCommon(node.firstChildElement("position").toElement(), point);
 
-        screenWidth = static_cast<Point::dataType>(elem.attribute("screenWidth").toFloat(&ok));
-        if ( !ok || !(screenWidth > 0))
+        screenWidth = static_cast<Point::dataType>(getFloat(elem, "screenWidth"));
+        if (!(screenWidth > 0))
           throw std::logic_error("Parametr screenWidth musi być większy od 0.");
 
-        FOV = static_cast<Camera::unitType>(elem.attribute("fov").toDouble(&ok));
-        if ( !ok || !(FOV > 0 && FOV < 180))
+        FOV = static_cast<Camera::unitType>(getDouble(elem, "fov"));
+        if (!(FOV > 0 && FOV < 180))
           throw std::logic_error("Parametr FOV musi być z zakresu (0;180)");
 
-        viewDistance = static_cast<worldUnit>(elem.attribute("viewDistance").toFloat(&ok));
-        if ( !ok || !(viewDistance > 0))
+        viewDistance = static_cast<worldUnit>(getFloat(elem, "viewDistance"));
+        if (!(viewDistance > 0))
          throw std::logic_error("Parametr viewDistance musi być większy od 0.");
 
         cameraType = elem.attribute("type").toStdString();
@@ -259,16 +250,41 @@ namespace Model {
   }
 
   void SceneFileManager::getColor (const QDomElement & value, Color &color){
-	bool dummy;
-    color.red = value.attribute("r").toInt(&dummy, 10);
-    color.green = value.attribute("g").toInt(&dummy, 10);
-    color.blue = value.attribute("b").toInt(&dummy, 10);
+    color.red = getInt(value, "r");
+    color.green = getInt(value, "g");
+    color.blue = getInt(value, "b");
   }
 
   void SceneFileManager::getVPCommon (const QDomElement & value, VPCommon &object) {
-	bool dummy;
-    object.coords [PX] = value.attribute("x").toFloat(&dummy);
-    object.coords [PY] = value.attribute("y").toFloat(&dummy);
-    object.coords [PZ] = value.attribute("z").toFloat(&dummy);
+    object.coords [PX] = getFloat(value, "x");
+    object.coords [PY] = getFloat(value, "y");
+    object.coords [PZ] = getFloat(value, "z");
+  }
+
+  int SceneFileManager::getInt(const QDomElement &elem, const QString &name)
+  {
+	  bool ok;
+	  int val;
+	  val = elem.attribute(name).toInt(&ok, 10);
+	  if(!ok) throw std::logic_error("Błąd podczas wczytywania elementu " + name.toStdString());
+	  return val;
+  }
+
+  float SceneFileManager::getFloat(const QDomElement &elem, const QString &name)
+  {
+	  bool ok;
+	  float val;
+	  val = elem.attribute(name).toFloat(&ok);
+	  if(!ok) throw std::logic_error("Błąd podczas wczytywania elementu " + name.toStdString());
+	  return val;
+  }
+
+  double SceneFileManager::getDouble(const QDomElement &elem, const QString &name)
+  {
+	  bool ok;
+	  double val;
+	  val = elem.attribute(name).toDouble(&ok);
+	  if(!ok) throw std::logic_error("Błąd podczas wczytywania elementu " + name.toStdString());
+	  return val;
   }
 }/* namespace Model */

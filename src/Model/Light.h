@@ -14,7 +14,10 @@ namespace Model {
    */
   class Light: public Object, public Color {
     public:
-      Light (){
+      worldUnit power;
+
+      Light ()
+          : power(1){
       }
 
       /**Sets color of light

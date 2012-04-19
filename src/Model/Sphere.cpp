@@ -20,22 +20,19 @@ namespace Model {
     VisibleObject::operator=(other);
   }
 
-  bool Sphere::checkRay (const Ray &ray, worldUnit &range, Vector &e) const{
+  void Sphere::getNormal (const Point& point, Vector &normalAtPoint) const{
+    PVOperations::diff(point.coords, getPosition().coords, normalAtPoint.coords);
+    normalAtPoint.normalize();
+  }
+
+  bool Sphere::checkRay (const Ray& ray, worldUnit& range, Vector& e) const{
     PVOperations::diff(position.coords, ray.getStart().coords, e.coords);
-
     worldUnit a = PVOperations::dotProduct(ray.getDir().coords, e.coords);
-
-    if ((a - size - INTERSECTION_ERROR_TOLERANCE) > range)
+    if ((a - size) > range)
     {
       return false;
     }
-
     worldUnit D = squareRadius - PVOperations::dotProduct(e.coords) + a * a;
-
-    //    if (D < 0.0f)
-    //    {
-    //      return false;
-    //    }
 
     worldUnit t = SQRT(D);
 
@@ -43,7 +40,7 @@ namespace Model {
     //We are outside sphere
     {
       t = a - t;
-      if ((t > INTERSECTION_ERROR_TOLERANCE) && (t < range))
+      if ((t > 0.f) && (t < range))
       {
         range = t;
         return true;
@@ -54,7 +51,7 @@ namespace Model {
     {
       t += a;
 
-      if ((t > INTERSECTION_ERROR_TOLERANCE) && (t < range))
+      if ((t > 0.f) && (t < range))
       {
         range = t;
         return true;

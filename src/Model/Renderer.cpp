@@ -19,6 +19,7 @@
 
 #define REFLECTION_DEEP 10
 #define E 2.71828183f
+#define DEFAULT_INTERSECTION_ERROR_VALUE 0.01f
 
 inline int uRound (float d){
   return int(d + 0.5f);
@@ -35,6 +36,7 @@ namespace Model {
     lightRay.reset(new Ray);
     normalAtIntersection.reset(new Vector);
     intersection.reset(new Point);
+    intersectionErrorValue = DEFAULT_INTERSECTION_ERROR_VALUE;
   }
 
   Renderer::~Renderer (){
@@ -116,6 +118,7 @@ namespace Model {
       {
         if (( *object)->checkRay(ray, viewDistance, *tmpDistance) == true)
         {
+          viewDistance -= intersectionErrorValue;
           currentObject = object;
         }
       }
@@ -129,9 +132,7 @@ namespace Model {
                            intersection->coords);
 
         //Get normal vector at intersection point
-        PVOperations::diff(intersection->coords, ( *currentObject)->getPosition().coords,
-                           normalAtIntersection->coords);
-        normalAtIntersection->normalize();
+        ( *currentObject)->getNormal( *intersection, *normalAtIntersection);
 
         Material *currentMat = scene->getMaterials() [( *currentObject)->getMaterial()].data();
 
@@ -173,24 +174,22 @@ namespace Model {
 
           if ( !inShadow)
           {
-            // Lambert lighting model, "air" absorption 0.5/1m, world unit 1cm
+            // Lambert lighting model + hacked light attenuation
             worldUnit lambert = PVOperations::dotProduct(lightRay->getDir().coords,
-                                                         normalAtIntersection->coords)
-                * pow(E, -pointLightDist->coords [PW] * 0.005f) * tmpLightCoef;
+                                                         normalAtIntersection->coords) * 1
+                * ( *light)->power * pow(1.01f, -pointLightDist->coords [PW]) * tmpLightCoef;
 
             // qRound(0.49f / (COLOR_MAX_VALUE * COLOR_MAX_VALUE)) < 1
             if (lambert > LAMBERT_MIN)
             {
-              tmpColor = uRound(( *light)->getColor().red * currentMat->getColor()->red * lambert);
+              tmpColor = uRound(( *light)->red * currentMat->getColor()->red * lambert);
 
               resultColor.red += tmpColor;
 
-              tmpColor = uRound(
-                  ( *light)->getColor().green * currentMat->getColor()->green * lambert);
+              tmpColor = uRound(( *light)->green * currentMat->getColor()->green * lambert);
               resultColor.green += tmpColor;
 
-              tmpColor = uRound(
-                  ( *light)->getColor().blue * currentMat->getColor()->blue * lambert);
+              tmpColor = uRound(( *light)->blue * currentMat->getColor()->blue * lambert);
 
               resultColor.blue += tmpColor;
             }
@@ -198,6 +197,8 @@ namespace Model {
         }
 
         coef *= currentMat->getReflection();
+
+        //Calculate reflection vector
         PVOperations::multiply(
             PVOperations::dotProduct(ray.getDir().coords, normalAtIntersection->coords) * 2,
             normalAtIntersection->coords, normalAtIntersection->coords);
@@ -213,6 +214,11 @@ namespace Model {
         return;
       }
     }
+  }
+
+  void Renderer::calculateDistancePrecision (){
+    intersectionErrorValue = floor(log10(scene->getCamera()->getViewDistance())) - FLOAT_PRECISION;
+    intersectionErrorValue = pow(10, intersectionErrorValue);
   }
 
 }

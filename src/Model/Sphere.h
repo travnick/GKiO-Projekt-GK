@@ -29,6 +29,13 @@ namespace Model {
       inline virtual ~Sphere (){
       }
 
+      /**Calculates normal vector at given point
+       *
+       * @param point point to calculate normal at
+       * @param normalAtPoint vector to calculate normal in
+       */
+      virtual void getNormal (const Point& point, Vector &normalAtPoint) const;
+
       /**Checks if given ray intersects with sphere
        *
        * @param ray ray to check intersection with

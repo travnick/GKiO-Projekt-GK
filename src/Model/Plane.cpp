@@ -20,15 +20,15 @@ Plane::Plane (const Plane& other){
   normal = other.normal;
 }
 
-bool Plane::checkRay (const Ray& ray, worldUnit& range, Vector& tmpDist) const{
+bool Plane::checkRay (const Ray& ray, worldUnit& range, Vector&) const{
 
   worldUnit dn = PVOperations::dotProduct(ray.getDir().coords, normal.coords);
 
-  if (dn < 0)
+  if (dn != 0)
   //We are in front of plane
   {
-    worldUnit t = (normal.coords [D]
-        - PVOperations::dotProduct(ray.getStart().coords, normal.coords)) / dn;
+    worldUnit rsn = PVOperations::dotProduct(ray.getStart().coords, normal.coords);
+    worldUnit t = (normal.coords [D] - rsn) / dn;
 
     if ((t > 0.0f) && (t < range))
     {
@@ -51,6 +51,10 @@ void Plane::setNormal (Vector newNormal){
 
 void Plane::calculateNormal (){
   normal = angles;
+}
+
+void Plane::getNormal (const Point&, Vector &normalAtPoint) const{
+  normalAtPoint = normal;
 }
 
 /* namespace Model */

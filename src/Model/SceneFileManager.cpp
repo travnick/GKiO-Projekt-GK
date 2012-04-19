@@ -167,6 +167,7 @@ namespace Model {
               point.coords [PZ] += offset * k * multiplyZSign;
 
               object->setPosition(point);
+
               scene.addVisibleObject(object);
               }
             }

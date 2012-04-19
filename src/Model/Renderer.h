@@ -46,6 +46,7 @@ namespace Model {
        */
       inline void setScene (const Model::Scene *newScene){
         scene = newScene;
+        calculateDistancePrecision();
       }
 
     private:
@@ -62,6 +63,8 @@ namespace Model {
 
       const Scene *scene;
 
+      worldUnit intersectionErrorValue;
+
       /**It checks if given ray intersects with any object in scene
        * If there is no intersection with given ray then returned color
        * is equal to default color
@@ -71,6 +74,8 @@ namespace Model {
        * @param viewDistance maximum range to check intersections
        */
       void shootRay (Ray & ray, Color &resultColor, worldUnit viewDistance) const;
+
+      void calculateDistancePrecision ();
 
       Q_DISABLE_COPY (Renderer)
   };

@@ -10,7 +10,7 @@
 //Constants -->
 #define PI 3.14159265
 
-#define INTERSECTION_ERROR_TOLERANCE 0.01f
+#define FLOAT_PRECISION 6
 // <-- Constants
 
 //Macros -->

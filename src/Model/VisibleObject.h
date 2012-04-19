@@ -10,6 +10,7 @@ namespace Model {
   //Forward declarations -->
   class Ray;
   class Vector;
+  class Point;
   // <-- Forward declarations
 
   /**Visible object class
@@ -37,6 +38,13 @@ namespace Model {
         return size;
       }
 
+      /**Calculates normal vector at given point
+       *
+       * @param point point to calculate normal at
+       * @param normalAtPoint vector to calculate normal in
+       */
+      virtual void getNormal (const Point& point, Vector &normalAtPoint) const = 0;
+
       /**Sets material of the object
        *
        * @param materialId id of material to set
@@ -52,7 +60,7 @@ namespace Model {
        * @param tmpDist temporary ray for calculations
        * @return true if ray intersects with object and object is in ray range, otherwise false
        */
-      virtual bool checkRay (const Ray &ray, worldUnit &range, Vector &tmpDist) const=0;
+      virtual bool checkRay (const Ray &ray, worldUnit &range, Vector &tmpDist) const = 0;
 
     protected:
       worldUnit size;

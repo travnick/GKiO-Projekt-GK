@@ -45,6 +45,7 @@ Thumbs.db
 *.dll
 *.out
 *~
+*.orig
 moc_*
 ui_*
 

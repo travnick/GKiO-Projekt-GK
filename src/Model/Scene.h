@@ -61,7 +61,7 @@ namespace Model {
        * @return if scene is loaded properly or not
        * @throws std::exception from rapidxml
        */
-      bool init (const std::string &filename, bool reload = false) throw (std::exception);
+      bool init (const QString &filename, bool reload = false) throw (std::exception);
 
       /**Returns camera
        *
@@ -151,6 +151,8 @@ namespace Model {
        */
       inline void addVisibleObject (const ObjectType &object){
         objects.push_back(object);
+
+        calculateObjectSizeOnImage(object);
       }
 
       /**Updates camera
@@ -174,6 +176,8 @@ namespace Model {
       LighContainer lights;
       MaterialContainer materials;
       ObjectContainer objects;
+
+      void calculateObjectSizeOnImage (const ObjectType &object);
   };
 }
 

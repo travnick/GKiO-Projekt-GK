@@ -135,6 +135,14 @@ namespace Model {
         FOV = newFOV;
       }
 
+      /**Returns FOV of camera
+       *
+       * @return FOV
+       */
+      inline unitType getFOV (){
+        return FOV;
+      }
+
       /**Calibrates camera
        * It calculates screen position and dimensions.
        * Also calculates position of camera origin.
@@ -177,11 +185,11 @@ namespace Model {
       }
 
       /**Sets camera type
-       * It takes camera name represented by std::string
+       * It takes camera name represented by QString
        *
        * @param typeName camera type name
        */
-      void setType (const std::string &typeName);
+      void setType (const QString &typeName);
 
       /**Sets camera direction
        *

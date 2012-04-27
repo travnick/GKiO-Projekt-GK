@@ -13,7 +13,8 @@ namespace Model {
   /**Tile information class
    *
    */
-  struct RenderTileData {
+  class RenderTileData {
+    public:
       quint64 imageDataSize;
       Point2D topLeft;
       Point2D bottomRight;

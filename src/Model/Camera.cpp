@@ -11,7 +11,7 @@
 
 namespace Model {
 
-  typedef std::map <std::string, Camera::Type> cameraTypesMap;
+  typedef std::map <QString, Camera::Type> cameraTypesMap;
 
   Camera::Camera ()
       : direction(new Vector), origin(new Point), screenTopLeft(new Point), screenBottomRight(
@@ -45,7 +45,7 @@ namespace Model {
                            position.coords [PZ]);
   }
 
-  void Camera::setType (const std::string & typeName){
+  void Camera::setType (const QString & typeName){
     static cameraTypesMap cameraTypes;
     cameraTypesMap::iterator iterator;
     type = Camera::None;

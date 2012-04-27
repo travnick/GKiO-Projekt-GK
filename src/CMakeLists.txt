@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 2.8)
 project(RayTracer)
 
-set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type (Debug|Release)")
+set(Debug "Debug")
+set(RelWithDebInfo "RelWithDebInfo")
+set(Profile "Profile")
+set(Release "Release")
+
+set(CMAKE_BUILD_TYPE CACHE STRING ${Debug})
 
 include(CmakeIncludes/CompilerOptions.cmake)
 include(CmakeIncludes/Directories.cmake)

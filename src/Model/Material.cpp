@@ -3,12 +3,8 @@
 /// @author Mikołaj Milej
 
 #include "Model/Material.h"
-#include "Model/Color.h"
 
 namespace Model {
 
-  Material::Material ()
-      : diffuse(new Color){
-  }
 
 }

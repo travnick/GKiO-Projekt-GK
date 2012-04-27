@@ -4,15 +4,11 @@
 
 #pragma once
 
-#include <QSharedPointer>
+#include "Model/Color.h"
 //Needed for worldUnit
 #include "Model/ModelDefines.h"
 
 namespace Model {
-  //Forward declarations -->
-  class Color;
-  // <-- Forward declarations
-
   /**Material class
    *
    */
@@ -28,10 +24,16 @@ namespace Model {
       /**Initializes color field
        *
        */
-      Material ();
+      inline Material (){
 
-      inline const QSharedPointer <Color> &getColor () const{
+      }
+
+      inline const Color &getColor () const{
         return diffuse;
+      }
+
+      inline void setColor (const Color &other){
+        diffuse = other;
       }
 
       inline const worldUnit &getReflection () const{
@@ -50,7 +52,7 @@ namespace Model {
       }
 
     private:
-      QSharedPointer <Color> diffuse;
+      Color diffuse;
       worldUnit reflection;
       Type type;
   };

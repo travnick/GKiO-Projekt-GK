@@ -19,6 +19,8 @@ namespace Model {
    */
   class VisibleObject: public Object {
     public:
+      worldUnit sizeOnImage;
+
       inline virtual ~VisibleObject (){
       }
 

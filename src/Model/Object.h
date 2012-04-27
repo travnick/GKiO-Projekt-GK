@@ -49,7 +49,7 @@ namespace Model {
        * @param typeName type name
        * @return obejct type
        */
-      static Objects::ObjectType getObjectType (const std::string &typeName);
+      static Objects::ObjectType getObjectType (const QString &typeName);
 
       /**Returns string representation of given object type
        * If type couldn't be resolved then empty string is returned
@@ -57,7 +57,7 @@ namespace Model {
        * @param object type
        * @return string representation of type
        */
-      static const std::string &getObjectTypeName (Objects::ObjectType);
+      static const QString &getObjectTypeName (Objects::ObjectType);
 
     protected:
       Point position;

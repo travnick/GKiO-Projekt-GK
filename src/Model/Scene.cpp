@@ -21,9 +21,9 @@ namespace Model {
     loaded = false;
   }
 
-  bool Scene::init (const string &filename, bool reload) throw (std::exception){
+  bool Scene::init (const QString &filename, bool reload) throw (std::exception){
     bool result = false;
-    QFile infile(QString::fromStdString(filename));
+    QFile infile(filename);
 
     if (loaded && !reload)
     {
@@ -37,10 +37,10 @@ namespace Model {
       materials.clear();
       objects.clear();
 
-	  SceneFileManager fileManager;
-	  fileManager.loadScene(infile, *this);
-	  infile.close();
-	  result = true;
+      SceneFileManager fileManager;
+      fileManager.loadScene(infile, *this);
+      infile.close();
+      result = true;
     }
     loaded = result;
 
@@ -49,6 +49,14 @@ namespace Model {
 
   void Scene::updateCamera (){
     camera->calibrate();
+  }
+
+  void Scene::calculateObjectSizeOnImage (const ObjectType &object){
+    worldUnit distance [4];
+    PVOperations::diff(object->getPosition().coords, camera->getPosition().coords, distance);
+
+    object->sizeOnImage = object->getSize()
+        - sin(RAD(camera->getFOV() / 2)) * PVOperations::length(distance);
   }
 
 }

@@ -34,8 +34,8 @@
         <widget class="QWidget" name="imageScrollAreaWidgetContents">
          <property name="geometry">
           <rect>
-           <x>426</x>
-           <y>239</y>
+           <x>421</x>
+           <y>237</y>
            <width>1</width>
            <height>1</height>
           </rect>
@@ -113,12 +113,6 @@
              </attribute>
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderVisible">
-              <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderDefaultSectionSize">
-              <number>50</number>
              </attribute>
              <column>
               <property name="text">
@@ -212,6 +206,13 @@
            <widget class="QPushButton" name="terminateRender">
             <property name="text">
              <string>Przerwij</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="randomRender">
+            <property name="text">
+             <string>Renderuj losowo</string>
             </property>
            </widget>
           </item>
@@ -478,7 +479,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>18</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

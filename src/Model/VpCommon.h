@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <malloc.h>
+#include <x86intrin.h>
 #include "Controller/GlobalDefines.h"
 #include "Model/ModelDefines.h"
 
@@ -12,6 +12,7 @@
 #define PY 1
 #define PZ 2
 #define PW 3
+//#define SSE_INSTR
 
 namespace Model {
 
@@ -27,7 +28,9 @@ namespace Model {
       };
 
       coordsUnit coords [COORDS_COUNT];
-
+#ifdef SSE_INSTR
+      __m128 coordsSSE;
+#endif
       /**Sets coordinates of object
        *
        * @param x position on x axis in 3D space
@@ -38,6 +41,10 @@ namespace Model {
         this->coords [PX] = x;
         this->coords [PY] = y;
         this->coords [PZ] = z;
+
+#ifdef SSE_INSTR
+        coordsSSE = _mm_set_ps(x, y, z, coords [PW]);
+#endif
       }
 
       /**Sets coordinates of object
@@ -48,6 +55,9 @@ namespace Model {
       inline void set (const dataType &x, const dataType &y){
         this->coords [PX] = x;
         this->coords [PY] = y;
+#ifdef SSE_INSTR
+        coordsSSE = _mm_set_ps(x, y, coords [PZ], coords [PW]);
+#endif
       }
 
     protected:
@@ -56,6 +66,9 @@ namespace Model {
        */
       inline VPCommon (){
         this->coords [PW] = -1;
+#ifdef SSE_INSTR
+        coordsSSE = _mm_set1_ps( -1);
+#endif
       }
 
       /**Frees memory allocated for coordinates
@@ -83,6 +96,10 @@ namespace Model {
       inline VPCommon &operator= (const VPCommon &other){
         this->set(other.coords [PX], other.coords [PY], other.coords [PZ]);
         this->coords [PW] = other.coords [PW];
+
+#ifdef SSE_INSTR
+        coordsSSE = other.coordsSSE;
+#endif
 
         return *this;
       }

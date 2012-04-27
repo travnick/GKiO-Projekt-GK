@@ -22,13 +22,13 @@ Plane::Plane (const Plane& other){
 
 bool Plane::checkRay (const Ray& ray, worldUnit& range, Vector&) const{
 
-  worldUnit dn = PVOperations::dotProduct(ray.getDir().coords, normal.coords);
+  worldUnit rayNormalDot = PVOperations::dotProduct(ray.getDir().coords, normal.coords);
 
-  if (dn != 0)
-  //We are in front of plane
+  if (rayNormalDot != 0)
+  //We are in front/back of plane
   {
-    worldUnit rsn = PVOperations::dotProduct(ray.getStart().coords, normal.coords);
-    worldUnit t = (normal.coords [D] - rsn) / dn;
+    worldUnit raystartNormalDot = PVOperations::dotProduct(ray.getStart().coords, normal.coords);
+    worldUnit t = (normal.coords [D] - raystartNormalDot) / rayNormalDot;
 
     if ((t > 0.0f) && (t < range))
     {

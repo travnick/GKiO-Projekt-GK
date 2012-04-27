@@ -3,6 +3,7 @@
 /// @author Mikołaj Milej
 
 #include <QMutexLocker>
+#include <QSemaphore>
 #include <QThreadPool>
 
 #include "Controller/ThreadRunner.h"
@@ -15,12 +16,13 @@
 
 namespace Controller {
 
-  void cleanImage (QSharedPointer <Model::RenderTileData> tile){
+  void cleanImage (QSharedPointer <Model::RenderTileData> &tile, colorType color =
+                       DEFAULT_RENDER_COLOR){
     for (quint64 size = 0; size < tile->imageDataSize; size += BPP)
     {
-      tile->imageData [size] = 100;
-      tile->imageData [size + 1] = 100;
-      tile->imageData [size + 2] = 100;
+      tile->imageData [size] = color;
+      tile->imageData [size + 1] = color;
+      tile->imageData [size + 2] = color;
     }
   }
 
@@ -29,23 +31,19 @@ namespace Controller {
   }
 
   ThreadRunner::~ThreadRunner (){
-    //Prevent destroying ThreadRunner if something else is
     QMutexLocker locker(mutex.data());
   }
 
-  void ThreadRunner::setParams (const QSharedPointer <Model::RenderTileData> &newImage,
-                                const QSharedPointer <Model::Scene> newScene,
+  void ThreadRunner::setParams (const QSharedPointer <Model::RenderTileData>& newImage,
+                                const QSharedPointer <Model::Scene> &newScene,
                                 int newMaxThreadCount,
-                                const MainWindow *eventListener){
-    //Prevent destroying ThreadRunner if something is doing here
+                                bool newRandomRender){
     QMutexLocker locker(mutex.data());
     this->image = newImage;
     this->scene = newScene;
     this->maxThreadCount = newMaxThreadCount;
-    this->updateEventListener = eventListener;
-
     cleanImage(this->image);
-    eventListener->updateImage();
+    randomRender = newRandomRender;
   }
 
   void ThreadRunner::run (){
@@ -53,20 +51,67 @@ namespace Controller {
     threadPool->setExpiryTimeout(THREAD_EXPIRE_TIMEOUT);
     threadPool->setMaxThreadCount(maxThreadCount);
 
-    threadCount = 0;
+    finishedThreadCount = 0;
     ableToRunning = true;
 
+    createTiles();
+
+    if (randomRender)
+    {
+      randomizeTiles();
+    }
+
+    int tilesSize = tiles.size();
+    for (int i = 0; i < tilesSize; ++i)
+    {
+      RendererThread *renderWorker = new RendererThread;
+      renderWorker->setRenderParams( *scene, ableToRunning);
+      renderWorker->setTile(tiles [i]);
+
+      threadPool->start(renderWorker);
+    }
+
+    threadPool->waitForDone();
+
+    emit renderFinished();
+  }
+
+  inline void ThreadRunner::createTile (int x, int y, int tileSizeX, int tileSizeY){
+    //Copy common data that are needed to render
+    QSharedPointer <Model::RenderTileData> tile(new Model::RenderTileData( *image));
+
+    tile->deleteImageData = false;
+
+    tile->topLeft.x = x;
+    tile->topLeft.y = y;
+    tile->bottomRight.x = tile->topLeft.x + tileSizeX;
+    tile->bottomRight.y = tile->topLeft.y + tileSizeY;
+
+    tile->width = tileSizeX;
+    tile->height = tileSizeY;
+
+    tiles.append(tile);
+  }
+
+  void ThreadRunner::createTiles (){
     imageUnit tileSize = image->width;
     div_t tilesX = div(image->imageWidth, tileSize);
     div_t tilesY = div(image->imageHeight, tileSize);
     imageUnit tileXLimit = image->imageWidth - tilesX.rem;
     imageUnit tileYLimit = image->imageHeight - tilesY.rem;
+    int tilesNumber = tilesX.quot * tilesY.quot;
+
+    tilesNumber += tilesX.rem > 0 ? 1 : 0;
+    tilesNumber += tilesY.rem > 0 ? 1 : 0;
+
+    tiles.reserve(tilesNumber);
+    tilesRandomized.reserve(tilesNumber);
 
     for (imageUnit y = 0; y < tileYLimit; y += tileSize)
     {
       for (imageUnit x = 0; x < tileXLimit; x += tileSize)
       {
-        createThread(createTile(x, y, tileSize, tileSize));
+        createTile(x, y, tileSize, tileSize);
       }
     }
 
@@ -74,7 +119,7 @@ namespace Controller {
     {
       for (imageUnit x = 0; x < tileXLimit; x += tileSize)
       {
-        createThread(createTile(x, tileYLimit, tileSize, tilesY.rem));
+        createTile(x, tileYLimit, tileSize, tilesY.rem);
       }
     }
 
@@ -82,59 +127,30 @@ namespace Controller {
     {
       for (imageUnit y = 0; y < tileYLimit; y += tileSize)
       {
-        createThread(createTile(tileXLimit, y, tilesX.rem, tileSize));
+        createTile(tileXLimit, y, tilesX.rem, tileSize);
       }
     }
 
     if (tilesX.rem > 0 && tilesY.rem > 0)
     {
-      createThread(createTile(tileXLimit, tileYLimit, tilesX.rem, tilesY.rem));
+      createTile(tileXLimit, tileYLimit, tilesX.rem, tilesY.rem);
     }
-
-    //It waits for all threads to finish and destroy them
-    threadPool->waitForDone();
-
-    QMutexLocker locker(mutex.data());
-    emit renderFinished ();
   }
 
-  inline void ThreadRunner::createThread (const QSharedPointer <Model::RenderTileData> &tile){
-    if (ableToRunning)
+  void ThreadRunner::randomizeTiles (){
+    qsrand(time(NULL));
+
+    while ( !tiles.empty())
     {
-      ++threadCount;
-
-      RendererThread *renderWorker = new RendererThread;
-      renderWorker->setRenderParams(tile, *scene, ableToRunning);
-
-      //QThreadPool takes ownership of renderWorker. no memory leaks here
-      threadPool->start(renderWorker);
+      int rand = qrand() % tiles.size();
+      tilesRandomized.append(tiles [rand]);
+      tiles.removeAt(rand);
     }
-  }
 
-  inline QSharedPointer <Model::RenderTileData> ThreadRunner::createTile (const int &x,
-                                                                          const int &y,
-                                                                          const int &tileSizeX,
-                                                                          const int &tileSizeY){
-
-    QSharedPointer <Model::RenderTileData> tile(new Model::RenderTileData);
-    //prevent deleting image data when deleting tile
-    tile->deleteImageData = false;
-    tile->imageData = image->imageData;
-    tile->topLeft.x = x;
-    tile->topLeft.y = y;
-    tile->bottomRight.x = tile->topLeft.x + tileSizeX;
-    tile->bottomRight.y = tile->topLeft.y + tileSizeY;
-    tile->width = tileSizeX;
-    tile->height = tileSizeY;
-    tile->imageWidth = image->imageWidth;
-    tile->imageHeight = image->imageHeight;
-    tile->imageDataSize = image->imageDataSize;
-
-    return tile;
+    tiles.swap(tilesRandomized);
   }
 
   void ThreadRunner::terminate (){
-    //Prevent destroying ThreadRunner if something is doing here
     QMutexLocker locker(mutex.data());
 
     ableToRunning = false;

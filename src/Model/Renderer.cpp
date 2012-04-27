@@ -80,13 +80,22 @@ namespace Model {
         rayResult.setDefaultColor();
         shootRay(ray, rayResult, viewDistance);
 
-        tile.imageData [R] = rayResult.red;
+//        tile.imageData [R] = rayResult.red.toColorType();
+//        R += BPP;
+//
+//        tile.imageData [G] = rayResult.green.toColorType();
+//        G += BPP;
+//
+//        tile.imageData [B] = rayResult.blue.toColorType();
+//        B += BPP;
+        rayResult.prapareColors();
+        tile.imageData [R] = rayResult.red();
         R += BPP;
 
-        tile.imageData [G] = rayResult.green;
+        tile.imageData [G] = rayResult.green();
         G += BPP;
 
-        tile.imageData [B] = rayResult.blue;
+        tile.imageData [B] = rayResult.blue();
         B += BPP;
 
         col += camera->getScreenImageWidthRatio();
@@ -106,7 +115,11 @@ namespace Model {
     worldUnit tmpLightCoef = 0;
     worldUnit viewDistance = mainViewDistance;
     int visibleSize = REFLECTION_DEEP;
+#ifdef USE_MMX
+    Color tmpColor;
+#else
     Color::dataType tmpColor;
+#endif
     bool inShadow;
 
     //Because qRound(0.49f * COLOR_MAX_VALUE / COLOR_MAX_VALUE) < 1
@@ -182,16 +195,27 @@ namespace Model {
             // qRound(0.49f / (COLOR_MAX_VALUE * COLOR_MAX_VALUE)) < 1
             if (lambert > LAMBERT_MIN)
             {
-              tmpColor = uRound(( *light)->red * currentMat->getColor()->red * lambert);
+#ifdef USE_MMX
+              //              tmpColor = uRound(( *light)->red * currentMat->getColor()->red * lambert);
+              tmpColor = ( * *light) * currentMat->getColor() * lambert;
+
+              resultColor += tmpColor;
+#else
+//              tmpColor = uRound(( *light)->red * currentMat->getColor()->red * lambert);
+              tmpColor = ( *light)->red * currentMat->getColor()->red * lambert;
 
               resultColor.red += tmpColor;
 
-              tmpColor = uRound(( *light)->green * currentMat->getColor()->green * lambert);
+//              tmpColor = uRound(( *light)->green * currentMat->getColor()->green * lambert);
+              tmpColor = ( *light)->green * currentMat->getColor()->green * lambert;
               resultColor.green += tmpColor;
 
-              tmpColor = uRound(( *light)->blue * currentMat->getColor()->blue * lambert);
+//              tmpColor = uRound(( *light)->blue * currentMat->getColor()->blue * lambert);
+              tmpColor = ( *light)->blue * currentMat->getColor()->blue * lambert;
 
               resultColor.blue += tmpColor;
+//              resultColor *= lambert;
+#endif
             }
           }
         }

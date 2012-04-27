@@ -12,7 +12,7 @@
 //Forward declarations -->
 namespace Model {
   class Renderer;
-  struct RenderTileData;
+  class RenderTileData;
   class Scene;
 }
 // <-- Forward declarations
@@ -24,9 +24,10 @@ namespace Controller {
    *
    */
   class RendererThread: public QObject, public QRunnable {
-      Q_OBJECT
+    Q_OBJECT
 
     public:
+
       /**Initializes renderer
        *
        */
@@ -46,15 +47,33 @@ namespace Controller {
        * @param scene 3D scene to render
        * @param allowRunning is thread allower to run or not
        */
-      void setRenderParams (const QSharedPointer <Model::RenderTileData> &tile,
-                            const Model::Scene &scene,
-                            const bool &allowRunning);
+      /**
+       *
+       * @param scene
+       * @param allowRunning
+       */
+      void setRenderParams (const Model::Scene &scene, const bool &allowRunning);
 
+      /**Sets tile to render
+       *
+       * @param newTile description of image part to render
+       */
+      void setTile (const QSharedPointer <Model::RenderTileData> &newTile){
+        tile = newTile;
+      }
+
+    public slots:
       /**Runs rendering
        * It's called by thread manager
        *
        */
       void run ();
+
+//    signals:
+//      /**Sends signal when work is done
+//       *
+//       */
+//      void jobFinished (Controller::RendererThread *renderer);
 
     private:
       const bool *allowRunning;

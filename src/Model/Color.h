@@ -4,10 +4,12 @@
 
 #pragma once
 
-//#include <x86intrin.h> // SIMD functions
+#include <x86intrin.h> // SIMD functions
 #include "Controller/GlobalDefines.h"
+#include "Model/ModelDefines.h"
 
 #define DEFAULT_COLOR_VALUE 0
+#define USE_MMX
 
 namespace Model {
 
@@ -15,34 +17,15 @@ namespace Model {
    *
    */
   class Color {
-    private:
-      typedef unsigned short int privateColorValueDataType;
-
-      class ColorValue {
-        public:
-          ColorValue (int value);
-
-          ColorValue ();
-
-          ColorValue & operator= (const int& value);
-
-          ColorValue & operator+= (const int& value);
-
-          ColorValue & operator+= (const ColorValue& value);
-
-          inline operator colorType () const;
-
-        private:
-          privateColorValueDataType data;
-      };
-
     public:
-      typedef privateColorValueDataType colorValueDataType;
-
-      typedef ColorValue dataType;
+      typedef float dataType;
 
       inline Color (){
         setDefaultColor();
+      }
+
+      inline Color (__m128 newData)
+          : data(newData){
       }
 
       /**Sets color
@@ -52,10 +35,8 @@ namespace Model {
        * @param g green
        * @param b blue
        */
-      inline void setColor (const dataType & r, const dataType & g, const dataType & b){
-        red = r;
-        green = g;
-        blue = b;
+      inline void setColor (dataType r, dataType g, dataType b){
+        data = _mm_set_ps(r, g, b, 0);
       }
 
       /**Reset color to default
@@ -69,44 +50,49 @@ namespace Model {
         setColor(DEFAULT_COLOR_VALUE, DEFAULT_COLOR_VALUE, DEFAULT_COLOR_VALUE);
       }
 
-      dataType red;
-      dataType green;
-      dataType blue;
+      inline Color operator * (float mulValue) const{
+        __m128 value = _mm_set1_ps(mulValue);
+        return _mm_mul_ps(data, value);
+      }
+
+      inline Color operator * (const Color& other) const{
+        return _mm_mul_ps(data, other.data);
+      }
+
+      inline Color &operator += (const Color& other){
+        data = _mm_add_ps(data, other.data);
+        return *this;
+      }
+
+      inline void prapareColors (){
+        _mm_store_ps(dataArray, data);
+      }
+
+      inline colorType red () const{
+        return dataArray [3];
+      }
+
+      inline colorType green () const{
+        return dataArray [2];
+      }
+
+      inline colorType blue () const{
+        return dataArray [1];
+      }
+
+    private:
+      __m128 data;
+      __attribute__((aligned(16))) float dataArray [4];
+
+      inline colorType retCol (__m128 &col){
+        float dataT = _mm_cvtt_ss2si(col);
+
+        if (dataT > COLOR_MAX_VALUE)
+        {
+          dataT = COLOR_MAX_VALUE;
+        }
+
+        return dataT;
+      }
   };
-
-  inline Color::ColorValue::ColorValue (int value)
-      : data(value){
-  }
-
-  inline Color::ColorValue::ColorValue (){
-  }
-
-  inline Color::ColorValue & Color::ColorValue::operator= (const int& value){
-    data = value;
-    if (data > COLOR_MAX_VALUE)
-    {
-      data = COLOR_MAX_VALUE;
-    }
-    return *this;
-  }
-
-  inline Color::ColorValue & Color::ColorValue::operator+= (const int& value){
-    data += value;
-    if (data > COLOR_MAX_VALUE)
-    {
-      data = COLOR_MAX_VALUE;
-    }
-
-    return *this;
-  }
-
-  inline Color::ColorValue & Color::ColorValue::operator+= (const ColorValue& value){
-
-    return ( *this) += value.data;
-  }
-
-  inline Color::ColorValue::operator colorType () const{
-    return static_cast <colorType>(data);
-  }
-
 }

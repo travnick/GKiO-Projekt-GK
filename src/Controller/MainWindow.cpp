@@ -6,8 +6,6 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
-#include <QtAlgorithms>
-#include <QDebug>
 #include <QElapsedTimer>
 #include <QErrorMessage>
 #include <QFileDialog>
@@ -21,12 +19,11 @@
 #include "Controller/MainWindow.h"
 #include "Controller/GlobalDefines.h"
 #include "Controller/ThreadRunner.h"
-#include "Model/Camera.h"
-#include "Model/PointAndVectorOperations.h"
 #include "Model/RenderTileData.h"
 #include "Model/Scene.h"
 
-#define TIME_WAIT_BEFORE_REMOVE_THREADS 1000 //[ms]
+#define TIME_BEFORE_REMOVE_THREADS 60000 //[ms]
+#define TIME_BEFORE_REMOVE_THREADS_ON_EXIT 1000 //[ms]
 #define DEFAULT_REFRESH_TIME 1000 //[ms]
 #define WINDOW_MARGIN 0 //
 #define IMAGE_SAVE_FORMAT "png"
@@ -36,9 +33,11 @@
 
 namespace Controller {
 
-  void showWarning (QString message){
-    QErrorMessage *errorMessage = new QErrorMessage();
+  void MainWindow::showWarning (QString message){
+    QErrorMessage *errorMessage = new QErrorMessage(this);
+    //No memory leaks hear
     errorMessage->setAttribute(Qt::WA_DeleteOnClose);
+    errorMessage->setWindowModality(Qt::ApplicationModal);
 
     errorMessage->showMessage(message);
   }
@@ -52,6 +51,7 @@ namespace Controller {
     threadPool.reset(new QThreadPool);
     timer.reset(new QTimer);
 
+    threadPool->setExpiryTimeout(TIME_BEFORE_REMOVE_THREADS);
     image->imageData = 0;
 
     sizeChanged = false;
@@ -65,7 +65,7 @@ namespace Controller {
     //Send terminate signal to thread runner and wait for end
     ui->terminateRender->click();
 
-    threadPool->waitForDone(TIME_WAIT_BEFORE_REMOVE_THREADS);
+    threadPool->waitForDone(TIME_BEFORE_REMOVE_THREADS_ON_EXIT);
   }
 
   void MainWindow::runRenderer (){
@@ -93,7 +93,8 @@ namespace Controller {
     image->height = image->width;
 
     ThreadRunner *threadRunner = new ThreadRunner;
-    threadRunner->setParams(image, scene, ui->threadCounter->value(), this);
+    threadRunner->setParams(image, scene, ui->threadCounter->value(),
+                            ui->randomRender->isChecked());
 
     connect(threadRunner, SIGNAL(renderFinished()), this, SLOT(renderFinished()));
     connect(ui->terminateRender, SIGNAL(clicked()), threadRunner, SLOT(terminate()));
@@ -104,7 +105,7 @@ namespace Controller {
     timer->start();
     timeCounter->start();
 
-    QThreadPool::globalInstance()->start(threadRunner, 10);
+    threadPool->start(threadRunner);
   }
 
   void MainWindow::terminateRender (){
@@ -120,7 +121,9 @@ namespace Controller {
     if (imageToSave != 0)
     {
       QString fileName = QFileDialog::getSaveFileName(this, tr("Zapisz obraz"), "RenderedImage.png",
-                                                      tr("Image Files (*.png)"));
+                                                      tr("Image Files (*.png)"), 0,
+                                                      QFileDialog::DontUseNativeDialog);
+
       QImageWriter imageWriter(fileName);
 
       imageWriter.setFormat(IMAGE_SAVE_FORMAT);
@@ -330,12 +333,20 @@ namespace Controller {
   }
 
   void MainWindow::loadScene (){
-    std::string filename(SCENE_FILE_NAME);
     bool result = false;
+    QString fileName(DEFAULT_SCENE_FILE_NAME);
+
+    if ( !QFile::exists(fileName))
+    {
+      fileName = QFileDialog::getOpenFileName(this, tr("Otwórz plik sceny"),
+                                              QSTRING(DEFAULT_SCENE_FILE_NAME),
+                                              tr("XML files (*.xml)"), 0,
+                                              QFileDialog::DontUseNativeDialog);
+    }
 
     try
     {
-      result = scene->init(filename, true);
+      result = scene->init(fileName, true);
       if (result)
       {
         scene->setImageWidth(image->imageWidth);
@@ -344,15 +355,13 @@ namespace Controller {
       else
       {
         showWarning(QSTRING("Nie można otworzyć pliku sceny.<br>"
-            "Sprawdź czy plik istnieje."));
+            "Sprawdź czy plik istnieje.") + fileName);
       }
     }
     catch (std::exception &ex)
     {
-      showWarning(
-          QSTRING("Błąd parsowania pliku sceny<br>"
-              "Sprawdź poprawność pliku: ") + QString::fromStdString(filename) + QSTRING("<br><br>")
-          + QSTRING(ex.what()));
+      showWarning(QSTRING("Błąd parsowania pliku sceny<br>"
+          "Sprawdź poprawność pliku: ") + fileName + QSTRING("<br><br>") + QSTRING(ex.what()));
     }
 
     if ( !result)

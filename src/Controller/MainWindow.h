@@ -7,14 +7,12 @@
 #include <QSharedPointer>
 #include <QScopedPointer>
 
-//#include <QList>
 #include <QMainWindow>
 
 #include "Controller/GlobalDefines.h"
 
 //Forward declarations -->
 class QElapsedTimer;
-class QLibrary;
 class QThreadPool;
 
 namespace Ui {
@@ -107,6 +105,12 @@ namespace Controller {
        *
        */
       void updateImage () const;
+
+      /**Shows warnings
+       *
+       * @param message message to show
+       */
+      void showWarning (QString message);
 
     private:
       /**Image data structure

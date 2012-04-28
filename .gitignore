@@ -26,12 +26,17 @@
 *.sql
 *.sqlite
 
+# Images #
+######################
+*.png
+
 # OS generated files #
 ######################
 .DS_Store*
 ehthumbs.db
 Icon?
 Thumbs.db
+deskop.ini
 
 # other
 *.a

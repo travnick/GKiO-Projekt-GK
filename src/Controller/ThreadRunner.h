@@ -83,6 +83,10 @@ namespace Controller {
       QScopedPointer <QThreadPool> threadPool;
 
       QScopedPointer <QMutex> mutex;
+
+      /**Container for tiles that are queued
+       *
+       */
       QList <QSharedPointer <Model::RenderTileData> > tiles;
       QList <QSharedPointer <Model::RenderTileData> > tilesRandomized;
 

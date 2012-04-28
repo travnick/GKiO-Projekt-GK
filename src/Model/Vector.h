@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Model/VpCommon.h"
+#include "Model/Point.h"
 #include "Model/PointAndVectorOperations.h"
 
 namespace Model {
@@ -12,50 +12,67 @@ namespace Model {
   /**3D Vector class
    *
    */
-  class Vector: public VPCommon {
+  class Vector: public Point {
     public:
+      worldUnit length;
 
-      /**Sets current vector length to -1
-       * Length of vector is checked during normalization.
-       * If length >= 0 then it means that normalization was done already.
+      /**Square length is equal to dot product with self
        *
        */
-      inline Vector (){
-      }
+      worldUnit squareLength;
 
-      /**Copy constructor
-       * It does deep copy of another vector
-       *
-       * @param other vector to copy data from
-       */
-      inline Vector (const Vector &other)
-          : VPCommon(){
-        VPCommon::operator =(other);
-      }
-
-      inline virtual ~Vector (){
+      Vector ()
+          : length(0), squareLength(0){
       }
 
       /**Normalizes vector
-       * Current length is stored to coords[PW].
+       * Length before normalization is stored to length
        *
        */
       inline void normalize (){
-        if (coords [PW] < 0)
-        {
-          PVOperations::normalize(coords);
-        }
+        calculateLength();
+
+        worldUnit constant = 1.0f / length;
+
+        PVOperations::multiply(constant, data, data);
       }
 
-      /**Copy operator
-       * It does deep copy of another vector
+      /**Calculate length of vector
        *
-       * @param other vector to copy data from
-       * @return self
        */
-      inline Vector &operator= (const Vector &other){
-        VPCommon::operator =(other);
-        return *this;
+      inline void calculateLength (){
+        length = SQRT(dotProduct());
+      }
+
+      /**Calculates dot product of vector with self
+       * Result is also stored in squareLength
+       *
+       * It uses SSE4.1 if avaliable or SSE3 instead.
+       * No SSE2 support now.
+       *
+       * @return dotProduct
+       */
+      inline worldUnit dotProduct (){
+#ifdef __SSE4_1__
+        _mm_store_ss( &squareLength, _mm_dp_ps(data, data, 0b11100001));
+#else
+        __m128 result = _mm_mul_ps(data, data);
+        result = _mm_hadd_ps(result, result);
+        result = _mm_hadd_ps(result, result);
+        _mm_store_ss( &squareLength, result);
+#endif
+
+        return squareLength;
+      }
+
+      /**Calculates dot product with other vector or point
+       * You should give here Point::data
+       *
+       * @param vector2 other vector or point
+       * @return dotProduct
+       */
+      inline worldUnit dotProduct (const __m128 &vector2) const{
+        return Point::dotProduct(vector2);
       }
 
       /**Sets parameters of vector
@@ -65,8 +82,11 @@ namespace Model {
        * @param z length on z axis in 3D space
        */
       inline void set (const dataType &x, const dataType &y, const dataType &z){
-        VPCommon::set(x, y, z);
-        this->coords [PW] = -1;
+        Point::set(x, y, z);
+
+        //previous data are invalid
+        length = -1;
+        squareLength = -1;
       }
   };
 }

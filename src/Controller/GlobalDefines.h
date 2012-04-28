@@ -3,6 +3,7 @@
 /// @author Mikołaj Milej
 
 #pragma once
+#include <stdint.h>
 
 // Type defines
 typedef unsigned char uchar;
@@ -16,7 +17,7 @@ const char BPP = sizeof(uchar) * 3; //Bytes per pixel: 1 byte for each color: R 
 const int COLOR_COUNT = 256;
 const int COLOR_MAX_VALUE = 255;
 
-const __uint64_t IMAGE_MAX_DATA_SIZE = 2147483648; //2^31 max of int in QImage
+const int64_t IMAGE_MAX_DATA_SIZE = 2147483648LL; //2^31 max of int in QImage
 const colorType DEFAULT_RENDER_COLOR = 100;
 //--------------------------------------------------
 

@@ -61,7 +61,7 @@ namespace Model {
       inline void getDirection (const Point &point, Vector &directionToPoint) const{
         Q_ASSERT(screenImageRatio > 0);
 
-        PVOperations::diff(point.coords, origin->coords, directionToPoint.coords);
+        PVOperations::diff(point.data, origin->data, directionToPoint.data);
 
         directionToPoint.normalize();
       }

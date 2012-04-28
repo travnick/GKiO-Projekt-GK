@@ -15,9 +15,9 @@ namespace Controller {
   RendererThread::~RendererThread (){
   }
 
-  void RendererThread::setRenderParams (const Model::Scene &scene, const bool &newAllowRunning){
+  void RendererThread::setRenderParams (const Model::Scene &scene, const bool *newAllowRunning){
     renderer->setScene( &scene);
-    allowRunning = &newAllowRunning;
+    allowRunning = newAllowRunning;
   }
 
   void RendererThread::run (){

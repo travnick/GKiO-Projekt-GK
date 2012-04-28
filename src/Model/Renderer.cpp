@@ -21,10 +21,6 @@
 #define E 2.71828183f
 #define DEFAULT_INTERSECTION_ERROR_VALUE 0.01f
 
-inline int uRound (float d){
-  return int(d + 0.5f);
-}
-
 namespace Model {
 
   const float LAMBERT_MIN = (0.49f / (COLOR_MAX_VALUE * COLOR_MAX_VALUE));
@@ -56,8 +52,8 @@ namespace Model {
     imageUnit G = R + 1;
     imageUnit B = G + 1;
 
-    Camera::unitType rayStartX = camera->getScreenTopLeft()->coords [PX];
-    Camera::unitType rayStartY = camera->getScreenTopLeft()->coords [PY];
+    Camera::unitType rayStartX = camera->getScreenTopLeft()->data [PX];
+    Camera::unitType rayStartY = camera->getScreenTopLeft()->data [PY];
 
     Camera::unitType line = rayStartY + tile.topLeft.y * camera->getScreenImageWidthRatio();
     Camera::unitType col;
@@ -80,15 +76,6 @@ namespace Model {
         rayResult.setDefaultColor();
         shootRay(ray, rayResult, viewDistance);
 
-//        tile.imageData [R] = rayResult.red.toColorType();
-//        R += BPP;
-//
-//        tile.imageData [G] = rayResult.green.toColorType();
-//        G += BPP;
-//
-//        tile.imageData [B] = rayResult.blue.toColorType();
-//        B += BPP;
-        rayResult.prapareColors();
         tile.imageData [R] = rayResult.red();
         R += BPP;
 
@@ -115,11 +102,11 @@ namespace Model {
     worldUnit tmpLightCoef = 0;
     worldUnit viewDistance = mainViewDistance;
     int visibleSize = REFLECTION_DEEP;
-#ifdef USE_MMX
-    Color tmpColor;
-#else
-    Color::dataType tmpColor;
-#endif
+//#ifdef USE_MMX
+//    Color tmpColor;
+//#else
+//    Color::dataType tmpColor;
+//#endif
     bool inShadow;
 
     //Because qRound(0.49f * COLOR_MAX_VALUE / COLOR_MAX_VALUE) < 1
@@ -138,11 +125,10 @@ namespace Model {
 
       if (currentObject != endObjects)
       {
-        PVOperations::multiply(viewDistance, ray.getDir().coords, distanceToIntersection->coords);
+        PVOperations::multiply(viewDistance, ray.getDir().data, distanceToIntersection->data);
 
         //Calculate intersection point
-        PVOperations::move(ray.getStart().coords, distanceToIntersection->coords,
-                           intersection->coords);
+        PVOperations::move(ray.getStart().data, distanceToIntersection->data, intersection->data);
 
         //Get normal vector at intersection point
         ( *currentObject)->getNormal( *intersection, *normalAtIntersection);
@@ -156,17 +142,16 @@ namespace Model {
         for (Scene::LighContainerIterator light = scene->getLights().begin(); light < endLights;
             light++)
         {
-          PVOperations::diff(( *light)->getPosition().coords, intersection->coords,
-                             pointLightDist->coords);
-          if (PVOperations::dotProduct(normalAtIntersection->coords, pointLightDist->coords)
-              <= 0.0f)
+          PVOperations::diff(( *light)->getPosition().data, intersection->data,
+                             pointLightDist->data);
+          if (normalAtIntersection->dotProduct(pointLightDist->data) <= 0.0f)
           {
             continue;
           }
 
           pointLightDist->normalize();
 
-          if (pointLightDist->coords [PW] < 0.0f)
+          if (pointLightDist->length < 0.0f)
           {
             continue;
           }
@@ -178,7 +163,7 @@ namespace Model {
           for (Scene::ObjectContainerIterator object = scene->getObjects().begin();
               object < endObjects; object++)
           {
-            if (( *object)->checkRay( *lightRay, pointLightDist->coords [PW], *tmpDistance) == true)
+            if (( *object)->checkRay( *lightRay, pointLightDist->length, *tmpDistance) == true)
             {
               inShadow = true;
               break;
@@ -188,34 +173,13 @@ namespace Model {
           if ( !inShadow)
           {
             // Lambert lighting model + hacked light attenuation
-            worldUnit lambert = PVOperations::dotProduct(lightRay->getDir().coords,
-                                                         normalAtIntersection->coords) * 1
-                * ( *light)->power * pow(1.01f, -pointLightDist->coords [PW]) * tmpLightCoef;
+            worldUnit lambert = lightRay->getDir().dotProduct(normalAtIntersection->data) * 1
+                * ( *light)->power * pow(1.01f, -pointLightDist->length) * tmpLightCoef;
 
             // qRound(0.49f / (COLOR_MAX_VALUE * COLOR_MAX_VALUE)) < 1
             if (lambert > LAMBERT_MIN)
             {
-#ifdef USE_MMX
-              //              tmpColor = uRound(( *light)->red * currentMat->getColor()->red * lambert);
-              tmpColor = ( * *light) * currentMat->getColor() * lambert;
-
-              resultColor += tmpColor;
-#else
-//              tmpColor = uRound(( *light)->red * currentMat->getColor()->red * lambert);
-              tmpColor = ( *light)->red * currentMat->getColor()->red * lambert;
-
-              resultColor.red += tmpColor;
-
-//              tmpColor = uRound(( *light)->green * currentMat->getColor()->green * lambert);
-              tmpColor = ( *light)->green * currentMat->getColor()->green * lambert;
-              resultColor.green += tmpColor;
-
-//              tmpColor = uRound(( *light)->blue * currentMat->getColor()->blue * lambert);
-              tmpColor = ( *light)->blue * currentMat->getColor()->blue * lambert;
-
-              resultColor.blue += tmpColor;
-//              resultColor *= lambert;
-#endif
+              resultColor += ( * *light) * currentMat->getColor() * lambert;
             }
           }
         }
@@ -223,11 +187,9 @@ namespace Model {
         coef *= currentMat->getReflection();
 
         //Calculate reflection vector
-        PVOperations::multiply(
-            PVOperations::dotProduct(ray.getDir().coords, normalAtIntersection->coords) * 2,
-            normalAtIntersection->coords, normalAtIntersection->coords);
-        PVOperations::subVectors(ray.getDir().coords, normalAtIntersection->coords,
-                                 ray.getDir().coords);
+        PVOperations::multiply(ray.getDir().dotProduct(normalAtIntersection->data) * 2,
+                               normalAtIntersection->data, normalAtIntersection->data);
+        PVOperations::subVectors(ray.getDir().data, normalAtIntersection->data, ray.getDir().data);
         ray.getDir().normalize();
         ray.setParams( *intersection);
 

@@ -10,6 +10,7 @@
 #include "Model/Point2D.h"
 
 namespace Model {
+
   /**Tile information class
    *
    */

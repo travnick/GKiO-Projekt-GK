@@ -30,7 +30,7 @@ namespace Controller {
    * Main window controller
    */
   class MainWindow: public QMainWindow {
-      Q_OBJECT
+    Q_OBJECT
 
     public:
       /**Initializes all necessary fields and creates GUI
@@ -51,7 +51,7 @@ namespace Controller {
        */
       void calibrate ();
 
-      public slots:
+    public slots:
 
       /**Listens to load scene event
        *
@@ -114,7 +114,7 @@ namespace Controller {
 
     private:
       /**Image data structure
-       * It handles image data and image roperties
+       * It handles image data and image properties
        */
       QSharedPointer <Model::RenderTileData> image;
 

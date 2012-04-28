@@ -32,7 +32,7 @@ namespace Model {
         return materialId;
       }
 
-      /**Returns aproximated size of object
+      /**Returns approximated size of object
        *
        * @return size of object
        */

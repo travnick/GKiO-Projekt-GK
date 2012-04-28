@@ -51,6 +51,10 @@ namespace Model {
         }
       }
 
+      static void* operator new (size_t rozmiar){
+        return _mm_malloc(rozmiar, 16);
+      }
+
     private:
       Color diffuse;
       worldUnit reflection;

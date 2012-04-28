@@ -1,4 +1,5 @@
 set(HDRS_Model
+  ${SOURCE_DIR}/Model/AlignedClass.h
   ${SOURCE_DIR}/Model/Camera.h
   ${SOURCE_DIR}/Model/Color.h
   ${SOURCE_DIR}/Model/Light.h
@@ -12,12 +13,12 @@ set(HDRS_Model
   ${SOURCE_DIR}/Model/Ray.h
   ${SOURCE_DIR}/Model/RenderTileData.h
   ${SOURCE_DIR}/Model/Renderer.h
+  ${SOURCE_DIR}/Model/SSEData.h
   ${SOURCE_DIR}/Model/Scene.h
   ${SOURCE_DIR}/Model/SceneFileManager.h
   ${SOURCE_DIR}/Model/Sphere.h
   ${SOURCE_DIR}/Model/Vector.h
   ${SOURCE_DIR}/Model/VisibleObject.h
-  ${SOURCE_DIR}/Model/VpCommon.h
 )
 set(SRCS_Model
   ${SOURCE_DIR}/Model/Camera.cpp

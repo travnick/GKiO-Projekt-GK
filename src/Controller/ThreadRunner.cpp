@@ -3,8 +3,8 @@
 /// @author Mikołaj Milej
 
 #include <QMutexLocker>
-#include <QSemaphore>
 #include <QThreadPool>
+#include <ctime>
 
 #include "Controller/ThreadRunner.h"
 #include "Controller/MainWindow.h"
@@ -65,7 +65,7 @@ namespace Controller {
     for (int i = 0; i < tilesSize; ++i)
     {
       RendererThread *renderWorker = new RendererThread;
-      renderWorker->setRenderParams( *scene, ableToRunning);
+      renderWorker->setRenderParams( *scene, &ableToRunning);
       renderWorker->setTile(tiles [i]);
 
       threadPool->start(renderWorker);

@@ -30,8 +30,8 @@ namespace Model {
 
     direction->normalize();
     origin.reset(new Point(position));
-    PVOperations::multiply(focalLength, direction->coords, tmpVector.coords);
-    PVOperations::negMove(origin->coords, tmpVector.coords, origin->coords);
+    PVOperations::multiply(focalLength, direction->data, tmpVector.data);
+    PVOperations::negMove(origin->data, tmpVector.data, origin->data);
 
     screenImageRatio = screenWidth / imageWidth;
     screenHeight = imageHeight * screenImageRatio;
@@ -39,10 +39,10 @@ namespace Model {
     unitType halfHeight = screenHeight / 2;
     unitType halfWidth = screenWidth / 2;
 
-    screenTopLeft->set(position.coords [PX] - halfWidth, position.coords [PY] - halfHeight,
-                       position.coords [PZ]);
-    screenBottomRight->set(position.coords [PX] + halfWidth, position.coords [PY] + halfHeight,
-                           position.coords [PZ]);
+    screenTopLeft->set(position.data [PX] - halfWidth, position.data [PY] - halfHeight,
+                       position.data [PZ]);
+    screenBottomRight->set(position.data [PX] + halfWidth, position.data [PY] + halfHeight,
+                           position.data [PZ]);
   }
 
   void Camera::setType (const QString & typeName){

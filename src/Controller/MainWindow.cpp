@@ -178,8 +178,8 @@ namespace Controller {
     QString sufix;
     double memoryForImage;
 
-    quint64 newImageBytesPerLine = imageWidth * BPP;
-    quint64 newImageDataSize = newImageBytesPerLine * imageHeight;
+    int64_t newImageBytesPerLine = imageWidth * BPP;
+    int64_t newImageDataSize = newImageBytesPerLine * imageHeight;
 
     if (newImageDataSize > IMAGE_MAX_DATA_SIZE)
     {
@@ -338,7 +338,7 @@ namespace Controller {
 
     if ( !QFile::exists(fileName))
     {
-      fileName = QFileDialog::getOpenFileName(this, tr("Otwórz plik sceny"),
+      fileName = QFileDialog::getOpenFileName(this, QSTRING("Otwórz plik sceny"),
                                               QSTRING(DEFAULT_SCENE_FILE_NAME),
                                               tr("XML files (*.xml)"), 0,
                                               QFileDialog::DontUseNativeDialog);

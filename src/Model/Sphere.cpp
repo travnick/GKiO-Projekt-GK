@@ -21,22 +21,22 @@ namespace Model {
   }
 
   void Sphere::getNormal (const Point& point, Vector &normalAtPoint) const{
-    PVOperations::diff(point.coords, getPosition().coords, normalAtPoint.coords);
+    PVOperations::diff(point.data, getPosition().data, normalAtPoint.data);
     normalAtPoint.normalize();
   }
 
   bool Sphere::checkRay (const Ray& ray, worldUnit& range, Vector& e) const{
-    PVOperations::diff(position.coords, ray.getStart().coords, e.coords);
-    worldUnit a = PVOperations::dotProduct(ray.getDir().coords, e.coords);
+    PVOperations::diff(position.data, ray.getStart().data, e.data);
+    worldUnit a = ray.getDir().dotProduct(e.data);
     if ((a - size) > range)
     {
       return false;
     }
-    worldUnit D = squareRadius - PVOperations::dotProduct(e.coords) + a * a;
+    worldUnit D = squareRadius - e.dotProduct() + a * a;
 
     worldUnit t = SQRT(D);
 
-    if (e.coords [PW] >= squareRadius)
+    if (e.squareLength >= squareRadius)
     //We are outside sphere
     {
       t = a - t;

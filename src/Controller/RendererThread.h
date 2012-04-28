@@ -33,26 +33,21 @@ namespace Controller {
        */
       RendererThread ();
 
-      /**It's empty now
+      /**Needed for QScopedPointer
        *
        */
-      virtual ~RendererThread ();
+      ~RendererThread ();
 
       /**Sets rendering parameters
+       *
        * If allowRunning is changed outside the thread to false
        * thread breaks rendering as fast as renderer checks condition
        * "if (allowRunning)"
        *
-       * @param tile description of image part to render
        * @param scene 3D scene to render
-       * @param allowRunning is thread allower to run or not
+       * @param allowRunning is allowing thread to run or not
        */
-      /**
-       *
-       * @param scene
-       * @param allowRunning
-       */
-      void setRenderParams (const Model::Scene &scene, const bool &allowRunning);
+      void setRenderParams (const Model::Scene &scene, const bool *allowRunning);
 
       /**Sets tile to render
        *
@@ -69,12 +64,6 @@ namespace Controller {
        */
       void run ();
 
-//    signals:
-//      /**Sends signal when work is done
-//       *
-//       */
-//      void jobFinished (Controller::RendererThread *renderer);
-
     private:
       const bool *allowRunning;
 
@@ -82,6 +71,10 @@ namespace Controller {
        *
        */
       QSharedPointer <Model::RenderTileData> tile;
+
+      /**Renderer
+       *
+       */
       QScopedPointer <Model::Renderer> renderer;
 
       /**Disables copying of object

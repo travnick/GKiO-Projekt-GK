@@ -7,9 +7,14 @@
 #include <x86intrin.h> // SIMD functions
 #include "Controller/GlobalDefines.h"
 #include "Model/ModelDefines.h"
+#include "Model/SSEData.h"
 
 #define DEFAULT_COLOR_VALUE 0
 #define USE_MMX
+
+inline colorType uRound (float d){
+  return colorType(d + 0.5f);
+}
 
 namespace Model {
 
@@ -24,7 +29,7 @@ namespace Model {
         setDefaultColor();
       }
 
-      inline Color (__m128 newData)
+      inline Color (const __m128 &newData)
           : data(newData){
       }
 
@@ -64,35 +69,33 @@ namespace Model {
         return *this;
       }
 
-      inline void prapareColors (){
-        _mm_store_ps(dataArray, data);
-      }
-
       inline colorType red () const{
-        return dataArray [3];
+        return retCol(data [3]);
       }
 
       inline colorType green () const{
-        return dataArray [2];
+        return retCol(data [2]);
       }
 
       inline colorType blue () const{
-        return dataArray [1];
+        return retCol(data [1]);
       }
 
     private:
-      __m128 data;
-      __attribute__((aligned(16))) float dataArray [4];
+//      union {
+//          __m128 data;
+//          __attribute__((aligned(16))) float dataArray [4];
+//      };
 
-      inline colorType retCol (__m128 &col){
-        float dataT = _mm_cvtt_ss2si(col);
+      SSEData data;
 
-        if (dataT > COLOR_MAX_VALUE)
+      inline colorType retCol (float color) const{
+        if (color > COLOR_MAX_VALUE)
         {
-          dataT = COLOR_MAX_VALUE;
+          color = COLOR_MAX_VALUE;
         }
 
-        return dataT;
+        return uRound(color);
       }
   };
 }

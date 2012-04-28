@@ -52,11 +52,12 @@ namespace Model {
   }
 
   void Scene::calculateObjectSizeOnImage (const ObjectType &object){
-    worldUnit distance [4];
-    PVOperations::diff(object->getPosition().coords, camera->getPosition().coords, distance);
-
-    object->sizeOnImage = object->getSize()
-        - sin(RAD(camera->getFOV() / 2)) * PVOperations::length(distance);
+    //TODO: make implementation here
+//    __attribute__((aligned(16))) float distance [4];
+//    PVOperations::diff(object->getPosition().data, camera->getPosition().data, distance);
+//
+//    object->sizeOnImage = object->getSize()
+//        - sin(RAD(camera->getFOV() / 2)) * PVOperations::length(distance);
   }
 
 }

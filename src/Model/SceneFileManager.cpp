@@ -164,9 +164,9 @@ namespace Model {
                 QSharedPointer <VisibleObject> object(new Sphere( *mainbject));
                 point = object->getPosition();
 
-                point.coords [PX] += offset * i * multiplyXSign;
-                point.coords [PY] += offset * j * multiplyYSign;
-                point.coords [PZ] += offset * k * multiplyZSign;
+                point.data [PX] += offset * i * multiplyXSign;
+                point.data [PY] += offset * j * multiplyYSign;
+                point.data [PZ] += offset * k * multiplyZSign;
 
                 object->setPosition(point);
 
@@ -183,11 +183,11 @@ namespace Model {
           Vector angles;
           int material;
 
-          // TODO tymczasowo dopisywanie rzez coords
-          angles.coords [PX] = getFloat(elem, "angleX");
-          angles.coords [PY] = getFloat(elem, "angleY");
-          angles.coords [PZ] = getFloat(elem, "angleZ");
-          angles.coords [PW] = getFloat(elem, "d");
+          // TODO tymczasowo dopisywanie przez data
+          angles.data [PX] = getFloat(elem, "angleX");
+          angles.data [PY] = getFloat(elem, "angleY");
+          angles.data [PZ] = getFloat(elem, "angleZ");
+          angles.length = getFloat(elem, "d");
           material = getInt(elem, "material");
 
           object->setAngles(angles);
@@ -253,16 +253,13 @@ namespace Model {
   }
 
   void SceneFileManager::getColor (const QDomElement & value, Color &color){
-//    color.red = getInt(value, "r");
-//    color.green = getInt(value, "g");
-//    color.blue = getInt(value, "b");
     color.setColor(getInt(value, "r"), getInt(value, "g"), getInt(value, "b"));
   }
 
-  void SceneFileManager::getVPCommon (const QDomElement & value, VPCommon &object){
-    object.coords [PX] = getFloat(value, "x");
-    object.coords [PY] = getFloat(value, "y");
-    object.coords [PZ] = getFloat(value, "z");
+  void SceneFileManager::getVPCommon (const QDomElement & value, Point &object){
+    object.data [PX] = getFloat(value, "x");
+    object.data [PY] = getFloat(value, "y");
+    object.data [PZ] = getFloat(value, "z");
   }
 
   int SceneFileManager::getInt (const QDomElement &elem, const QString &name){

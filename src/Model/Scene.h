@@ -59,7 +59,7 @@ namespace Model {
        * @param filename file name to load scene from
        * @param reload if true forces reloading scene from file
        * @return if scene is loaded properly or not
-       * @throws std::exception from rapidxml
+       * @throws std::exception from XML parser
        */
       bool init (const QString &filename, bool reload = false) throw (std::exception);
 

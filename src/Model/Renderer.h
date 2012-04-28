@@ -29,6 +29,10 @@ namespace Model {
        *
        */
       Renderer ();
+
+      /**Needed for QScopedPointer
+       *
+       */
       ~Renderer ();
 
       /**Renders part of image which is described by tile

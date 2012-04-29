@@ -6,6 +6,7 @@
 
 #include "Model/Point.h"
 #include "Model/PointAndVectorOperations.h"
+#include "Controller/GlobalDefines.h"
 
 namespace Model {
 
@@ -53,6 +54,7 @@ namespace Model {
        * @return dotProduct
        */
       inline worldUnit dotProduct (){
+        IGNORE_WARNINGS_BEGIN
 #ifdef __SSE4_1__
         _mm_store_ss( &squareLength, _mm_dp_ps(data, data, 0b11100001));
 #else
@@ -61,7 +63,7 @@ namespace Model {
         result = _mm_hadd_ps(result, result);
         _mm_store_ss( &squareLength, result);
 #endif
-
+        IGNORE_WARNINGS_END
         return squareLength;
       }
 

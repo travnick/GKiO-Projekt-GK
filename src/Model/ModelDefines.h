@@ -7,6 +7,15 @@
 #include <QString>
 #include <cmath>
 
+/**
+ *
+ * @param string
+ * @return
+ */
+inline QString toLowerCase (const char* string){
+  return QString::fromStdString(string).toLower();
+}
+
 //Constants -->
 #define PI 3.14159265
 
@@ -14,10 +23,10 @@
 // <-- Constants
 
 //Macros -->
-/**Converts degrees to radians
+/**Converts degree to radian
  *
- * @param value angle in degrees
- * @return angle in radians
+ * @param value angle in degree
+ * @return angle in radian
  */
 #define RAD(x) (x*(PI/180))
 
@@ -28,12 +37,12 @@
  */
 #define STRINGIFY(x) #x
 
-/**Converts a macro argument into a lowercase std::string
+/**Converts a macro argument into a lower case QString
  *
  * @param value argument to stringify
- * @return lowercase string
+ * @return lower case string
  */
-#define LCSTRING(x) stringifytolowercase(STRINGIFY(x))
+#define LCSTRING(x) toLowerCase(STRINGIFY(x))
 // <--Macros
 
 //Templates -->
@@ -51,7 +60,7 @@ inline float SQRT (float value){
 
 // Functions -->
 
-QString stringifytolowercase (const char* string);
+QString toLowerCase (const char* string);
 
 // <-- Functions
 
@@ -98,5 +107,17 @@ namespace Model {
      *
      */
     const QString LIGHTS_NAME = LCSTRING(Lights);
+  }
+
+  /**Returns rounded value of given value
+   *
+   * Its only for non negative values
+   *
+   * @param value value to round
+   * @return rounded value
+   */
+  template <typename T>
+  inline T uRound (float value){
+    return static_cast <T>(value + 0.5f);
   }
 }

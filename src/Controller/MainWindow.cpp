@@ -30,6 +30,7 @@
 
 #define DEFAULT_IMAGE_WIDTH 800
 #define DEFAULT_IMAGE_HEIGHT 560
+#define DEFAULT_TILE_SIZE 32
 
 namespace Controller {
 
@@ -293,6 +294,7 @@ namespace Controller {
     //    ui->imageHeight->setValue(ui->imageScrollArea->size().height() - 2);
     ui->imageWidth->setValue(DEFAULT_IMAGE_WIDTH);
     ui->imageHeight->setValue(DEFAULT_IMAGE_HEIGHT);
+    ui->tileSize->setValue(DEFAULT_TILE_SIZE);
   }
 
   void MainWindow::activateButtons (){

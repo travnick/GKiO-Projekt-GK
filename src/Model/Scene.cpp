@@ -51,7 +51,7 @@ namespace Model {
     camera->calibrate();
   }
 
-  void Scene::calculateObjectSizeOnImage (const ObjectType &object){
+  void Scene::calculateObjectSizeOnImage (const ObjectType &){
     //TODO: make implementation here
 //    __attribute__((aligned(16))) float distance [4];
 //    PVOperations::diff(object->getPosition().data, camera->getPosition().data, distance);

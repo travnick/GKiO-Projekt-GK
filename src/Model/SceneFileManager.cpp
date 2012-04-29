@@ -164,9 +164,9 @@ namespace Model {
                 QSharedPointer <VisibleObject> object(new Sphere( *mainbject));
                 point = object->getPosition();
 
-                point.data [PX] += offset * i * multiplyXSign;
-                point.data [PY] += offset * j * multiplyYSign;
-                point.data [PZ] += offset * k * multiplyZSign;
+                point.data.x() += offset * i * multiplyXSign;
+                point.data.y() += offset * j * multiplyYSign;
+                point.data.z() += offset * k * multiplyZSign;
 
                 object->setPosition(point);
 
@@ -184,9 +184,9 @@ namespace Model {
           int material;
 
           // TODO tymczasowo dopisywanie przez data
-          angles.data [PX] = getFloat(elem, "angleX");
-          angles.data [PY] = getFloat(elem, "angleY");
-          angles.data [PZ] = getFloat(elem, "angleZ");
+          angles.data.x() = getFloat(elem, "angleX");
+          angles.data.y() = getFloat(elem, "angleY");
+          angles.data.z() = getFloat(elem, "angleZ");
           angles.length = getFloat(elem, "d");
           material = getInt(elem, "material");
 
@@ -257,9 +257,9 @@ namespace Model {
   }
 
   void SceneFileManager::getVPCommon (const QDomElement & value, Point &object){
-    object.data [PX] = getFloat(value, "x");
-    object.data [PY] = getFloat(value, "y");
-    object.data [PZ] = getFloat(value, "z");
+    object.data.x() = getFloat(value, "x");
+    object.data.y() = getFloat(value, "y");
+    object.data.z() = getFloat(value, "z");
   }
 
   int SceneFileManager::getInt (const QDomElement &elem, const QString &name){

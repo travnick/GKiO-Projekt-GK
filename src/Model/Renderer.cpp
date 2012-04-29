@@ -52,8 +52,8 @@ namespace Model {
     imageUnit G = R + 1;
     imageUnit B = G + 1;
 
-    Camera::unitType rayStartX = camera->getScreenTopLeft()->data [PX];
-    Camera::unitType rayStartY = camera->getScreenTopLeft()->data [PY];
+    Camera::unitType rayStartX = camera->getScreenTopLeft()->data.x();
+    Camera::unitType rayStartY = camera->getScreenTopLeft()->data.y();
 
     Camera::unitType line = rayStartY + tile.topLeft.y * camera->getScreenImageWidthRatio();
     Camera::unitType col;

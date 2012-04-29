@@ -10,11 +10,6 @@
 #include "Model/SSEData.h"
 
 #define DEFAULT_COLOR_VALUE 0
-#define USE_MMX
-
-inline colorType uRound (float d){
-  return colorType(d + 0.5f);
-}
 
 namespace Model {
 
@@ -23,6 +18,9 @@ namespace Model {
    */
   class Color {
     public:
+      enum ColorEnum {
+        R = 3, G = 2, B = 1
+      };
       typedef float dataType;
 
       inline Color (){
@@ -34,7 +32,7 @@ namespace Model {
       }
 
       /**Sets color
-       * Each value should be in range 0 <= value <= 255
+       * Each value should be in range 0 <= value <= COLOR_MAX_VALUE
        *
        * @param r red
        * @param g green
@@ -44,7 +42,8 @@ namespace Model {
         data = _mm_set_ps(r, g, b, 0);
       }
 
-      /**Reset color to default
+      /**Reset color to DEFAULT_COLOR_VALUE
+       *
        * Default:
        *  r = 0
        *  g = 0
@@ -55,47 +54,84 @@ namespace Model {
         setColor(DEFAULT_COLOR_VALUE, DEFAULT_COLOR_VALUE, DEFAULT_COLOR_VALUE);
       }
 
+      /**
+       *
+       * @param mulValue
+       * @return
+       */
       inline Color operator * (float mulValue) const{
         __m128 value = _mm_set1_ps(mulValue);
         return _mm_mul_ps(data, value);
       }
 
+      /**
+       *
+       * @param mulValue
+       * @return
+       */
+      inline Color &operator *= (float mulValue) const{
+        __m128 value = _mm_set1_ps(mulValue);
+        data = _mm_mul_ps(data, value);
+        return *this;
+      }
+
+      /**
+       *
+       * @param other
+       * @return
+       */
       inline Color operator * (const Color& other) const{
         return _mm_mul_ps(data, other.data);
       }
 
+      /**
+       *
+       * @param other
+       * @return
+       */
+      inline Color &operator *= (const Color& other) const{
+        __m128 value = _mm_set1_ps(other.data);
+        data = _mm_mul_ps(data, value);
+        return *this;
+      }
+
+      /**
+       *
+       * @param other
+       * @return
+       */
       inline Color &operator += (const Color& other){
         data = _mm_add_ps(data, other.data);
         return *this;
       }
 
       inline colorType red () const{
-        return retCol(data [3]);
+        return retCol(data [R]);
       }
 
       inline colorType green () const{
-        return retCol(data [2]);
+        return retCol(data [G]);
       }
 
       inline colorType blue () const{
-        return retCol(data [1]);
+        return retCol(data [B]);
       }
 
     private:
-//      union {
-//          __m128 data;
-//          __attribute__((aligned(16))) float dataArray [4];
-//      };
-
       SSEData data;
 
+      /**Returns color value saturated to COLOR_MAX_VALUE
+       *
+       * @param color float representation of color
+       * @return color value
+       */
       inline colorType retCol (float color) const{
         if (color > COLOR_MAX_VALUE)
         {
           color = COLOR_MAX_VALUE;
         }
 
-        return uRound(color);
+        return uRound <colorType>(color);
       }
   };
 }

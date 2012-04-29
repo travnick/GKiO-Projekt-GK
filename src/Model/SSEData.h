@@ -24,6 +24,9 @@ namespace Model {
 
       SSEDataPrivate * data;
     public:
+      enum Positions {
+        X = 3, Y = 2, Z = 1, W = 0, COORDS_COUNT = 4
+      };
 
       SSEData ()
           : data(new SSEDataPrivate){
@@ -63,6 +66,26 @@ namespace Model {
       inline __m128& sse ()const
       {
         return data->data;
+      }
+
+      inline float & x () const
+      {
+        return data->dataArray [X];
+      }
+
+      inline float & y () const
+      {
+        return data->dataArray [Y];
+      }
+
+      inline float & z () const
+      {
+        return data->dataArray [Z];
+      }
+
+      inline float & w () const
+      {
+        return data->dataArray [W];
       }
     };
 

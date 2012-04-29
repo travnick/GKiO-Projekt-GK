@@ -23,7 +23,6 @@ set(HDRS_Model
 set(SRCS_Model
   ${SOURCE_DIR}/Model/Camera.cpp
   ${SOURCE_DIR}/Model/Material.cpp
-  ${SOURCE_DIR}/Model/ModelDefines.cpp
   ${SOURCE_DIR}/Model/Object.cpp
   ${SOURCE_DIR}/Model/Plane.cpp
   ${SOURCE_DIR}/Model/Renderer.cpp

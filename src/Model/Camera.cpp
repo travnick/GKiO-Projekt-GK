@@ -39,10 +39,10 @@ namespace Model {
     unitType halfHeight = screenHeight / 2;
     unitType halfWidth = screenWidth / 2;
 
-    screenTopLeft->set(position.data [PX] - halfWidth, position.data [PY] - halfHeight,
-                       position.data [PZ]);
-    screenBottomRight->set(position.data [PX] + halfWidth, position.data [PY] + halfHeight,
-                           position.data [PZ]);
+    screenTopLeft->set(position.data.x() - halfWidth, position.data.y() - halfHeight,
+                       position.data.z());
+    screenBottomRight->set(position.data.x() + halfWidth, position.data.y() + halfHeight,
+                           position.data.z());
   }
 
   void Camera::setType (const QString & typeName){

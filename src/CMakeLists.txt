@@ -1,12 +1,15 @@
 cmake_minimum_required(VERSION 2.8)
 project(RayTracer)
 
-set(Debug "Debug")
-set(RelWithDebInfo "RelWithDebInfo")
-set(Profile "Profile")
-set(Release "Release")
+set(Debug Debug)
+set(RelWithDebInfo RelWithDebInfo)
+set(Profile Profile)
+set(Release Release)
+set(x86 x86)
+set(Native Native)
 
-set(CMAKE_BUILD_TYPE CACHE STRING ${Debug})
+set(CMAKE_BUILD_TYPE ${Debug} CACHE STRING "Set build type: ${Debug} | ${RelWithDebInfo} | ${Profile} | ${Release}")
+set(PLATFORM_TARGET ${Native} CACHE STRING "Set target platform: ${x86} | ${Native}")
 
 include(CmakeIncludes/CompilerOptions.cmake)
 include(CmakeIncludes/Directories.cmake)

@@ -63,30 +63,25 @@ namespace Model {
         return data->data;
       }
 
-      inline __m128& sse ()const
-      {
+      inline __m128 & sse () const{
         return data->data;
       }
 
-      inline float & x () const
-      {
+      inline float & x () const{
         return data->dataArray [X];
       }
 
-      inline float & y () const
-      {
+      inline float & y () const{
         return data->dataArray [Y];
       }
 
-      inline float & z () const
-      {
+      inline float & z () const{
         return data->dataArray [Z];
       }
 
-      inline float & w () const
-      {
+      inline float & w () const{
         return data->dataArray [W];
       }
-    };
+  };
 
-  } /* namespace Model */
+} /* namespace Model */

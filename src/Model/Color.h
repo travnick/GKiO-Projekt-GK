@@ -69,7 +69,7 @@ namespace Model {
        * @param mulValue
        * @return
        */
-      inline Color &operator *= (float mulValue) const{
+      inline Color &operator *= (float mulValue){
         __m128 value = _mm_set1_ps(mulValue);
         data = _mm_mul_ps(data, value);
         return *this;
@@ -89,9 +89,8 @@ namespace Model {
        * @param other
        * @return
        */
-      inline Color &operator *= (const Color& other) const{
-        __m128 value = _mm_set1_ps(other.data);
-        data = _mm_mul_ps(data, value);
+      inline Color &operator *= (const Color& other){
+        data = _mm_mul_ps(data, other.data);
         return *this;
       }
 

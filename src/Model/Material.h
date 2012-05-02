@@ -1,4 +1,4 @@
-/// @file Main/Model/Material.h
+/// @file Model/Material.h
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 
@@ -49,10 +49,6 @@ namespace Model {
         {
           reflection = newReflection;
         }
-      }
-
-      static void* operator new (size_t rozmiar){
-        return _mm_malloc(rozmiar, 16);
       }
 
     private:

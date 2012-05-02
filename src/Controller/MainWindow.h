@@ -1,4 +1,4 @@
-/// @file Main/Controller/MainWindow.h
+/// @file Controller/MainWindow.h
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 
@@ -137,11 +137,6 @@ namespace Controller {
        *
        */
       QSharedPointer <Model::Scene> scene;
-
-      /**Stores thread management object
-       *
-       */
-      QScopedPointer <QThreadPool> threadPool;
 
       /**Stores timer for rendering time measuring
        *

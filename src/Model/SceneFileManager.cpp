@@ -1,4 +1,4 @@
-/// @file Main/Model/SceneFileManager.cpp
+/// @file Model/SceneFileManager.cpp
 /// @date 29-03-2012
 /// @author Piotr Jawniak
 

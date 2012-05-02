@@ -1,4 +1,4 @@
-/// @file Main/Model/Scene.h
+/// @file Model/Scene.h
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 

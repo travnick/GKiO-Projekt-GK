@@ -12,6 +12,8 @@ namespace Model {
   template <int alignmentSize>
   class AlignedClass {
     public:
+      //For x86_64 we don't need this because of default 16B heap alignment (ABI)
+#ifndef __x86_64__
       //TODO: Implement other operators new and delete
 
       /**Allocates memory aligned to specified boundary
@@ -31,5 +33,8 @@ namespace Model {
       }
       // Alignment for static object creation
   }__attribute__((aligned(alignmentSize)));
+#else
+  };
+#endif
 
 } /* namespace Model */

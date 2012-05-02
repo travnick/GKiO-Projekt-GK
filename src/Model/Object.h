@@ -1,4 +1,4 @@
-/// @file Main/Model/Object.h
+/// @file Model/Object.h
 /// @date 22-12-2011
 /// @author Mikołaj Milej
 

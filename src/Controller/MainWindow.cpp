@@ -1,4 +1,4 @@
-/// @file Main/Controller/MainWindow.cpp
+/// @file Controller/MainWindow.cpp
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 
@@ -30,7 +30,7 @@
 
 #define DEFAULT_IMAGE_WIDTH 800
 #define DEFAULT_IMAGE_HEIGHT 560
-#define DEFAULT_TILE_SIZE 32
+#define DEFAULT_TILE_SIZE 100
 
 namespace Controller {
 
@@ -49,10 +49,9 @@ namespace Controller {
     image = QSharedPointer <Model::RenderTileData>(new Model::RenderTileData);
     scene = QSharedPointer <Model::Scene>(new Model::Scene);
     ui.reset(new Ui::MainWindow);
-    threadPool.reset(new QThreadPool);
     timer.reset(new QTimer);
 
-    threadPool->setExpiryTimeout(TIME_BEFORE_REMOVE_THREADS);
+    QThreadPool::globalInstance()->setExpiryTimeout(TIME_BEFORE_REMOVE_THREADS);
     image->imageData = 0;
 
     sizeChanged = false;
@@ -66,7 +65,7 @@ namespace Controller {
     //Send terminate signal to thread runner and wait for end
     ui->terminateRender->click();
 
-    threadPool->waitForDone(TIME_BEFORE_REMOVE_THREADS_ON_EXIT);
+    QThreadPool::globalInstance()->waitForDone(TIME_BEFORE_REMOVE_THREADS_ON_EXIT);
   }
 
   void MainWindow::runRenderer (){
@@ -106,7 +105,7 @@ namespace Controller {
     timer->start();
     timeCounter->start();
 
-    threadPool->start(threadRunner);
+    QThreadPool::globalInstance()->start(threadRunner);
   }
 
   void MainWindow::terminateRender (){

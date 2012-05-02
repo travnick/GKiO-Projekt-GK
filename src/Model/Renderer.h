@@ -1,4 +1,4 @@
-/// @file Main/Model/Renderer.h
+/// @file Model/Renderer.h
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 

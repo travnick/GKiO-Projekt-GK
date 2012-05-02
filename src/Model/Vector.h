@@ -1,4 +1,4 @@
-/// @file Main/Model/Vector.h
+/// @file Model/Vector.h
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 
@@ -56,7 +56,7 @@ namespace Model {
       inline worldUnit dotProduct (){
         IGNORE_WARNINGS_BEGIN
 #ifdef __SSE4_1__
-        _mm_store_ss( &squareLength, _mm_dp_ps(data, data, 0b11100001));
+        _mm_store_ss( &squareLength, _mm_dp_ps(data, data, DOT_PROD_MASK));
 #else
         __m128 result = _mm_mul_ps(data, data);
         result = _mm_hadd_ps(result, result);

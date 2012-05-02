@@ -1,4 +1,4 @@
-/// @file Main/Model/SceneFileManager.h
+/// @file Model/SceneFileManager.h
 /// @date 22-12-2011
 /// @author Mikołaj Milej
 

@@ -1,13 +1,11 @@
-/// @file UsableCpp/include/PointAndVectorOperations.h
+/// @file Model/PointAndVectorOperations.h
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 
 #pragma once
 
 #include <x86intrin.h> // SIMD functions
-#include <cmath>
 #include <Model/ModelDefines.h>
-#include <Model/Point.h>
 
 namespace Model {
   namespace PVOperations {

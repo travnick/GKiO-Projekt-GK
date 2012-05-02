@@ -1,4 +1,4 @@
-/// @file Main/Model/Point2D.h
+/// @file Model/Point2D.h
 /// @date 29-12-2011
 /// @author Mikołaj Milej
 

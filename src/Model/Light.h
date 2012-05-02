@@ -1,4 +1,4 @@
-/// @file Main/Model/Light.h
+/// @file Model/Light.h
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 

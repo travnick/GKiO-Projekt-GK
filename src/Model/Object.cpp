@@ -1,4 +1,4 @@
-/// @file Main/Model/Object.cpp
+/// @file Model/Object.cpp
 /// @date 22-12-2011
 /// @author Mikołaj Milej
 

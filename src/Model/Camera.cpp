@@ -1,4 +1,4 @@
-/// @file Main/Model/Camera.cpp
+/// @file Model/Camera.cpp
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 

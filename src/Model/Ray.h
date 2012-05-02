@@ -1,4 +1,4 @@
-/// @file Main/Model/Ray.h
+/// @file Model/Ray.h
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 

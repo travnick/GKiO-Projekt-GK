@@ -1,4 +1,4 @@
-/// @file Main/Model/VisibleObject.h
+/// @file Model/VisibleObject.h
 /// @date 27-12-2011
 /// @author Mikołaj Milej
 

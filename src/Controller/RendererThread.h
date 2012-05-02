@@ -1,4 +1,4 @@
-/// @file Main/Controller/RendererThread.h
+/// @file Controller/RendererThread.h
 /// @date 06-01-2012
 /// @author Mikołaj Milej
 

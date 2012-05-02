@@ -1,4 +1,4 @@
-/// @file Main/Controller/RendererThread.cpp
+/// @file Controller/RendererThread.cpp
 /// @date 06-01-2012
 /// @author Mikołaj Milej
 

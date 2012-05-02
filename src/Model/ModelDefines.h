@@ -1,4 +1,4 @@
-/// @file Main/Model/ModelDefines.h
+/// @file Model/ModelDefines.h
 /// @date 22-12-2011
 /// @author Mikołaj Milej
 

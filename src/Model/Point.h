@@ -1,4 +1,4 @@
-/// @file Main/Model/Point.h
+/// @file Model/Point.h
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 
@@ -9,6 +9,9 @@
 #include "Controller/GlobalDefines.h"
 #include "Model/ModelDefines.h"
 #include "Model/SSEData.h"
+
+// Calculate dot product from xmm[3/2/1] and store sesult to xmm[0]
+#define  DOT_PROD_MASK  0b11100001
 
 namespace Model {
 
@@ -45,9 +48,6 @@ namespace Model {
         data.x() = x;
         data.y() = y;
         data.z() = z;
-        data.w() = 0; // Zeroing is important for dot product
-
-        data = _mm_set_ps(x, y, z, 0);
       }
 
       /**Sets coordinates of object
@@ -73,7 +73,7 @@ namespace Model {
         float dotProd;
         IGNORE_WARNINGS_BEGIN
 #ifdef __SSE4_1__
-        _mm_store_ss( &dotProd, _mm_dp_ps(data, vector2, 0b11100001));
+        _mm_store_ss( &dotProd, _mm_dp_ps(data, vector2, DOT_PROD_MASK));
 #else
         __m128 result = _mm_mul_ps(data, vector2);
         result = _mm_hadd_ps(result, result);

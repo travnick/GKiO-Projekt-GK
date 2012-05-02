@@ -1,4 +1,4 @@
-/// @file Main/Model/Renderer.cpp
+/// @file Model/Renderer.cpp
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 

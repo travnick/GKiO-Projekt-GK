@@ -1,4 +1,4 @@
-/// @file Main/Model/Sphere.cpp
+/// @file Model/Sphere.cpp
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 
@@ -27,11 +27,14 @@ namespace Model {
 
   bool Sphere::checkRay (const Ray& ray, worldUnit& range, Vector& e) const{
     PVOperations::diff(position.data, ray.getStart().data, e.data);
+
     worldUnit a = ray.getDir().dotProduct(e.data);
+
     if ((a - size) > range)
     {
       return false;
     }
+
     worldUnit D = squareRadius - e.dotProduct() + a * a;
 
     worldUnit t = SQRT(D);

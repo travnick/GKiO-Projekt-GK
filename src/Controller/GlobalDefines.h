@@ -1,4 +1,4 @@
-/// @file Main/Controller/GlobalDefines.h
+/// @file Controller/GlobalDefines.h
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 

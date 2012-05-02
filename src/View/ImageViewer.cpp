@@ -1,4 +1,4 @@
-/// @file Main/View/ImageViewer.cpp
+/// @file View/ImageViewer.cpp
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 

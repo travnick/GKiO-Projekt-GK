@@ -1,4 +1,4 @@
-/// @file Main/Controller/ThreadRunner.cpp
+/// @file Controller/ThreadRunner.cpp
 /// @date 07-01-2012
 /// @author Mikołaj Milej
 

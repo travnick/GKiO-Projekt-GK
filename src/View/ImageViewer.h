@@ -1,4 +1,4 @@
-/// @file Main/View/ImageViewer.h
+/// @file View/ImageViewer.h
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 

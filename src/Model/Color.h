@@ -1,4 +1,4 @@
-/// @file Main/Model/Color.h
+/// @file Model/Color.h
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 
@@ -39,7 +39,9 @@ namespace Model {
        * @param b blue
        */
       inline void setColor (dataType r, dataType g, dataType b){
-        data = _mm_set_ps(r, g, b, 0);
+        data [R] = r;
+        data [G] = g;
+        data [B] = b;
       }
 
       /**Reset color to DEFAULT_COLOR_VALUE

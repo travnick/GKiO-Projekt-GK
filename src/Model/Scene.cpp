@@ -1,4 +1,4 @@
-/// @file Main/Model/Scene.cpp
+/// @file Model/Scene.cpp
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 

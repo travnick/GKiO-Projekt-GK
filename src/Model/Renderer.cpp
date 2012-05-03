@@ -12,35 +12,30 @@
 #include "Model/Scene.h"
 #include "Model/Color.h"
 #include "Model/VisibleObject.h"
-#include "Model/PointAndVectorOperations.h"
 #include "Model/RenderTileData.h"
 #include "Model/Light.h"
 #include "Model/Material.h"
+#include "Controller/RendererThread.h"
 
-#define REFLECTION_DEEP 10
-#define E 2.71828183f
-#define DEFAULT_INTERSECTION_ERROR_VALUE 0.01f
+const float E = 2.71828183f;
 
 namespace Model {
 
   const float LAMBERT_MIN = (0.49f / (COLOR_MAX_VALUE * COLOR_MAX_VALUE));
 
-  Renderer::Renderer (){
-    tmpDistance.reset(new Vector);
-    pointLightDist.reset(new Vector);
-    distanceToIntersection.reset(new Vector);
-    lightRay.reset(new Ray);
-    normalAtIntersection.reset(new Vector);
-    intersection.reset(new Point);
-    intersectionErrorValue = DEFAULT_INTERSECTION_ERROR_VALUE;
+  Renderer::Renderer (const Controller::RenderParams &newRenderParams)
+      : tmpDistance(new Vector), pointLightDist(new Vector), distanceToIntersection(new Vector), lightRay(
+          new Ray), normalAtIntersection(new Vector), intersection(new Point), intersectionErrorValue(
+              newRenderParams.scene->getCamera()->getDistancePrecision()){
+    setRenderParams( &newRenderParams);
   }
 
   Renderer::~Renderer (){
   }
 
-  void Renderer::render (const RenderTileData &tile, const bool &run){
-    const Camera *camera = scene->getCamera().data();
-    worldUnit viewDistance = scene->getCamera()->getViewDistance();
+  void Renderer::render (const RenderTileData &tile){
+    const Camera *camera = renderParams->scene->getCamera().data();
+    worldUnit viewDistance = renderParams->scene->getCamera()->getViewDistance();
     Vector direction( *(camera->getDirection()));
     Point start(camera->getPosition());
     Ray ray;
@@ -62,7 +57,8 @@ namespace Model {
     {
       col = rayStartX + tile.topLeft.x * camera->getScreenImageWidthRatio();
       //Checking if thread is allowed to run
-      for (imageUnit iCol = tile.topLeft.x; run && iCol < tile.bottomRight.x; ++iCol)
+      for (imageUnit iCol = tile.topLeft.x; renderParams->allowRunning && iCol < tile.bottomRight.x;
+          ++iCol)
       {
         start.set(col, line);
 
@@ -96,12 +92,12 @@ namespace Model {
   }
 
   inline void Renderer::shootRay (Ray & ray, Color &resultColor, worldUnit mainViewDistance) const{
-    Scene::ObjectContainerIterator endObjects = scene->getObjects().end();
+    Scene::ObjectContainerIterator endObjects = renderParams->scene->getObjects().end();
     Scene::ObjectContainerIterator currentObject = endObjects;
     worldUnit coef = 1;
     worldUnit tmpLightCoef = 0;
     worldUnit viewDistance = mainViewDistance;
-    int visibleSize = REFLECTION_DEEP;
+    int visibleSize = renderParams->reflectionDeep;
 //#ifdef USE_MMX
 //    Color tmpColor;
 //#else
@@ -113,8 +109,8 @@ namespace Model {
     while (visibleSize-- > 0 && coef > (0.45f / COLOR_MAX_VALUE))
     {
       viewDistance = mainViewDistance;
-      for (Scene::ObjectContainerIterator object = scene->getObjects().begin(); object < endObjects;
-          object++)
+      for (Scene::ObjectContainerIterator object = renderParams->scene->getObjects().begin();
+          object < endObjects; object++)
       {
         if (( *object)->checkRay(ray, viewDistance, *tmpDistance) == true)
         {
@@ -125,25 +121,25 @@ namespace Model {
 
       if (currentObject != endObjects)
       {
-        PVOperations::multiply(viewDistance, ray.getDir().data, distanceToIntersection->data);
+        ray.getDir().data.multiply(viewDistance, distanceToIntersection->data);
 
         //Calculate intersection point
-        PVOperations::move(ray.getStart().data, distanceToIntersection->data, intersection->data);
+        ray.getStart().data.move(distanceToIntersection->data, intersection->data);
 
         //Get normal vector at intersection point
         ( *currentObject)->getNormal( *intersection, *normalAtIntersection);
 
-        Material *currentMat = scene->getMaterials() [( *currentObject)->getMaterial()].data();
+        Material *currentMat =
+            renderParams->scene->getMaterials() [( *currentObject)->getMaterial()].data();
 
         tmpLightCoef = (1.0f - currentMat->getReflection()) * coef * (1.0f / COLOR_COUNT);
 
         //Calculate light contribution
-        Scene::LighContainerIterator endLights = scene->getLights().end();
-        for (Scene::LighContainerIterator light = scene->getLights().begin(); light < endLights;
-            light++)
+        Scene::LighContainerIterator endLights = renderParams->scene->getLights().end();
+        for (Scene::LighContainerIterator light = renderParams->scene->getLights().begin();
+            light < endLights; light++)
         {
-          PVOperations::diff(( *light)->getPosition().data, intersection->data,
-                             pointLightDist->data);
+          ( *light)->getPosition().data.diff(intersection->data, pointLightDist->data);
           if (normalAtIntersection->dotProduct(pointLightDist->data) <= 0.0f)
           {
             continue;
@@ -160,7 +156,7 @@ namespace Model {
           // Computation of the shadows
           inShadow = false;
 
-          for (Scene::ObjectContainerIterator object = scene->getObjects().begin();
+          for (Scene::ObjectContainerIterator object = renderParams->scene->getObjects().begin();
               object < endObjects; object++)
           {
             if (( *object)->checkRay( *lightRay, pointLightDist->length, *tmpDistance) == true)
@@ -187,9 +183,8 @@ namespace Model {
         coef *= currentMat->getReflection();
 
         //Calculate reflection vector
-        PVOperations::multiply(ray.getDir().dotProduct(normalAtIntersection->data) * 2,
-                               normalAtIntersection->data, normalAtIntersection->data);
-        PVOperations::subVectors(ray.getDir().data, normalAtIntersection->data, ray.getDir().data);
+        normalAtIntersection->data *= ray.getDir().dotProduct(normalAtIntersection->data) * 2;
+        ray.getDir().data -= normalAtIntersection->data;
         ray.getDir().normalize();
         ray.setParams( *intersection);
 
@@ -200,11 +195,6 @@ namespace Model {
         return;
       }
     }
-  }
-
-  void Renderer::calculateDistancePrecision (){
-    intersectionErrorValue = floor(log10(scene->getCamera()->getViewDistance())) - FLOAT_PRECISION;
-    intersectionErrorValue = pow(10, intersectionErrorValue);
   }
 
 }

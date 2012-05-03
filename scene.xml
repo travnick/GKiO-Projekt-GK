@@ -69,7 +69,7 @@
 	  	<position x="0" y="-30" z="-45" />
 	  </camera>
 	 
-	  <plane angleX="0" angleY="1" angleZ="0" d="0" material="4" />
+	  <plane angleX="0" angleY="-1" angleZ="0" d="0" material="4" />
 	  <!-- TOP -->
 	  <sphere r="1.0" material="5" offset="15">
 	  	<position x="-45" y="-60" z="50" />
@@ -81,14 +81,14 @@
 	  	<multiply x="15" y="8" z="1" />
 	  </sphere>
 	  <!-- LEFT -->
-	  <sphere r="2.0" material="3" offset="-4">
+	  <sphere r="2.0" material="3" offset="-8">
 	  	<position x="-47" y="-3" z="140" />
-	  	<multiply x="1" y="15" z="22" />
+	  	<multiply x="1" y="8" z="11" />
 	  </sphere>
 	  <!-- RIGHT -->
-	  <sphere r="2.0" material="3" offset="-4">
+	  <sphere r="2.0" material="3" offset="-8">
 	  	<position x="47" y="-3" z="140" />
-	  	<multiply x="1" y="15" z="22" />
+	  	<multiply x="1" y="8" z="11" />
 	  </sphere>
 	  <!-- BOTTOM
 	  <sphere r="2.0" material="6" offset="3.5">

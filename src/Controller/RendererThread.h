@@ -19,6 +19,15 @@ namespace Model {
 
 namespace Controller {
 
+  struct RenderParams {
+      QSharedPointer <Model::Scene> scene;
+      bool allowRunning;
+      bool randomRender;
+      int maxThreadCount;
+      int reflectionDeep;
+      int refractionDeep;
+  };
+
   /**Single render thread
    * It renders part of image which is described in tile parameter
    *
@@ -31,7 +40,7 @@ namespace Controller {
       /**Initializes renderer
        *
        */
-      RendererThread ();
+      RendererThread (const QSharedPointer <RenderParams> &renderParams);
 
       /**Needed for QScopedPointer
        *
@@ -40,14 +49,9 @@ namespace Controller {
 
       /**Sets rendering parameters
        *
-       * If allowRunning is changed outside the thread to false
-       * thread breaks rendering as fast as renderer checks condition
-       * "if (allowRunning)"
-       *
-       * @param scene 3D scene to render
-       * @param allowRunning is allowing thread to run or not
+       * @param renderParams rendering parameters
        */
-      void setRenderParams (const Model::Scene &scene, const bool *allowRunning);
+      void setRenderParams (const RenderParams &renderParams);
 
       /**Sets tile to render
        *
@@ -65,8 +69,6 @@ namespace Controller {
       void run ();
 
     private:
-      const bool *allowRunning;
-
       /**Description of image part to render
        *
        */

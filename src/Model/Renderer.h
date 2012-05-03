@@ -9,6 +9,12 @@
 #include "Controller/GlobalDefines.h"
 #include "Model/ModelDefines.h"
 
+namespace Controller {
+  //Forward declarations -->
+  struct RenderParams;
+// <-- Forward declarations
+}
+
 namespace Model {
   //Forward declarations -->
   class Ray;
@@ -28,7 +34,7 @@ namespace Model {
       /**Initializes temporary fields
        *
        */
-      Renderer ();
+      Renderer (const Controller::RenderParams &renderParams);
 
       /**Needed for QScopedPointer
        *
@@ -36,21 +42,17 @@ namespace Model {
       ~Renderer ();
 
       /**Renders part of image which is described by tile
-       * "run" is checked at the beginning of each loop.
-       * If run == false then rendering stops
        *
        * @param tile part of image
-       * @param run permission for rendering
        */
-      void render (const RenderTileData &tile, const bool &run);
+      void render (const RenderTileData &tile);
 
       /**Sets 3D scene to render
        *
        * @param scene 3d scene to render
        */
-      inline void setScene (const Model::Scene *newScene){
-        scene = newScene;
-        calculateDistancePrecision();
+      inline void setRenderParams (const Controller::RenderParams * newRenderParams){
+        renderParams = newRenderParams;
       }
 
     private:
@@ -65,7 +67,7 @@ namespace Model {
 
       const RenderTileData *tilePtr;
 
-      const Scene *scene;
+      const Controller::RenderParams * renderParams;
 
       worldUnit intersectionErrorValue;
 
@@ -78,8 +80,6 @@ namespace Model {
        * @param viewDistance maximum range to check intersections
        */
       void shootRay (Ray & ray, Color &resultColor, worldUnit viewDistance) const;
-
-      void calculateDistancePrecision ();
 
       Q_DISABLE_COPY (Renderer)
   };

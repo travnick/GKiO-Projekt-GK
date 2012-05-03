@@ -21,6 +21,7 @@
 #include "Controller/ThreadRunner.h"
 #include "Model/RenderTileData.h"
 #include "Model/Scene.h"
+#include "Controller/RendererThread.h"
 
 #define TIME_BEFORE_REMOVE_THREADS 60000 //[ms]
 #define TIME_BEFORE_REMOVE_THREADS_ON_EXIT 1000 //[ms]
@@ -92,9 +93,16 @@ namespace Controller {
     image->width = ui->tileSize->value();
     image->height = image->width;
 
+    QSharedPointer <RenderParams> renderParams(new RenderParams);
+    renderParams->scene = scene;
+    renderParams->allowRunning = true;
+    renderParams->randomRender = ui->randomRender->isChecked();
+    renderParams->maxThreadCount = ui->threadCounter->value();
+    renderParams->reflectionDeep = ui->maxReflectionDeep->value() + 1; // +1 is important !!
+    renderParams->refractionDeep = ui->maxRefractionDeep->value();
+
     ThreadRunner *threadRunner = new ThreadRunner;
-    threadRunner->setParams(image, scene, ui->threadCounter->value(),
-                            ui->randomRender->isChecked());
+    threadRunner->setParams(image, renderParams);
 
     connect(threadRunner, SIGNAL(renderFinished()), this, SLOT(renderFinished()));
     connect(ui->terminateRender, SIGNAL(clicked()), threadRunner, SLOT(terminate()));

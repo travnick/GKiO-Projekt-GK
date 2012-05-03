@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <x86intrin.h> // SIMD functions
 #include "Controller/GlobalDefines.h"
 #include "Model/ModelDefines.h"
 #include "Model/SSEData.h"
@@ -27,7 +26,7 @@ namespace Model {
         setDefaultColor();
       }
 
-      inline Color (const __m128 &newData)
+      inline Color (const SSEData &newData)
           : data(newData){
       }
 
@@ -62,8 +61,7 @@ namespace Model {
        * @return
        */
       inline Color operator * (float mulValue) const{
-        __m128 value = _mm_set1_ps(mulValue);
-        return _mm_mul_ps(data, value);
+        return SSEData(data * mulValue);
       }
 
       /**
@@ -72,8 +70,7 @@ namespace Model {
        * @return
        */
       inline Color &operator *= (float mulValue){
-        __m128 value = _mm_set1_ps(mulValue);
-        data = _mm_mul_ps(data, value);
+        data *= mulValue;
         return *this;
       }
 
@@ -83,7 +80,7 @@ namespace Model {
        * @return
        */
       inline Color operator * (const Color& other) const{
-        return _mm_mul_ps(data, other.data);
+        return SSEData(data * other.data);
       }
 
       /**
@@ -92,7 +89,7 @@ namespace Model {
        * @return
        */
       inline Color &operator *= (const Color& other){
-        data = _mm_mul_ps(data, other.data);
+        data *= other.data;
         return *this;
       }
 
@@ -102,7 +99,7 @@ namespace Model {
        * @return
        */
       inline Color &operator += (const Color& other){
-        data = _mm_add_ps(data, other.data);
+        data += other.data;
         return *this;
       }
 

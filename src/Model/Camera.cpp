@@ -7,15 +7,16 @@
 
 #include "Model/Camera.h"
 #include "Model/Vector.h"
-#include "Model/PointAndVectorOperations.h"
+
+const float DEFAULT_INTERSECTION_ERROR_VALUE = 0.01f;
 
 namespace Model {
 
   typedef std::map <QString, Camera::Type> cameraTypesMap;
 
   Camera::Camera ()
-      : direction(new Vector), origin(new Point), screenTopLeft(new Point), screenBottomRight(
-          new Point){
+      : distancePrecision(DEFAULT_INTERSECTION_ERROR_VALUE), direction(new Vector), origin(
+          new Point), screenTopLeft(new Point), screenBottomRight(new Point){
     screenImageRatio = 0;
     imageWidth = 0;
     screenWidth = 0;
@@ -30,8 +31,8 @@ namespace Model {
 
     direction->normalize();
     origin.reset(new Point(position));
-    PVOperations::multiply(focalLength, direction->data, tmpVector.data);
-    PVOperations::negMove(origin->data, tmpVector.data, origin->data);
+    direction->data.multiply(focalLength, tmpVector.data);
+    origin->data.negMove(tmpVector.data, origin->data);
 
     screenImageRatio = screenWidth / imageWidth;
     screenHeight = imageHeight * screenImageRatio;
@@ -66,5 +67,10 @@ namespace Model {
 
   void Camera::setDirection (const Vector &vector){
     *direction = vector;
+  }
+
+  void Camera::calculateDistancePrecision (){
+    distancePrecision = floor(log10(getViewDistance())) - FLOAT_PRECISION;
+    distancePrecision = pow(10, distancePrecision);
   }
 }

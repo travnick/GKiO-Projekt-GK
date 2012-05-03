@@ -6,9 +6,8 @@
 
 #include <QSharedPointer>
 #include <QScopedPointer>
-#include "Model/PointAndVectorOperations.h"
-#include "Model/Vector.h"
 
+#include "Model/Vector.h"
 #include "Model/Object.h"
 
 #define MAX_VIEW_ANGLE 180
@@ -61,7 +60,7 @@ namespace Model {
       inline void getDirection (const Point &point, Vector &directionToPoint) const{
         Q_ASSERT(screenImageRatio > 0);
 
-        PVOperations::diff(point.data, origin->data, directionToPoint.data);
+        point.data.diff(origin->data, directionToPoint.data);
 
         directionToPoint.normalize();
       }
@@ -203,6 +202,16 @@ namespace Model {
        */
       inline void setViewDistance (const worldUnit &newViewDistance){
         viewDistance = newViewDistance;
+        calculateDistancePrecision();
+      }
+
+      /**Calculates minimum precision of calculation with the present view distance
+       *
+       */
+      void calculateDistancePrecision ();
+
+      worldUnit getDistancePrecision () const{
+        return distancePrecision;
       }
 
     private:
@@ -213,6 +222,7 @@ namespace Model {
       worldUnit screenWidth;
       worldUnit screenHeight;
       worldUnit screenImageRatio;
+      worldUnit distancePrecision;
       Type type;
       QSharedPointer <Vector> direction;
       QScopedPointer <Point> origin;

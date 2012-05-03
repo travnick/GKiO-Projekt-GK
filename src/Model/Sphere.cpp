@@ -6,7 +6,6 @@
 
 #include "Model/Sphere.h"
 #include "Model/Ray.h"
-#include "Model/PointAndVectorOperations.h"
 
 namespace Model {
 
@@ -21,12 +20,12 @@ namespace Model {
   }
 
   void Sphere::getNormal (const Point& point, Vector &normalAtPoint) const{
-    PVOperations::diff(point.data, getPosition().data, normalAtPoint.data);
+    point.data.diff(getPosition().data, normalAtPoint.data);
     normalAtPoint.normalize();
   }
 
   bool Sphere::checkRay (const Ray& ray, worldUnit& range, Vector& e) const{
-    PVOperations::diff(position.data, ray.getStart().data, e.data);
+    position.data.diff(ray.getStart().data, e.data);
 
     worldUnit a = ray.getDir().dotProduct(e.data);
 

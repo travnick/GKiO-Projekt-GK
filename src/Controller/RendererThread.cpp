@@ -8,20 +8,18 @@
 
 namespace Controller {
 
-  RendererThread::RendererThread (){
-    renderer.reset(new Model::Renderer);
+  RendererThread::RendererThread (const QSharedPointer <RenderParams> &newRenderParams)
+      : renderer(new Model::Renderer( *newRenderParams)){
   }
 
   RendererThread::~RendererThread (){
   }
 
-  void RendererThread::setRenderParams (const Model::Scene &scene, const bool *newAllowRunning){
-    renderer->setScene( &scene);
-    allowRunning = newAllowRunning;
+  void RendererThread::setRenderParams (const RenderParams &){
   }
 
   void RendererThread::run (){
-    renderer->render( *tile, *allowRunning);
+    renderer->render( *tile);
   }
 
 } /* namespace Controller */

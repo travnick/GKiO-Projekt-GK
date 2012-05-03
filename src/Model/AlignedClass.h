@@ -13,7 +13,7 @@ namespace Model {
   class AlignedClass {
     public:
       //For x86_64 we don't need this because of default 16B heap alignment (ABI)
-#ifndef __x86_64__
+#if __x86_64__ == 1 && USE_SSE == 12
       //TODO: Implement other operators new and delete
 
       /**Allocates memory aligned to specified boundary

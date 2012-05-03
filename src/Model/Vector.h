@@ -5,7 +5,6 @@
 #pragma once
 
 #include "Model/Point.h"
-#include "Model/PointAndVectorOperations.h"
 #include "Controller/GlobalDefines.h"
 
 namespace Model {
@@ -35,7 +34,7 @@ namespace Model {
 
         worldUnit constant = 1.0f / length;
 
-        PVOperations::multiply(constant, data, data);
+        data *= constant;
       }
 
       /**Calculate length of vector
@@ -54,17 +53,7 @@ namespace Model {
        * @return dotProduct
        */
       inline worldUnit dotProduct (){
-        IGNORE_WARNINGS_BEGIN
-#ifdef __SSE4_1__
-        _mm_store_ss( &squareLength, _mm_dp_ps(data, data, DOT_PROD_MASK));
-#else
-        __m128 result = _mm_mul_ps(data, data);
-        result = _mm_hadd_ps(result, result);
-        result = _mm_hadd_ps(result, result);
-        _mm_store_ss( &squareLength, result);
-#endif
-        IGNORE_WARNINGS_END
-        return squareLength;
+        return squareLength = data.dotProduct();
       }
 
       /**Calculates dot product with other vector or point
@@ -73,8 +62,8 @@ namespace Model {
        * @param vector2 other vector or point
        * @return dotProduct
        */
-      inline worldUnit dotProduct (const __m128 &vector2) const{
-        return Point::dotProduct(vector2);
+      inline worldUnit dotProduct (const SSEData &vector2) const{
+        return data.dotProduct(vector2);
       }
 
       /**Sets parameters of vector

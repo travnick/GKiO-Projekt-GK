@@ -9,7 +9,6 @@ set(HDRS_Model
   ${SOURCE_DIR}/Model/Plane.h
   ${SOURCE_DIR}/Model/Point.h
   ${SOURCE_DIR}/Model/Point2D.h
-  ${SOURCE_DIR}/Model/PointAndVectorOperations.h
   ${SOURCE_DIR}/Model/Ray.h
   ${SOURCE_DIR}/Model/RenderTileData.h
   ${SOURCE_DIR}/Model/Renderer.h

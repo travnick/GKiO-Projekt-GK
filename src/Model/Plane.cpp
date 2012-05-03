@@ -4,7 +4,6 @@
 
 #include "Model/Plane.h"
 #include "Model/Ray.h"
-#include "Model/PointAndVectorOperations.h"
 
 using Model::Plane;
 
@@ -28,7 +27,7 @@ bool Plane::checkRay (const Ray& ray, worldUnit& range, Vector&) const{
   //We are in front/back of plane
   {
 
-    worldUnit raystartNormalDot = ray.getStart().dotProduct(normal.data);
+    worldUnit raystartNormalDot = ray.getStart().data.dotProduct(normal.data);
     worldUnit t = (normal.length - raystartNormalDot) / rayNormalDot;
 
     if ((t > 0.0f) && (t < range))

@@ -25,6 +25,7 @@ namespace Controller {
   //Forward declarations -->
   class MainWindow;
   class RendererThread;
+  struct RenderParams;
   // <-- Forward declarations
 
   /**Creates threads for image rendering
@@ -37,17 +38,13 @@ namespace Controller {
       ThreadRunner ();
       virtual ~ThreadRunner ();
 
-      /**Sets image parameters
+      /**Sets image and rendering parameters
        *
        * @param image image description
-       * @param scene 3D scene
-       * @param maxThreadCount max thread to run simultaneously
-       * @param randomRender determines if render tiles randomly
+       * @param newRenderParams rendering parameters
        */
       void setParams (const QSharedPointer <Model::RenderTileData> &image,
-                      const QSharedPointer <Model::Scene> &scene,
-                      int maxThreadCount,
-                      bool randomRender);
+                      const QSharedPointer <RenderParams> &newRenderParams);
 
       /**Creates tiles and render threads, each tread renders one tile.
        * There are created as much threads as tiles.
@@ -69,8 +66,8 @@ namespace Controller {
 
     private:
       bool ableToRunning;
-      bool randomRender;
-      int maxThreadCount;
+
+      QSharedPointer <RenderParams> renderParams;
 
       /**Stores current count of created threads
        *
@@ -91,7 +88,6 @@ namespace Controller {
       QList <QSharedPointer <Model::RenderTileData> > tilesRandomized;
 
       QSharedPointer <Model::RenderTileData> image;
-      QSharedPointer <Model::Scene> scene;
 
       /**Creates image tile
        * New tile is added to the end of tile container

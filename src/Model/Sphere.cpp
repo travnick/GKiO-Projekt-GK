@@ -29,12 +29,13 @@ namespace Model {
 
     worldUnit a = ray.getDir().dotProduct(e.data);
 
-    if ((a - size) > range)
+    worldUnit D = squareRadius - e.dotProduct() + a * a;
+
+    //There is no intersection with sphere if D < 0
+    if (D - DEFAULT_INTERSECTION_ERROR_VALUE < 0)
     {
       return false;
     }
-
-    worldUnit D = squareRadius - e.dotProduct() + a * a;
 
     worldUnit t = SQRT(D);
 
@@ -42,22 +43,17 @@ namespace Model {
     //We are outside sphere
     {
       t = a - t;
-      if ((t > 0.f) && (t < range))
-      {
-        range = t;
-        return true;
-      }
     }
     else
     //We are inside sphere
     {
       t += a;
+    }
 
-      if ((t > 0.f) && (t < range))
-      {
-        range = t;
-        return true;
-      }
+    if ((t > 0.f) && (t < range))
+    {
+      range = t;
+      return true;
     }
 
     return false;

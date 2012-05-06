@@ -18,7 +18,6 @@ namespace Controller {
 namespace Model {
   //Forward declarations -->
   class Ray;
-  class Scene;
   class Color;
   struct RenderTileData;
   class Vector;
@@ -66,8 +65,6 @@ namespace Model {
       // <-- Internal temporary
 
       const Controller::RenderParams * renderParams;
-
-      worldUnit intersectionErrorValue;
 
       /**It checks if given ray intersects with any object in scene
        * If there is no intersection with given ray then returned color

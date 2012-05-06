@@ -9,8 +9,6 @@
 #include "Model/ModelDefines.h"
 #include "Model/Point.h"
 
-const float DEFAULT_INTERSECTION_ERROR_VALUE = 0.01f;
-
 namespace Model {
 
   /**Common object class
@@ -18,8 +16,7 @@ namespace Model {
    */
   class Object {
     public:
-      Object ()
-          : distancePrecision(DEFAULT_INTERSECTION_ERROR_VALUE){
+      Object (){
       }
 
       /**Sets position of object in 3D space
@@ -67,7 +64,6 @@ namespace Model {
 
     protected:
       Point position;
-      worldUnit distancePrecision;
   };
 
 } /* namespace Model */

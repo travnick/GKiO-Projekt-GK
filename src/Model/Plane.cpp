@@ -5,6 +5,8 @@
 #include "Model/Plane.h"
 #include "Model/Ray.h"
 
+const float ANGLE_ERROR_VALUE = 0.0001f;
+
 using Model::Plane;
 
 Plane::Plane (){
@@ -23,10 +25,9 @@ bool Plane::checkRay (const Ray& ray, worldUnit& range, Vector&) const{
 
   worldUnit rayNormalDot = ray.getDir().dotProduct(normal.data);
 
-  if (rayNormalDot != 0.0f)
+  if (rayNormalDot > ANGLE_ERROR_VALUE || rayNormalDot < -ANGLE_ERROR_VALUE)
   //We are in front/back of plane
   {
-
     worldUnit raystartNormalDot = ray.getStart().data.dotProduct(normal.data);
     worldUnit t = (normal.length - raystartNormalDot) / rayNormalDot;
 
@@ -61,7 +62,7 @@ void Plane::calculateNormal (){
 void Plane::getNormal (const Point &point, Vector &normalAtPoint) const{
   normalAtPoint = normal;
 
-  if (normal.data.dotProduct(point.data) - normal.length - distancePrecision < 0)
+  if (normal.data.dotProduct(point.data) - normal.length < 0)
   {
     normalAtPoint.data.negate();
   }

@@ -14,9 +14,6 @@ namespace Model {
    */
   class Plane: public Model::VisibleObject {
     public:
-      enum normalParams {
-        A = 0, B = 1, C = 2, D = 3
-      };
 
       /**Creates plane
        *

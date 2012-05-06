@@ -17,9 +17,11 @@ inline QString toLowerCase (const char* string){
 }
 
 //Constants -->
-#define PI 3.14159265
+const float PI = 3.14159265;
 
 #define FLOAT_PRECISION 6
+
+const float DEFAULT_INTERSECTION_ERROR_VALUE = 0.1f;
 // <-- Constants
 
 //Macros -->

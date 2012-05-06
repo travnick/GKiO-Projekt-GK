@@ -197,16 +197,6 @@ namespace Model {
        */
       inline void setViewDistance (const worldUnit &newViewDistance){
         viewDistance = newViewDistance;
-        calculateDistancePrecision();
-      }
-
-      /**Calculates minimum precision of calculation with the present view distance
-       *
-       */
-      void calculateDistancePrecision ();
-
-      worldUnit getDistancePrecision () const{
-        return distancePrecision;
       }
 
       Point screenWidthDelta;

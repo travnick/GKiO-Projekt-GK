@@ -2,8 +2,6 @@
 /// @date 01-12-2011
 /// @author Mikołaj Milej
 
-#include <cmath>
-
 #include "Model/Renderer.h"
 #include "Model/Ray.h"
 #include "Model/Point.h"
@@ -21,12 +19,12 @@ const float E = 2.71828183f;
 
 namespace Model {
 
-  const float LAMBERT_MIN = (0.49f / (COLOR_MAX_VALUE * COLOR_MAX_VALUE));
+  //Because qRound(0.49f * COLOR_MAX_VALUE / COLOR_MAX_VALUE) < 1
+  const float COLOR_MIN_VALUE = 0.49f / COLOR_MAX_VALUE;
 
   Renderer::Renderer (const Controller::RenderParams &newRenderParams)
       : tmpDistance(new Vector), pointLightDist(new Vector), distanceToIntersection(new Vector), lightRay(
-          new Ray), normalAtIntersection(new Vector), intersection(new Point), intersectionErrorValue(
-          newRenderParams.scene->getCamera()->getDistancePrecision()){
+          new Ray), normalAtIntersection(new Vector), intersection(new Point){
     setRenderParams( &newRenderParams);
   }
 
@@ -54,9 +52,9 @@ namespace Model {
     {
       currentOnScreen.data = startOnScreen.data;
 
-//Checking if thread is allowed to run
       for (imageUnit iCol = tile.topLeft.x; renderParams->allowRunning && iCol < tile.bottomRight.x;
           ++iCol)
+      //Checking if thread is allowed to run: renderParams->allowRunning
       {
         if (camera->getType() == Camera::Conic)
         {
@@ -95,11 +93,9 @@ namespace Model {
     worldUnit tmpLightCoef = 0;
     worldUnit viewDistance = mainViewDistance;
     int visibleSize = renderParams->reflectionDeep;
-    Color tmpColor;
     bool inShadow;
 
-    //Because qRound(0.49f * COLOR_MAX_VALUE / COLOR_MAX_VALUE) < 1
-    while (visibleSize-- > 0 && coef > (0.45f / COLOR_MAX_VALUE))
+    while (visibleSize-- > 0 && coef > COLOR_MIN_VALUE)
     {
       viewDistance = mainViewDistance;
       for (Scene::ObjectContainerIterator object = renderParams->scene->getObjects().begin();
@@ -107,7 +103,7 @@ namespace Model {
       {
         if (( *object)->checkRay(ray, viewDistance, *tmpDistance) == true)
         {
-          viewDistance -= intersectionErrorValue;
+          viewDistance -= DEFAULT_INTERSECTION_ERROR_VALUE;
           currentObject = object;
         }
       }
@@ -125,6 +121,7 @@ namespace Model {
         Material *currentMat =
             renderParams->scene->getMaterials() [( *currentObject)->getMaterial()].data();
 
+        //(1.0f / COLOR_COUNT) because few lines bellow we do color * color
         tmpLightCoef = (1.0f - currentMat->getReflection()) * coef * (1.0f / COLOR_COUNT);
 
         //Calculate light contribution
@@ -140,7 +137,7 @@ namespace Model {
 
           pointLightDist->normalize();
 
-          if (pointLightDist->length < 0.0f)
+          if (pointLightDist->length < DEFAULT_INTERSECTION_ERROR_VALUE)
           {
             continue;
           }
@@ -159,20 +156,14 @@ namespace Model {
             }
           }
 
-          if ( !inShadow)
+          if ( !inShadow && pointLightDist->length < 1500)
+          //because pow(1.01f, - (>1500)) gives too small result and float underflow
           {
             // Lambert lighting model + hacked light attenuation
             worldUnit lambert = lightRay->getDir().dotProduct(normalAtIntersection->data) * 1
                 * ( *light)->power * pow(1.01f, -pointLightDist->length) * tmpLightCoef;
 
-            // qRound(0.49f / (COLOR_MAX_VALUE * COLOR_MAX_VALUE)) < 1
-            if (lambert > LAMBERT_MIN)
-            {
-              tmpColor = ( * *light);
-              tmpColor *= currentMat->getColor();
-              tmpColor *= lambert;
-              resultColor += tmpColor;
-            }
+            resultColor += ( * *light) * currentMat->getColor() * lambert;
           }
         }
 

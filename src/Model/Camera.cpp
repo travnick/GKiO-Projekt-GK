@@ -85,9 +85,4 @@ namespace Model {
     direction.set(0, 0, 1);
     direction.rotate(angles);
   }
-
-  void Camera::calculateDistancePrecision (){
-    distancePrecision = floor(log10(getViewDistance())) - FLOAT_PRECISION;
-    distancePrecision = pow(10, distancePrecision);
-  }
 }

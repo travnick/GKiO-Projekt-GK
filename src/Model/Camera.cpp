@@ -8,15 +8,11 @@
 #include "Model/Camera.h"
 #include "Model/Vector.h"
 
-const float DEFAULT_INTERSECTION_ERROR_VALUE = 0.01f;
-
 namespace Model {
 
   typedef std::map <QString, Camera::Type> cameraTypesMap;
 
-  Camera::Camera ()
-      : distancePrecision(DEFAULT_INTERSECTION_ERROR_VALUE), direction(new Vector), origin(
-          new Point), screenTopLeft(new Point), screenBottomRight(new Point){
+  Camera::Camera (){
     screenImageRatio = 0;
     imageWidth = 0;
     screenWidth = 0;
@@ -25,14 +21,15 @@ namespace Model {
   void Camera::calibrate (){
     Q_ASSERT(imageWidth > 0);
     Vector tmpVector;
+    QMatrix4x4 transformMatrix;
 
     worldUnit angle = (180 - FOV) / 2.0f;
     worldUnit focalLength = tan(RAD(angle)) * screenWidth / 2;
 
-    direction->normalize();
-    origin.reset(new Point(position));
-    direction->data.multiply(focalLength, tmpVector.data);
-    origin->data.negMove(tmpVector.data, origin->data);
+    direction.normalize();
+    origin = position;
+    direction.data.multiply(focalLength, tmpVector.data);
+    origin.data.negMove(tmpVector.data, origin.data);
 
     screenImageRatio = screenWidth / imageWidth;
     screenHeight = imageHeight * screenImageRatio;
@@ -40,10 +37,23 @@ namespace Model {
     unitType halfHeight = screenHeight / 2;
     unitType halfWidth = screenWidth / 2;
 
-    screenTopLeft->set(position.data.x() - halfWidth, position.data.y() - halfHeight,
-                       position.data.z());
-    screenBottomRight->set(position.data.x() + halfWidth, position.data.y() + halfHeight,
-                           position.data.z());
+    screenTopLeft.set( -halfWidth, halfHeight, 0);
+    screenTopRight.set(halfWidth, halfHeight, 0);
+    screenBottomLeft.set( -halfWidth, -halfHeight, 0);
+
+    screenTopLeft.rotate(angles);
+    screenTopRight.rotate(angles);
+    screenBottomLeft.rotate(angles);
+
+    screenTopLeft.data += position;
+    screenTopRight.data += position;
+    screenBottomLeft.data += position;
+
+    screenWidthDelta.data = screenTopRight.data - screenTopLeft.data;
+    screenHeightDelta.data = screenBottomLeft.data - screenTopLeft.data;
+
+    screenWidthDelta.data *= 1.0f / imageWidth;
+    screenHeightDelta.data *= 1.0f / imageHeight;
   }
 
   void Camera::setType (const QString & typeName){
@@ -66,7 +76,14 @@ namespace Model {
   }
 
   void Camera::setDirection (const Vector &vector){
-    *direction = vector;
+    direction = vector;
+  }
+
+  void Camera::setAngles (const Vector& vector){
+    angles = vector;
+    //look at the z+ axis
+    direction.set(0, 0, 1);
+    direction.rotate(angles);
   }
 
   void Camera::calculateDistancePrecision (){

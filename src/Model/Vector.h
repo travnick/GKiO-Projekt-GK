@@ -25,6 +25,10 @@ namespace Model {
           : length(0), squareLength(0){
       }
 
+      Vector (const SSEData &newData)
+          : Point(newData), length(0), squareLength(0){
+      }
+
       /**Normalizes vector
        * Length before normalization is stored to length
        *
@@ -78,6 +82,15 @@ namespace Model {
         //previous data are invalid
         length = -1;
         squareLength = -1;
+      }
+
+      inline Vector operator * (const Vector &other) const{
+        return data.crossProduct(other.data);
+      }
+
+      inline Vector &operator *= (const Vector &other){
+        data = data.crossProduct(other.data);
+        return *this;
       }
   };
 }

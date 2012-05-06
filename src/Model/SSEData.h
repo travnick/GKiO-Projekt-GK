@@ -43,12 +43,16 @@ namespace Model {
     public:
 
       inline SSEDataPrivate (){
+        // It's important, without determining W value there is random performance loss
+        ( *this) [W] = 1;
       }
 
-      inline SSEDataPrivate (const float &x, const float &y, const float &z){
+      inline SSEDataPrivate (float x, float y, float z){
         ( *this) [X] = x;
         ( *this) [Y] = y;
         ( *this) [Z] = z;
+        // It's important, without determining W value there is random performance loss
+        ( *this) [W] = 1;
       }
 
       inline SSEDataPrivate (const __m128 &other){
@@ -60,18 +64,15 @@ namespace Model {
       }
 
 #if USE_SSE == 1
-      inline & operator __m128 ()
-      {
+      inline & operator __m128 (){
         return sse();
       }
 
-      inline __m128 & sse ()
-      {
+      inline __m128 & sse (){
         return data;
       }
 
-      inline const __m128 & sse () const
-      {
+      inline const __m128 & sse () const{
         return data;
       }
 #endif
@@ -95,8 +96,7 @@ namespace Model {
         return dataArray [idx];
       }
 
-
-      //Some hacks to act like pointer
+      //Some hacks to act like pointer. I't was needed in version with pointers
       inline const SSEDataPrivate *operator -> () const{
         return this;
       }
@@ -126,6 +126,10 @@ namespace Model {
 
       inline SSEData (const SSEDataBaseType &newData)
           : internalData(newData){
+      }
+
+      inline SSEData (float newX, float newY, float newZ)
+          : internalData(newX, newY, newZ){
       }
 
       inline SSEData & operator = (const SSEData &other){
@@ -247,12 +251,12 @@ namespace Model {
        * @param other SSEData
        * @param result SSEData
        */
-      inline SSEDataBaseType operator + (const SSEData other) const{
+      inline SSEDataBaseType operator + (const SSEData &other) const{
 #if USE_SSE == 1
         return _mm_add_ps(const_cast <SSEData&>( *this), const_cast <SSEData&>(other));
 #else
         return SSEDataBaseType(( *this) [X] + other [X], ( *this) [Y] + other [Y],
-                               ( *this) [Z] + other [Z]);
+            ( *this) [Z] + other [Z]);
 #endif
       }
 
@@ -262,7 +266,7 @@ namespace Model {
        * @param other SSEData
        * @param result SSEData
        */
-      inline SSEData &operator += (const SSEData other){
+      inline SSEData &operator += (const SSEData &other){
         *internalData = *this + other;
         return *this;
       }
@@ -273,12 +277,12 @@ namespace Model {
        * @param other SSEData
        * @param result SSEData
        */
-      inline SSEDataBaseType operator - (const SSEData other) const{
+      inline SSEDataBaseType operator - (const SSEData &other) const{
 #if USE_SSE == 1
         return _mm_sub_ps(const_cast <SSEData&>( *this), const_cast <SSEData&>(other));
 #else
         return SSEDataBaseType(( *this) [X] - other [X], ( *this) [Y] - other [Y],
-                               ( *this) [Z] - other [Z]);
+            ( *this) [Z] - other [Z]);
 #endif
       }
 
@@ -288,7 +292,7 @@ namespace Model {
        * @param other SSEData
        * @param result SSEData
        */
-      inline SSEData &operator -= (const SSEData other){
+      inline SSEData &operator -= (const SSEData &other){
         *internalData = ( *this) - other;
         return *this;
       }
@@ -313,12 +317,12 @@ namespace Model {
        * @param constant worldUnit
        * @param result __m128
        */
-      inline SSEDataBaseType operator * (const SSEData other) const{
+      inline SSEDataBaseType operator * (const SSEData &other) const{
 #if USE_SSE == 1
         return _mm_mul_ps(const_cast <SSEData&>( *this), const_cast <SSEData&>(other));
 #else
         return SSEDataBaseType(( *this) [X] * other [X], ( *this) [Y] * other [Y],
-                               ( *this) [Z] * other [Z]);
+            ( *this) [Z] * other [Z]);
 #endif
       }
 
@@ -339,7 +343,7 @@ namespace Model {
        * @param constant worldUnit
        * @param result __m128
        */
-      inline SSEData &operator *= (const SSEData other){
+      inline SSEData &operator *= (const SSEData &other){
         *internalData = *this * other;
         return *this;
       }
@@ -375,6 +379,22 @@ namespace Model {
         return dotProd;
       }
 
+      /**Calculates cross product of two vectors
+       * You should give here Point::date
+       *
+       * @param other __m128 secondVector
+       * @return dotProduct
+       */
+      inline SSEData crossProduct (const SSEData &other) const{
+        SSEData crossProd;
+
+        crossProd [X] = ( *this) [Y] * other [Z] - ( *this) [Z] * other [Y];
+        crossProd [Y] = ( *this) [Z] * other [X] - ( *this) [X] * other [Z];
+        crossProd [Z] = ( *this) [X] * other [Y] - ( *this) [Y] * other [X];
+
+        return crossProd;
+      }
+
       /**Calculates dot product of vector with self
        * Result is also stored in squareLength
        *
@@ -388,20 +408,26 @@ namespace Model {
       }
       // <-- operations on data
 
+      inline SSEDataBaseType operator - () const{
+        return SSEDataPrivate( -( *this) [X], -( *this) [Y], -( *this) [Z]);
+      }
+
+      inline void negate (){
+        SSEData tmp(0, 0, 0);
+        *this = tmp - *this;
+      }
+
     private:
 #if USE_SSE == 1
-      inline & operator __m128 ()
-      {
+      inline & operator __m128 (){
         return sse();
       }
 
-      inline const __m128 & sse () const
-      {
+      inline const __m128 & sse () const{
         return internalData->sse();
       }
 
-      inline __m128 & sse ()
-      {
+      inline __m128 & sse (){
         return *internalData;
       }
 #endif

@@ -23,7 +23,7 @@ bool Plane::checkRay (const Ray& ray, worldUnit& range, Vector&) const{
 
   worldUnit rayNormalDot = ray.getDir().dotProduct(normal.data);
 
-  if (rayNormalDot != 0)
+  if (rayNormalDot != 0.0f)
   //We are in front/back of plane
   {
 
@@ -50,11 +50,21 @@ void Plane::setNormal (Vector newNormal){
 }
 
 void Plane::calculateNormal (){
-  normal = angles;
+  normal.set(0, 1, 0);
+  normal.rotate(angles);
+
+  normal.normalize();
+
+  normal.length = angles.length;
 }
 
-void Plane::getNormal (const Point&, Vector &normalAtPoint) const{
+void Plane::getNormal (const Point &point, Vector &normalAtPoint) const{
   normalAtPoint = normal;
+
+  if (normal.data.dotProduct(point.data) - normal.length - distancePrecision < 0)
+  {
+    normalAtPoint.data.negate();
+  }
 }
 
 /* namespace Model */

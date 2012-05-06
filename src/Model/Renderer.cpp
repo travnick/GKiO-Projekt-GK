@@ -26,7 +26,7 @@ namespace Model {
   Renderer::Renderer (const Controller::RenderParams &newRenderParams)
       : tmpDistance(new Vector), pointLightDist(new Vector), distanceToIntersection(new Vector), lightRay(
           new Ray), normalAtIntersection(new Vector), intersection(new Point), intersectionErrorValue(
-              newRenderParams.scene->getCamera()->getDistancePrecision()){
+          newRenderParams.scene->getCamera()->getDistancePrecision()){
     setRenderParams( &newRenderParams);
   }
 
@@ -36,38 +36,34 @@ namespace Model {
   void Renderer::render (const RenderTileData &tile){
     const Camera *camera = renderParams->scene->getCamera().data();
     worldUnit viewDistance = renderParams->scene->getCamera()->getViewDistance();
-    Vector direction( *(camera->getDirection()));
-    Point start(camera->getPosition());
+    Vector direction;
+    Point startOnScreen(camera->getScreenTopLeft());
+    Point currentOnScreen;
     Ray ray;
     Color rayResult;
-    tilePtr = &tile;
 
     imageUnit diffToNewLine = BPP * (tile.imageWidth - tile.width);
     imageUnit R = BPP * (tile.topLeft.x + tile.topLeft.y * tile.imageWidth);
     imageUnit G = R + 1;
     imageUnit B = G + 1;
 
-    Camera::unitType rayStartX = camera->getScreenTopLeft()->data.x();
-    Camera::unitType rayStartY = camera->getScreenTopLeft()->data.y();
-
-    Camera::unitType line = rayStartY + tile.topLeft.y * camera->getScreenImageWidthRatio();
-    Camera::unitType col;
+    startOnScreen.data += camera->screenWidthDelta.data * tile.topLeft.x;
+    startOnScreen.data += camera->screenHeightDelta.data * tile.topLeft.y;
 
     for (imageUnit iLine = tile.topLeft.y; iLine < tile.bottomRight.y; ++iLine)
     {
-      col = rayStartX + tile.topLeft.x * camera->getScreenImageWidthRatio();
-      //Checking if thread is allowed to run
+      currentOnScreen.data = startOnScreen.data;
+
+//Checking if thread is allowed to run
       for (imageUnit iCol = tile.topLeft.x; renderParams->allowRunning && iCol < tile.bottomRight.x;
           ++iCol)
       {
-        start.set(col, line);
-
         if (camera->getType() == Camera::Conic)
         {
-          camera->getDirection(start, direction);
+          camera->getDirection(currentOnScreen, direction);
         }
 
-        ray.setParams(start, direction);
+        ray.setParams(currentOnScreen, direction);
 
         rayResult.setDefaultColor();
         shootRay(ray, rayResult, viewDistance);
@@ -81,9 +77,10 @@ namespace Model {
         tile.imageData [B] = rayResult.blue();
         B += BPP;
 
-        col += camera->getScreenImageWidthRatio();
+        currentOnScreen.data += camera->screenWidthDelta.data;
       }
-      line += camera->getScreenImageWidthRatio();
+
+      startOnScreen.data += camera->screenHeightDelta.data;
 
       R += diffToNewLine;
       G += diffToNewLine;
@@ -98,11 +95,7 @@ namespace Model {
     worldUnit tmpLightCoef = 0;
     worldUnit viewDistance = mainViewDistance;
     int visibleSize = renderParams->reflectionDeep;
-//#ifdef USE_MMX
-//    Color tmpColor;
-//#else
-//    Color::dataType tmpColor;
-//#endif
+    Color tmpColor;
     bool inShadow;
 
     //Because qRound(0.49f * COLOR_MAX_VALUE / COLOR_MAX_VALUE) < 1
@@ -175,7 +168,10 @@ namespace Model {
             // qRound(0.49f / (COLOR_MAX_VALUE * COLOR_MAX_VALUE)) < 1
             if (lambert > LAMBERT_MIN)
             {
-              resultColor += ( * *light) * currentMat->getColor() * lambert;
+              tmpColor = ( * *light);
+              tmpColor *= currentMat->getColor();
+              tmpColor *= lambert;
+              resultColor += tmpColor;
             }
           }
         }

@@ -6,14 +6,13 @@
 #include <stdint.h>
 
 // Type defines
-typedef unsigned char uchar;
-typedef unsigned int uint;
-typedef int imageUnit;
-typedef uchar colorType;
+typedef uint32_t uint;
+typedef int32_t imageUnit;
+typedef uint8_t colorType;
 //--------------------------------------------------
 
 // Constants for image
-const char BPP = sizeof(uchar) * 3; //Bytes per pixel: 1 byte for each color: R G B
+const char BPP = sizeof(colorType) * 3; //Bytes per pixel: 1 byte for each color: R G B
 const int COLOR_COUNT = 256;
 const int COLOR_MAX_VALUE = 255;
 

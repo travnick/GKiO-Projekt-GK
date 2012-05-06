@@ -37,7 +37,7 @@ namespace Controller {
 
   void MainWindow::showWarning (QString message){
     QErrorMessage *errorMessage = new QErrorMessage(this);
-    //No memory leaks hear
+    //No memory leaks here
     errorMessage->setAttribute(Qt::WA_DeleteOnClose);
     errorMessage->setWindowModality(Qt::ApplicationModal);
 
@@ -131,6 +131,11 @@ namespace Controller {
       QString fileName = QFileDialog::getSaveFileName(this, tr("Zapisz obraz"), "RenderedImage.png",
                                                       tr("Image Files (*.png)"), 0,
                                                       QFileDialog::DontUseNativeDialog);
+
+      if (fileName.isEmpty())
+      {
+        return;
+      }
 
       QImageWriter imageWriter(fileName);
 

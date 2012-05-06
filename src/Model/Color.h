@@ -18,12 +18,15 @@ namespace Model {
   class Color {
     public:
       enum ColorEnum {
-        R = 3, G = 2, B = 1
+        R = X, G = Y, B = Z
       };
       typedef float dataType;
 
       inline Color (){
-        setDefaultColor();
+      }
+
+      inline Color (dataType r, dataType g, dataType b)
+          : data(r, g, b){
       }
 
       inline Color (const SSEData &newData)
@@ -124,12 +127,30 @@ namespace Model {
        * @return color value
        */
       inline colorType retCol (float color) const{
+        saturate(color);
+
+        return uRound <colorType>(color);
+      }
+
+      /**Saturates given color to COLOR_MAX_VALUE
+       *
+       * @param color RGB data
+       */
+      inline void saturate (SSEData &color) const{
+        saturate(color [R]);
+        saturate(color [G]);
+        saturate(color [B]);
+      }
+
+      /**Saturates given color value to COLOR_MAX_VALUE
+       *
+       * @param color float representation of color
+       */
+      inline void saturate (float &color) const{
         if (color > COLOR_MAX_VALUE)
         {
           color = COLOR_MAX_VALUE;
         }
-
-        return uRound <colorType>(color);
       }
   };
 }

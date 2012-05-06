@@ -4,9 +4,6 @@
 
 #pragma once
 
-#include <QSharedPointer>
-#include <QScopedPointer>
-
 #include "Model/Vector.h"
 #include "Model/Object.h"
 
@@ -48,8 +45,8 @@ namespace Model {
        *
        * @return current camera direction
        */
-      inline const Vector *getDirection () const{
-        return direction.data();
+      inline const Vector &getDirection () const{
+        return direction;
       }
 
       /**Returns direction from camera origin to given point
@@ -60,7 +57,7 @@ namespace Model {
       inline void getDirection (const Point &point, Vector &directionToPoint) const{
         Q_ASSERT(screenImageRatio > 0);
 
-        point.data.diff(origin->data, directionToPoint.data);
+        point.data.diff(origin.data, directionToPoint.data);
 
         directionToPoint.normalize();
       }
@@ -78,16 +75,8 @@ namespace Model {
        *
        * @return top left corner of camera screen
        */
-      inline const Point *getScreenTopLeft () const{
-        return screenTopLeft.data();
-      }
-
-      /**Returns bottom right corner of camera screen in 3D space
-       *
-       * @return bottom right corner of camera screen
-       */
-      inline const Point *getScreenBottomRight () const{
-        return screenBottomRight.data();
+      inline const Point &getScreenTopLeft () const{
+        return screenTopLeft;
       }
 
       /**Returns camera screen height
@@ -196,6 +185,12 @@ namespace Model {
        */
       void setDirection (const Vector &vector);
 
+      /**Sets camera rotation parameters
+       *
+       * @param vector
+       */
+      void setAngles (const Vector &vector);
+
       /**Sets camera view distance
        *
        * @param viewDistance new view distance
@@ -214,6 +209,8 @@ namespace Model {
         return distancePrecision;
       }
 
+      Point screenWidthDelta;
+      Point screenHeightDelta;
     private:
       unitType FOV;
       worldUnit viewDistance;
@@ -222,12 +219,13 @@ namespace Model {
       worldUnit screenWidth;
       worldUnit screenHeight;
       worldUnit screenImageRatio;
-      worldUnit distancePrecision;
       Type type;
-      QSharedPointer <Vector> direction;
-      QScopedPointer <Point> origin;
-      QScopedPointer <Point> screenTopLeft;
-      QScopedPointer <Point> screenBottomRight;
+      Vector direction;
+      Vector angles;
+      Point origin;
+      Point screenTopLeft;
+      Point screenTopRight;
+      Point screenBottomLeft;
   };
 }
 

@@ -65,8 +65,6 @@ namespace Model {
       QScopedPointer <Point> intersection;
       // <-- Internal temporary
 
-      const RenderTileData *tilePtr;
-
       const Controller::RenderParams * renderParams;
 
       worldUnit intersectionErrorValue;

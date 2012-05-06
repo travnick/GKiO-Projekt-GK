@@ -29,12 +29,12 @@
 	 <!-- TOP -->
 	  <light id="1">
 	  	<position x="20" y="-80" z="60" />
-		<color r="160" g="160" b="160" />
+		<color r="255" g="255" b="255" />
 	  </light>
 	 <!-- CENTER -->
 	  <light id="2">
 	  	<position x="0" y="-13" z="70" />
-		<color r="90" g="90" b="90" />
+		<color r="150" g="150" b="150" />
 	  </light>
 	 
 	  <light id="3">
@@ -58,43 +58,70 @@
 	  </light>
 	  
 	  <light id="7">
-	  	<position x="-200" y="-30" z="500" />
+	  	<position x="-10" y="-60" z="140" />
 		<color r="255" g="255" b="255" />
 	  </light>
+
+<!--	  <light id="8">
+	  	<position x="0" y="-50" z="70" />
+		<color r="255" g="255" b="255" />
+	  </light>
+
+	  <light id="9">
+	  	<position x="0" y="-10" z="-40" />
+		<color r="255" g="255" b="255" />
+	  </light>
+
+	  <light id="10">
+	  	<position x="0" y="-40" z="40" />
+		<color r="255" g="255" b="255" />
+	  </light>
+
+	  <light id="11">
+	  	<position x="-30" y="-60" z="70" />
+		<color r="255" g="255" b="255" />
+	  </light>-->
 	</lights>
 	
 	<objects>
 	<!-- 48 - human like FOV -->
-	  <camera screenWidth="10" viewDistance="2000000" fov="48" type="conic">
-	  	<position x="0" y="-30" z="-45" />
+	  <camera screenWidth="10" viewDistance="20000" fov="48" type="conic">
+	  	<direction x="45" y="45" z="180" />
+	  	<position x="100" y="-155" z="0" />
 	  </camera>
 	 
-	  <plane angleX="0" angleY="-1" angleZ="0" d="0" material="4" />
 	  <!-- TOP -->
-	  <sphere r="1.0" material="5" offset="15">
+<!--	  <sphere r="1.0" material="5" offset="15">
 	  	<position x="-45" y="-60" z="50" />
 	  	<multiply x="7" y="1" z="7" />
-	  </sphere>
+	  </sphere>-->
+<!-- 	  <plane angleX="0" angleY="0" angleZ="0" d="-90" material="4" /> -->
 	  <!-- BACK -->
-	  <sphere r="2.0" material="3" offset="-6">
+	  <sphere r="2.0" material="3" offset="-12">
 	  	<position x="43" y="-3" z="140" />
-	  	<multiply x="15" y="8" z="1" />
+	  	<multiply x="8" y="5" z="1" />
 	  </sphere>
+	  <plane angleX="80" angleY="0" angleZ="20" d="180" material="4" />
+<!-- 	  <plane angleX="90" angleY="0" angleZ="0" d="-50" material="4" /> -->
 	  <!-- LEFT -->
-	  <sphere r="2.0" material="3" offset="-8">
+	  <!--<sphere r="2.0" material="3" offset="-8">
 	  	<position x="-47" y="-3" z="140" />
 	  	<multiply x="1" y="8" z="11" />
-	  </sphere>
+	  </sphere>-->
+	  <plane angleX="90" angleY="-80" angleZ="-40" d="100" material="4" />
 	  <!-- RIGHT -->
-	  <sphere r="2.0" material="3" offset="-8">
+	  <!--<sphere r="2.0" material="3" offset="-8">
 	  	<position x="47" y="-3" z="140" />
 	  	<multiply x="1" y="8" z="11" />
-	  </sphere>
-	  <!-- BOTTOM
-	  <sphere r="2.0" material="6" offset="3.5">
+	  </sphere>-->
+<!-- 	  <plane angleX="30" angleY="0" angleZ="0" d="150" material="4" /> -->
+	  <!-- BOTTOM -->
+	  <sphere r="2.0" material="6" offset="7">
 	  	<position x="-45" y="0" z="50" />
-	  	<multiply x="31" y="1" z="31" />
-	  </sphere> -->
+	  	<multiply x="14" y="1" z="14" />
+	  </sphere>
+	  <plane angleX="0" angleY="0" angleZ="10" d="40" material="6" />
+<!-- 	  <plane angleX="0" angleY="-1" angleZ="0" d="0" material="4" /> -->
 	  
 	  <!-- CUBE-->
 	  <sphere r="1.0" material="2" offset="-6">

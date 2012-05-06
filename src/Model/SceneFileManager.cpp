@@ -211,10 +211,7 @@ namespace Model {
           Camera::unitType FOV;
           QString cameraType;
 
-          /**
-           * Camera rotating not yet implemented
-           */
-          vector.set(0, 0, 3);
+          getVPCommon(node.firstChildElement("direction").toElement(), vector);
           getVPCommon(node.firstChildElement("position").toElement(), point);
 
           screenWidth = static_cast <Point::dataType>(getFloat(elem, "screenWidth"));
@@ -234,7 +231,7 @@ namespace Model {
           object->setViewDistance(viewDistance);
           object->setScreenWidth(screenWidth);
           object->setPosition(point);
-          object->setDirection(vector);
+          object->setAngles(vector);
           object->setType(cameraType);
 
           scene.setCamera(object);

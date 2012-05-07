@@ -53,7 +53,7 @@ namespace View {
     }
   }
 
-  const QImage *ImageViewer::getImage (){
+  QImage *ImageViewer::getImage (){
     return image;
   }
 

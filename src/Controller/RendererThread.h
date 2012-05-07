@@ -23,6 +23,7 @@ namespace Controller {
       QSharedPointer <Model::Scene> scene;
       bool allowRunning;
       bool randomRender;
+      bool shadows;
       int maxThreadCount;
       int reflectionDeep;
       int refractionDeep;

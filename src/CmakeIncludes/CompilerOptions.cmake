@@ -8,13 +8,6 @@ if(CMAKE_COMPILER_IS_GNUCC)
   # Turn off all pragma warnings.
   add_definitions(-Wno-pragmas -Wno-unknown-pragmas)
 
-  if(PLATFORM_TARGET STREQUAL ${x86})
-    add_definitions(-m32)
-    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -m32")
-    set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -m32")
-    set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -m32")
-  endif()
-
   add_definitions(-march=native -ffast-math)
 
   if(CMAKE_BUILD_TYPE STREQUAL ${Debug})
@@ -26,6 +19,8 @@ if(CMAKE_COMPILER_IS_GNUCC)
   elseif(CMAKE_BUILD_TYPE STREQUAL ${Release})
     #add_definitions(-pg)
     add_definitions(-O3)
+    add_definitions(-flto=2 -fwhole-program)
+    set(CMAKE_EXE_LINKER_FLAGS "-flto=2 -fwhole-program -fuse-linker-plugin")
 
   elseif(CMAKE_BUILD_TYPE STREQUAL ${RelWithDebInfo})
     add_definitions(-g3)
@@ -37,6 +32,13 @@ if(CMAKE_COMPILER_IS_GNUCC)
     add_definitions(-g)
     #add_definitions(--coverage)
     add_definitions(-O3)
+  endif()
+
+  if(PLATFORM_TARGET STREQUAL ${x86})
+    add_definitions(-m32)
+    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -m32")
+    set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -m32")
+    set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -m32")
   endif()
 
 endif()

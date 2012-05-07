@@ -36,8 +36,8 @@ namespace Model {
        * @param y position on y axis in 3D space
        * @param z position on z axis in 3D space
        */
-      inline Point (const dataType &x, const dataType &y, const dataType &z){
-        set(x, y, z);
+      inline Point (const dataType &x, const dataType &y, const dataType &z)
+          : data(x, y, z){
       }
 
       /**Sets coordinates of object
@@ -47,9 +47,9 @@ namespace Model {
        * @param z position on z axis in 3D space
        */
       inline void set (dataType x, dataType y, dataType z){
-        data.x() = x;
-        data.y() = y;
-        data.z() = z;
+        data [X] = x;
+        data [Y] = y;
+        data [Z] = z;
       }
 
       /**Sets coordinates of object
@@ -58,8 +58,8 @@ namespace Model {
        * @param y position on y axis in 3D space
        */
       inline void set (const dataType &x, const dataType &y){
-        data.x() = x;
-        data.y() = y;
+        data [X] = x;
+        data [Y] = y;
       }
 
       inline float &operator [] (int idx){

@@ -45,18 +45,23 @@ namespace Controller {
   }
 
   MainWindow::MainWindow (QMainWindow *myParent)
-      : QMainWindow(myParent){
-
-    image = QSharedPointer <Model::RenderTileData>(new Model::RenderTileData);
-    scene = QSharedPointer <Model::Scene>(new Model::Scene);
+      : QMainWindow(myParent), image(new Model::RenderTileData), scene(new Model::Scene), renderParams(
+          new RenderParams), threadRunner(new ThreadRunner){
     ui.reset(new Ui::MainWindow);
     timer.reset(new QTimer);
 
     QThreadPool::globalInstance()->setExpiryTimeout(TIME_BEFORE_REMOVE_THREADS);
     image->imageData = 0;
 
+    renderParams->scene = scene;
+    renderParams->randomRender = false;
+
+    threadRunner->setParams(image, renderParams);
+    threadRunner->setAutoDelete(false);
+
     sizeChanged = false;
     addResult = true;
+    renderingInProgress = false;
 
     setUpGUI();
     loadScene();
@@ -70,6 +75,34 @@ namespace Controller {
   }
 
   void MainWindow::runRenderer (){
+    renderingInProgress = true;
+
+    deactivateButtons();
+
+    updateCamera();
+
+    if ( !ui->liveCamera->isChecked())
+    {
+      ui->imageViewer->getImage()->fill(Qt::darkGray);
+    }
+
+    renderParams->allowRunning = true;
+    renderParams->maxThreadCount = ui->threadCounter->value();
+    renderParams->reflectionDeep = ui->maxReflectionDeep->value() + 1; // +1 is important !!
+    renderParams->refractionDeep = ui->maxRefractionDeep->value();
+    renderParams->shadows = ui->shadows->isChecked();
+
+    timeCounter.reset(new QElapsedTimer);
+
+    timer->start();
+    timeCounter->start();
+
+    QThreadPool::globalInstance()->start(threadRunner.data());
+  }
+
+  void MainWindow::updateCamera (){
+    image->width = ui->tileSize->value();
+    image->height = image->width;
 
     if (sizeChanged)
     {
@@ -80,44 +113,32 @@ namespace Controller {
 
       scene->setImageWidth(image->imageWidth);
       scene->setImageHeight(image->imageHeight);
-      scene->updateCamera();
 
       ui->imageViewer->setImage(
           new QImage(image->imageData, image->imageWidth, image->imageHeight, imageBytesPerLine,
                      QImage::Format_RGB888),
           true);
+
+      threadRunner->createTiles();
     }
 
-    deactivateButtons();
+    scene->getCamera()->setPosition(ui->xPos->value(), ui->yPos->value(), ui->zPos->value());
 
-    image->width = ui->tileSize->value();
-    image->height = image->width;
+    scene->getCamera()->getAngles().set(ui->xAngle->value(), ui->yAngle->value(),
+                                        ui->zAngle->value());
 
-    QSharedPointer <RenderParams> renderParams(new RenderParams);
-    renderParams->scene = scene;
-    renderParams->allowRunning = true;
-    renderParams->randomRender = ui->randomRender->isChecked();
-    renderParams->maxThreadCount = ui->threadCounter->value();
-    renderParams->reflectionDeep = ui->maxReflectionDeep->value() + 1; // +1 is important !!
-    renderParams->refractionDeep = ui->maxRefractionDeep->value();
+    scene->getCamera()->updateRotation();
 
-    ThreadRunner *threadRunner = new ThreadRunner;
-    threadRunner->setParams(image, renderParams);
+    scene->getCamera()->setFOV(ui->fov->value());
 
-    connect(threadRunner, SIGNAL(renderFinished()), this, SLOT(renderFinished()));
-    connect(ui->terminateRender, SIGNAL(clicked()), threadRunner, SLOT(terminate()));
-    connect(timer.data(), SIGNAL(timeout()), ui->imageViewer, SLOT(update()));
-
-    timeCounter.reset(new QElapsedTimer);
-
-    timer->start();
-    timeCounter->start();
-
-    QThreadPool::globalInstance()->start(threadRunner);
+    scene->updateCamera();
   }
 
   void MainWindow::terminateRender (){
     addResult = false;
+
+    //stop all threads
+    renderParams->allowRunning = false;
   }
 
   void MainWindow::setRefreshTime (int refreshTime){
@@ -274,6 +295,28 @@ namespace Controller {
     connect(ui->refreshTime, SIGNAL(valueChanged(int)), this, SLOT(setRefreshTime(int)));
     connect(ui->terminateRender, SIGNAL(clicked()), this, SLOT(terminateRender()));
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveImage()));
+
+    //Camera movement
+    connect(ui->forward, SIGNAL(clicked()), this, SLOT(moveCamera()));
+    connect(ui->backward, SIGNAL(clicked()), this, SLOT(moveCamera()));
+    connect(ui->left, SIGNAL(clicked()), this, SLOT(moveCamera()));
+    connect(ui->right, SIGNAL(clicked()), this, SLOT(moveCamera()));
+    connect(ui->up, SIGNAL(clicked()), this, SLOT(moveCamera()));
+    connect(ui->down, SIGNAL(clicked()), this, SLOT(moveCamera()));
+
+    //Camera rotation
+    connect(ui->xAngleInc, SIGNAL(clicked()), this, SLOT(rotateCamera()));
+    connect(ui->yAngleInc, SIGNAL(clicked()), this, SLOT(rotateCamera()));
+    connect(ui->zAngleInc, SIGNAL(clicked()), this, SLOT(rotateCamera()));
+    connect(ui->xAngleDec, SIGNAL(clicked()), this, SLOT(rotateCamera()));
+    connect(ui->yAngleDec, SIGNAL(clicked()), this, SLOT(rotateCamera()));
+    connect(ui->zAngleDec, SIGNAL(clicked()), this, SLOT(rotateCamera()));
+
+    //Rendering signals
+    connect(threadRunner.data(), SIGNAL(renderFinished()), this, SLOT(renderFinished()));
+    connect(timer.data(), SIGNAL(timeout()), ui->imageViewer, SLOT(update()));
+    connect(ui->tileSize, SIGNAL(editingFinished()), threadRunner.data(), SLOT(createTiles()));
+    connect(ui->randomRender, SIGNAL(toggled(bool)), this, SLOT(setRandomRender(bool)));
   }
 
   void MainWindow::calibrate (){
@@ -313,8 +356,9 @@ namespace Controller {
     ui->loadScene->setDisabled(false);
     ui->render->setDisabled(false);
     ui->terminateRender->setDisabled(true);
-    ui->imageWidth->setDisabled(false);
-    ui->imageHeight->setDisabled(false);
+
+    ui->imageGroup->setDisabled(false);
+    ui->cameraGroup->setDisabled(false);
 
     ui->actionSave->setDisabled(false);
   }
@@ -323,8 +367,9 @@ namespace Controller {
     ui->loadScene->setDisabled(withSceneLoading);
     ui->render->setDisabled(true);
     ui->terminateRender->setDisabled(false | ( !withLibSelect));
-    ui->imageWidth->setDisabled(true);
-    ui->imageHeight->setDisabled(true);
+
+    ui->imageGroup->setDisabled(true);
+    ui->cameraGroup->setDisabled(true);
 
     //Disable image saving
     ui->actionSave->setDisabled(true);
@@ -335,7 +380,7 @@ namespace Controller {
   }
 
   void MainWindow::renderFinished (){
-    qint64 elapsedTime = timeCounter->nsecsElapsed();
+    qint64 elapsedTime = timeCounter->elapsed();
     timeCounter.reset();
     timer->stop();
 
@@ -344,6 +389,7 @@ namespace Controller {
     activateButtons();
 
     showRenderTime(elapsedTime);
+    renderingInProgress = false;
   }
 
   void MainWindow::loadScene (){
@@ -387,30 +433,34 @@ namespace Controller {
     {
       scene->updateCamera();
       activateButtons();
+
+      //Preserve camera settings
+      if (ui->keepCameraSettings->isChecked())
+      {
+        updateCamera();
+      }
+      else
+      {
+        getCameraParameters();
+        ui->keepCameraSettings->setChecked(true);
+      }
     }
   }
 
   void MainWindow::showRenderTime (qint64 time){
-    QString timeString(QString::number(time / GIGA));
+    ui->lastTime->setValue(time / static_cast <float>(KILO));
 
-    qint64 miliSeconds = qRound(static_cast <double>(time % GIGA) / MEGA);
-    QString miliSecondsString(QString::number(miliSeconds));
-
-    //Fill with 0 to match 1 second
-    while (miliSecondsString.length() < 3)
+    if ( !ui->liveCamera->isChecked())
     {
-      miliSecondsString.prepend(QString::number(0));
+      //Add new row to result list
+      if (addResult)
+      {
+        addTimeToResultList(ui->lastTime->value());
+      }
     }
-
-    timeString.append(QLocale::system().decimalPoint());
-    timeString.append(miliSecondsString);
-
-    ui->timePlace->setText(timeString + QSTRING(" s"));
-
-    //Add new row to result list
-    if (addResult)
+    else if ( !ui->refreshTimeGroup->isChecked())
     {
-      addTimeToResultList(timeString.toDouble());
+      ui->refreshTime->setValue(time);
     }
     addResult = true;
   }
@@ -440,5 +490,94 @@ namespace Controller {
 
     ui->resultList->sortByColumn(0, Qt::AscendingOrder);
     ui->resultList->setSortingEnabled(true);
+  }
+
+  void MainWindow::moveCamera (){
+    QPushButton *button = dynamic_cast <QPushButton *>(sender());
+
+    float speed = ui->movementSpeed->value();
+
+    //[1] because [0] == & -> shortcut
+    switch (button->text() [1].toAscii()) {
+      case Qt::Key_W:
+        scene->getCamera()->move(Model::Forward, speed);
+        break;
+      case Qt::Key_S:
+        scene->getCamera()->move(Model::Backward, speed);
+        break;
+      case Qt::Key_A:
+        scene->getCamera()->move(Model::Left, speed);
+        break;
+      case Qt::Key_D:
+        scene->getCamera()->move(Model::Right, speed);
+        break;
+      case Qt::Key_Q:
+        scene->getCamera()->move(Model::Up, speed);
+        break;
+      case Qt::Key_E:
+        scene->getCamera()->move(Model::Down, speed);
+        break;
+    }
+
+    getCameraParameters();
+
+    if ( !renderingInProgress && ui->liveCamera->isChecked())
+    {
+      runRenderer();
+    }
+  }
+
+  void MainWindow::rotateCamera (){
+    QPushButton *button = dynamic_cast <QPushButton *>(sender());
+
+    float speed = ui->rotateAngle->value();
+
+    //[1] because [0] == & -> shortcut
+    switch (button->text() [1].toAscii()) {
+      case 'P':
+        scene->getCamera()->rotate(Model::X, speed);
+        break;
+      case ';':
+        scene->getCamera()->rotate(Model::X, -speed);
+        break;
+
+      case '[':
+        scene->getCamera()->rotate(Model::Y, speed);
+        break;
+      case '\'':
+        scene->getCamera()->rotate(Model::Y, -speed);
+        break;
+
+      case ']':
+        scene->getCamera()->rotate(Model::Z, speed);
+        break;
+      case '\\':
+        scene->getCamera()->rotate(Model::Z, -speed);
+        break;
+    }
+
+    getCameraParameters();
+
+    if ( !renderingInProgress && ui->liveCamera->isChecked())
+    {
+      runRenderer();
+    }
+  }
+
+  void MainWindow::getCameraParameters (){
+    ui->xPos->setValue(scene->getCamera()->getPosition() [Model::X]);
+    ui->yPos->setValue(scene->getCamera()->getPosition() [Model::Y]);
+    ui->zPos->setValue(scene->getCamera()->getPosition() [Model::Z]);
+
+    ui->xAngle->setValue(scene->getCamera()->getAngles() [Model::X]);
+    ui->yAngle->setValue(scene->getCamera()->getAngles() [Model::Y]);
+    ui->zAngle->setValue(scene->getCamera()->getAngles() [Model::Z]);
+
+    ui->fov->setValue(scene->getCamera()->getFOV());
+  }
+
+  void MainWindow::setRandomRender (bool value){
+    renderParams->randomRender = value;
+    threadRunner->createTiles();
   }
 }

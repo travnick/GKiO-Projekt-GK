@@ -71,6 +71,14 @@ namespace Model {
         return camera;
       }
 
+      /**Returns camera
+       *
+       * @return camera
+       */
+      inline CameraType &getCamera (){
+        return camera;
+      }
+
       /**Returns objects in scene
        *
        * @return objects scene

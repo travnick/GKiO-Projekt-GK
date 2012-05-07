@@ -29,6 +29,16 @@ namespace Model {
           : Point(newData), length(0), squareLength(0){
       }
 
+      /**Constructs object with given parameters
+       *
+       * @param x position on x axis in 3D space
+       * @param y position on y axis in 3D space
+       * @param z position on z axis in 3D space
+       */
+      inline Vector (const dataType &x, const dataType &y, const dataType &z)
+          : Point(x, y, z), length(0), squareLength(0){
+      }
+
       /**Normalizes vector
        * Length before normalization is stored to length
        *
@@ -39,6 +49,16 @@ namespace Model {
         worldUnit constant = 1.0f / length;
 
         data *= constant;
+      }
+
+      /**Creates new normalized vector
+       * Length before normalization is stored to length
+       *
+       */
+      inline Vector toNormal () const{
+        Vector other( *this);
+        other.normalize();
+        return other;
       }
 
       /**Calculate length of vector

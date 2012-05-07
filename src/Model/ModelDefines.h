@@ -122,4 +122,11 @@ namespace Model {
   inline T uRound (float value){
     return static_cast <T>(value + 0.5f);
   }
+
+  /**Movement directions
+   *
+   */
+  enum Direction {
+    Forward, Backward, Left, Right, Up, Down
+  };
 }

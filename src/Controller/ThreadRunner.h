@@ -10,6 +10,7 @@
 #include <QRunnable>
 #include <QObject>
 #include <QList>
+#include <QVector>
 
 //Forward declarations -->
 class QMutex;
@@ -58,6 +59,11 @@ namespace Controller {
        */
       void terminate ();
 
+      /**Creates image tiles
+       *
+       */
+      void createTiles ();
+
     signals:
       /**Sends signal when all threads done their job
        *
@@ -65,14 +71,11 @@ namespace Controller {
       void renderFinished ();
 
     private:
-      bool ableToRunning;
 
-      QSharedPointer <RenderParams> renderParams;
-
-      /**Stores current count of created threads
+      /**Stores rendering parameters
        *
        */
-      int finishedThreadCount;
+      QSharedPointer <RenderParams> renderParams;
 
       /**Thread manager
        *
@@ -87,6 +90,8 @@ namespace Controller {
       QList <QSharedPointer <Model::RenderTileData> > tiles;
       QList <QSharedPointer <Model::RenderTileData> > tilesRandomized;
 
+      QVector <QSharedPointer <RendererThread> > renderers;
+
       QSharedPointer <Model::RenderTileData> image;
 
       /**Creates image tile
@@ -98,11 +103,6 @@ namespace Controller {
        * @param tileSizeY tile height
        */
       void createTile (int x, int y, int tileSizeX, int tileSizeY);
-
-      /**Creates image tiles
-       *
-       */
-      void createTiles ();
 
       /**Randomizes tiles
        *

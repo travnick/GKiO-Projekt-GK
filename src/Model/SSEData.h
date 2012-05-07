@@ -4,8 +4,23 @@
 
 #pragma  once
 
-#ifdef __x86_64__
 #define USE_SSE 1
+
+#ifdef __x86_64__
+
+#if USE_SSE == 1
+#define USE_POINTERS 0
+#endif
+
+#else
+
+//There is no gain with using SSE and wasting time for mallocs.
+#undef USE_SSE
+
+#if USE_SSE == 1
+#define USE_POINTERS 1
+#endif
+
 #endif
 
 #include <x86intrin.h>
@@ -25,14 +40,14 @@ namespace Model {
   typedef SSEDataPrivate SSEDataBaseType;
 #endif
 
-  enum Positions {
+  enum Axis {
     X = 3, Y = 2, Z = 1, W = 0
   };
 
   /**Internal private struct that provides aligned data for SSE
    *
    */
-  class SSEDataPrivate {
+  class SSEDataPrivate: public AlignedClass <16> {
       union {
 #if USE_SSE == 1
           __m128 data;
@@ -43,16 +58,21 @@ namespace Model {
     public:
 
       inline SSEDataPrivate (){
+#if USE_SSE == 1
         // It's important, without determining W value there is random performance loss
         ( *this) [W] = 1;
+#endif
       }
 
       inline SSEDataPrivate (float x, float y, float z){
         ( *this) [X] = x;
         ( *this) [Y] = y;
         ( *this) [Z] = z;
+
+#if USE_SSE == 1
         // It's important, without determining W value there is random performance loss
         ( *this) [W] = 1;
+#endif
       }
 
       inline SSEDataPrivate (const __m128 &other){
@@ -96,7 +116,7 @@ namespace Model {
         return dataArray [idx];
       }
 
-      //Some hacks to act like pointer. I't was needed in version with pointers
+      //Some hacks to act like pointer. It's needed in version with pointers
       inline const SSEDataPrivate *operator -> () const{
         return this;
       }
@@ -118,8 +138,40 @@ namespace Model {
    */
   class SSEData {
 
+#if USE_POINTERS == 1
+      SSEDataPrivate *internalData;
+#else
       SSEDataPrivate internalData;
+#endif
+
     public:
+
+#if USE_POINTERS == 1
+      SSEData ()
+      : internalData(new SSEDataPrivate)
+      {
+      }
+
+      SSEData (const SSEData &other)
+      : internalData(new SSEDataPrivate( *other.internalData))
+      {
+      }
+
+      SSEData (const SSEDataBaseType &newData)
+      : internalData(new SSEDataPrivate(newData))
+      {
+      }
+      inline SSEData (float newX, float newY, float newZ)
+      : internalData(new SSEDataPrivate(newX, newY, newZ))
+      {
+      }
+
+      ~SSEData ()
+      {
+        delete internalData;
+      }
+
+#else
 
       inline SSEData (){
       }
@@ -131,6 +183,8 @@ namespace Model {
       inline SSEData (float newX, float newY, float newZ)
           : internalData(newX, newY, newZ){
       }
+
+#endif
 
       inline SSEData & operator = (const SSEData &other){
         *internalData = *other.internalData;
@@ -150,39 +204,7 @@ namespace Model {
         return ( *internalData) [idx];
       }
 
-      inline float & x (){
-        return ( *internalData) [X];
-      }
-
-      inline float & y (){
-        return ( *internalData) [Y];
-      }
-
-      inline float & z (){
-        return ( *internalData) [Z];
-      }
-
-      inline float & w (){
-        return ( *internalData) [W];
-      }
-
-      inline float x () const{
-        return ( *internalData) [X];
-      }
-
-      inline float y () const{
-        return ( *internalData) [Y];
-      }
-
-      inline float z () const{
-        return ( *internalData) [Z];
-      }
-
-      inline float w () const{
-        return ( *internalData) [W];
-      }
-
-      // operations on data -->
+// operations on data -->
 
       /**Moves point by a vector and save new point in result
        * You should give here Point::data
@@ -406,7 +428,7 @@ namespace Model {
       inline float dotProduct () const{
         return dotProduct( *this);
       }
-      // <-- operations on data
+// <-- operations on data
 
       inline SSEDataBaseType operator - () const{
         return SSEDataPrivate( -( *this) [X], -( *this) [Y], -( *this) [Z]);

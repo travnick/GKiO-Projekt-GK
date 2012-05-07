@@ -41,7 +41,7 @@ namespace View {
        *
        * @return pointer to image
        */
-      const QImage *getImage ();
+      QImage *getImage ();
 
     protected:
       /**Repaints image.

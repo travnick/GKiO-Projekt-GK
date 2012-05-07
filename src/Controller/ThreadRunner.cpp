@@ -16,18 +16,9 @@
 
 namespace Controller {
 
-  void cleanImage (QSharedPointer <Model::RenderTileData> &tile, colorType color =
-                       DEFAULT_RENDER_COLOR){
-    for (quint64 size = 0; size < tile->imageDataSize; size += BPP)
-    {
-      tile->imageData [size] = color;
-      tile->imageData [size + 1] = color;
-      tile->imageData [size + 2] = color;
-    }
-  }
-
   ThreadRunner::ThreadRunner ()
-      : renderParams(new RenderParams), mutex(new QMutex){
+      : renderParams(new RenderParams), threadPool(new QThreadPool), mutex(new QMutex){
+    threadPool->setExpiryTimeout(THREAD_EXPIRE_TIMEOUT);
   }
 
   ThreadRunner::~ThreadRunner (){
@@ -38,32 +29,20 @@ namespace Controller {
                                 const QSharedPointer <RenderParams> &newRenderParams){
     QMutexLocker locker(mutex.data());
     this->image = newImage;
-    cleanImage(this->image);
+
     renderParams = newRenderParams;
   }
 
   void ThreadRunner::run (){
-    threadPool.reset(new QThreadPool);
-    threadPool->setExpiryTimeout(THREAD_EXPIRE_TIMEOUT);
+    QMutexLocker locker(mutex.data());
     threadPool->setMaxThreadCount(renderParams->maxThreadCount);
-
-    finishedThreadCount = 0;
-    ableToRunning = true;
-
-    createTiles();
-
-    if (renderParams->randomRender)
-    {
-      randomizeTiles();
-    }
 
     int tilesSize = tiles.size();
     for (int i = 0; i < tilesSize; ++i)
     {
-      RendererThread *renderWorker = new RendererThread(renderParams);
-      renderWorker->setTile(tiles [i]);
+      renderers [i]->setTile(tiles [i]);
 
-      threadPool->start(renderWorker);
+      threadPool->start(renderers [i].data());
     }
 
     threadPool->waitForDone();
@@ -89,6 +68,9 @@ namespace Controller {
   }
 
   void ThreadRunner::createTiles (){
+    QMutexLocker locker(mutex.data());
+    tiles.clear();
+
     imageUnit tileSize = image->width;
     div_t tilesX = div(image->imageWidth, tileSize);
     div_t tilesY = div(image->imageHeight, tileSize);
@@ -102,6 +84,7 @@ namespace Controller {
     tiles.reserve(tilesNumber);
     tilesRandomized.reserve(tilesNumber);
 
+    //Slice image into whole tiles
     for (imageUnit y = 0; y < tileYLimit; y += tileSize)
     {
       for (imageUnit x = 0; x < tileXLimit; x += tileSize)
@@ -110,6 +93,7 @@ namespace Controller {
       }
     }
 
+    //Slice bottom part of image (if any) into part tiles
     if (tilesY.rem > 0)
     {
       for (imageUnit x = 0; x < tileXLimit; x += tileSize)
@@ -118,6 +102,7 @@ namespace Controller {
       }
     }
 
+    //Slice right part of image (if any) into part tiles
     if (tilesX.rem > 0)
     {
       for (imageUnit y = 0; y < tileYLimit; y += tileSize)
@@ -126,9 +111,27 @@ namespace Controller {
       }
     }
 
+    //Create tile for right bottom corner if left
     if (tilesX.rem > 0 && tilesY.rem > 0)
     {
       createTile(tileXLimit, tileYLimit, tilesX.rem, tilesY.rem);
+    }
+
+    if (renderParams->randomRender)
+    {
+      randomizeTiles();
+    }
+
+    //Create threads if there is more tiles. Don't delete threads if there is less tiles
+    if (tiles.size() > renderers.size())
+    {
+      for (int i = renderers.size(), j = tiles.size(); i < j; ++i)
+      {
+        QSharedPointer <RendererThread> renderer((new RendererThread(renderParams)));
+        renderer->setAutoDelete(false);
+
+        renderers.append(renderer);
+      }
     }
   }
 
@@ -142,6 +145,7 @@ namespace Controller {
       tiles.removeAt(rand);
     }
 
+    //Do fast swap of vectors
     tiles.swap(tilesRandomized);
   }
 

@@ -46,7 +46,7 @@ namespace Model {
        * @return current camera direction
        */
       inline const Vector &getDirection () const{
-        return direction;
+        return eyeDirection;
       }
 
       /**Returns direction from camera origin to given point
@@ -191,6 +191,19 @@ namespace Model {
        */
       void setAngles (const Vector &vector);
 
+      /**Updates camera rotation
+       *
+       */
+      void updateRotation ();
+
+      const Vector &getAngles () const{
+        return angles;
+      }
+
+      Vector &getAngles (){
+        return angles;
+      }
+
       /**Sets camera view distance
        *
        * @param viewDistance new view distance
@@ -199,8 +212,12 @@ namespace Model {
         viewDistance = newViewDistance;
       }
 
-      Point screenWidthDelta;
-      Point screenHeightDelta;
+      void move (Direction direction, float speed);
+
+      void rotate (Axis axis, float angle);
+
+      Vector screenWidthDelta;
+      Vector screenHeightDelta;
     private:
       unitType FOV;
       worldUnit viewDistance;
@@ -210,7 +227,7 @@ namespace Model {
       worldUnit screenHeight;
       worldUnit screenImageRatio;
       Type type;
-      Vector direction;
+      Vector eyeDirection;
       Vector angles;
       Point origin;
       Point screenTopLeft;

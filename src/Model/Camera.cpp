@@ -26,9 +26,9 @@ namespace Model {
     worldUnit angle = (180 - FOV) / 2.0f;
     worldUnit focalLength = tan(RAD(angle)) * screenWidth / 2;
 
-    direction.normalize();
+    eyeDirection.normalize();
     origin = position;
-    direction.data.multiply(focalLength, tmpVector.data);
+    eyeDirection.data.multiply(focalLength, tmpVector.data);
     origin.data.negMove(tmpVector.data, origin.data);
 
     screenImageRatio = screenWidth / imageWidth;
@@ -76,13 +76,73 @@ namespace Model {
   }
 
   void Camera::setDirection (const Vector &vector){
-    direction = vector;
+    eyeDirection = vector;
   }
 
   void Camera::setAngles (const Vector& vector){
     angles = vector;
+    updateRotation();
+  }
+
+  void Camera::updateRotation (){
+    Point positionOrig(position);
+
+    position.set(0, 0, 0);
+
     //look at the z+ axis
-    direction.set(0, 0, 1);
-    direction.rotate(angles);
+    eyeDirection.set(0, 0, 1);
+    eyeDirection.rotate(angles);
+
+    position.data = positionOrig.data;
+  }
+
+  void Camera::move (Direction direction, float speed){
+
+    switch (direction) {
+      case Forward:
+        position.data += eyeDirection.toNormal().data * speed;
+        break;
+
+      case Backward:
+        position.data -= eyeDirection.toNormal().data * speed;
+        break;
+
+      case Left:
+        position.data -= screenWidthDelta.toNormal().data * speed;
+        break;
+
+      case Right:
+        position.data += screenWidthDelta.toNormal().data * speed;
+        break;
+
+      case Up:
+        position.data += screenHeightDelta.toNormal().data * speed;
+        break;
+
+      case Down:
+        position.data -= screenHeightDelta.toNormal().data * speed;
+        break;
+    }
+  }
+
+  void Camera::rotate (Axis axis, float angle){
+    switch (axis) {
+      case X:
+        angles [X] += angle;
+        break;
+
+      case Y:
+        angles [Y] += angle;
+        break;
+
+      case Z:
+        angles [Z] += angle;
+        break;
+
+      case W:
+        break;
+    }
+
+    updateRotation();
   }
 }

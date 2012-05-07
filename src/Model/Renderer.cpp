@@ -20,7 +20,7 @@ const float E = 2.71828183f;
 namespace Model {
 
   //Because qRound(0.49f * COLOR_MAX_VALUE / COLOR_MAX_VALUE) < 1
-  const float COLOR_MIN_VALUE = 0.49f / COLOR_MAX_VALUE;
+  const float COLOR_MIN_VALUE = 0.5f / COLOR_MAX_VALUE;
 
   Renderer::Renderer (const Controller::RenderParams &newRenderParams)
       : tmpDistance(new Vector), pointLightDist(new Vector), distanceToIntersection(new Vector), lightRay(
@@ -95,7 +95,7 @@ namespace Model {
     int visibleSize = renderParams->reflectionDeep;
     bool inShadow;
 
-    while (visibleSize-- > 0 && coef > COLOR_MIN_VALUE)
+    while (visibleSize-- > 0)
     {
       viewDistance = mainViewDistance;
       for (Scene::ObjectContainerIterator object = renderParams->scene->getObjects().begin();
@@ -146,13 +146,17 @@ namespace Model {
           // Computation of the shadows
           inShadow = false;
 
-          for (Scene::ObjectContainerIterator object = renderParams->scene->getObjects().begin();
-              object < endObjects; object++)
+          //TODO: Can we check this once before starting rendering?
+          if (renderParams->shadows)
           {
-            if (( *object)->checkRay( *lightRay, pointLightDist->length, *tmpDistance) == true)
+            for (Scene::ObjectContainerIterator object = renderParams->scene->getObjects().begin();
+                object < endObjects; object++)
             {
-              inShadow = true;
-              break;
+              if (( *object)->checkRay( *lightRay, pointLightDist->length, *tmpDistance) == true)
+              {
+                inShadow = true;
+                break;
+              }
             }
           }
 
@@ -168,6 +172,11 @@ namespace Model {
         }
 
         coef *= currentMat->getReflection();
+
+        if (coef < COLOR_MIN_VALUE)
+        {
+          break;
+        }
 
         //Calculate reflection vector
         normalAtIntersection->data *= ray.getDir().dotProduct(normalAtIntersection->data) * 2;

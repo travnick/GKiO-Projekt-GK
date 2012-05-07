@@ -26,6 +26,11 @@ namespace Model {
 // <-- Forward declarations
 
 namespace Controller {
+  //Forward declarations -->
+  struct RenderParams;
+  class ThreadRunner;
+  // <-- Forward declarations
+
   /**
    * Main window controller
    */
@@ -112,6 +117,22 @@ namespace Controller {
        */
       void showWarning (QString message);
 
+      /**Moves camera
+       *
+       */
+      void moveCamera ();
+
+      /**Rotates camera
+       *
+       */
+      void rotateCamera ();
+
+      /**Sets random rendering
+       *
+       * @param value random rendering value
+       */
+      void setRandomRender (bool value);
+
     private:
       /**Image data structure
        * It handles image data and image properties
@@ -133,6 +154,11 @@ namespace Controller {
        */
       bool addResult;
 
+      /**Tells if there is rendering in progress
+       *
+       */
+      bool renderingInProgress;
+
       /**Stores 3D scene
        *
        */
@@ -152,6 +178,16 @@ namespace Controller {
        *
        */
       QScopedPointer <Ui::MainWindow> ui;
+
+      /**Stores rendering parameters
+       *
+       */
+      QSharedPointer <RenderParams> renderParams;
+
+      /**Thread runner object
+       *
+       */
+      QScopedPointer <ThreadRunner> threadRunner;
 
       /**Activates buttons in GUI.
        * Sets state to rendering ready.
@@ -209,6 +245,16 @@ namespace Controller {
        * @param time time in seconds
        */
       void addTimeToResultList (double time);
+
+      /**Updates camera parameters if needed
+       *
+       */
+      void updateCamera ();
+
+      /**Gets camera parameters and show them in the window
+       *
+       */
+      void getCameraParameters ();
   };
 }
 

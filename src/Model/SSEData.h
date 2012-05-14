@@ -58,20 +58,21 @@ namespace Model {
     public:
 
       inline SSEDataPrivate (){
-#if USE_SSE == 1
-        // It's important, without determining W value there is random performance loss
-        ( *this) [W] = 1;
-#endif
+        setDefaults();
       }
 
       inline SSEDataPrivate (float x, float y, float z){
+        setDefaults();
+
         ( *this) [X] = x;
         ( *this) [Y] = y;
         ( *this) [Z] = z;
+      }
 
+      inline void setDefaults (){
 #if USE_SSE == 1
         // It's important, without determining W value there is random performance loss
-        ( *this) [W] = 1;
+        ( *this) [W] = 0;
 #endif
       }
 
@@ -275,7 +276,8 @@ namespace Model {
        */
       inline SSEDataBaseType operator + (const SSEData &other) const{
 #if USE_SSE == 1
-        return _mm_add_ps(const_cast <SSEData&>( *this), const_cast <SSEData&>(other));
+        return _mm_add_ps(const_cast <SSEData&>( *this),
+                          const_cast <SSEData&>(other));
 #else
         return SSEDataBaseType(( *this) [X] + other [X], ( *this) [Y] + other [Y],
             ( *this) [Z] + other [Z]);
@@ -301,7 +303,8 @@ namespace Model {
        */
       inline SSEDataBaseType operator - (const SSEData &other) const{
 #if USE_SSE == 1
-        return _mm_sub_ps(const_cast <SSEData&>( *this), const_cast <SSEData&>(other));
+        return _mm_sub_ps(const_cast <SSEData&>( *this),
+                          const_cast <SSEData&>(other));
 #else
         return SSEDataBaseType(( *this) [X] - other [X], ( *this) [Y] - other [Y],
             ( *this) [Z] - other [Z]);
@@ -341,7 +344,8 @@ namespace Model {
        */
       inline SSEDataBaseType operator * (const SSEData &other) const{
 #if USE_SSE == 1
-        return _mm_mul_ps(const_cast <SSEData&>( *this), const_cast <SSEData&>(other));
+        return _mm_mul_ps(const_cast <SSEData&>( *this),
+                          const_cast <SSEData&>(other));
 #else
         return SSEDataBaseType(( *this) [X] * other [X], ( *this) [Y] * other [Y],
             ( *this) [Z] * other [Z]);

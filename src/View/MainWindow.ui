@@ -668,20 +668,6 @@
          <set>Qt::AlignCenter</set>
         </property>
         <widget class="QWidget" name="imageScrollAreaWidgetContents">
-         <property name="geometry">
-          <rect>
-           <x>404</x>
-           <y>256</y>
-           <width>1</width>
-           <height>1</height>
-          </rect>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="spacing">
            <number>0</number>

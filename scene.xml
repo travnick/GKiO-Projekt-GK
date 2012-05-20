@@ -27,57 +27,57 @@
 	<lights>
 	  
 	 <!-- TOP -->
-	  <light id="1">
+	  <light id="1" power="1.0">
 	  	<position x="20" y="80" z="60" />
 		<color r="255" g="255" b="255" />
 	  </light>
 	 <!-- CENTER -->
-	  <light id="2">
+	  <light id="2" power="1.0">
 	  	<position x="0" y="13" z="70" />
 		<color r="150" g="150" b="150" />
 	  </light>
 	 
-	  <light id="3">
+	  <light id="3" power="1.0">
 	  	<position x="-35" y="25" z="50" />
 		<color r="250" g="250" b="250" />
 	  </light>
 	  
-	   <light id="4">
+	   <light id="4" power="1.0">
 	   	<position x="30" y="13" z="53" />
 		<color r="75" g="75" b="75" />
 	  </light>
 
-	  <light id="5">
+	  <light id="5" power="1.0">
 	  	<position x="30" y="45" z="100" />
 		<color r="75" g="75" b="75" />
 	  </light>
 
-	  <light id="6">
+	  <light id="6" power="1.0">
 	  	<position x="30" y="13" z="120" />
 		<color r="50" g="50" b="50" />
 	  </light>
 	  
-	  <light id="7">
+	  <light id="7" power="1.0">
 	  	<position x="-10" y="60" z="140" />
 		<color r="255" g="255" b="255" />
 	  </light>
 
-	  <light id="8">
+	  <light id="8" power="1.0">
 	  	<position x="1" y="50" z="70" />
 		<color r="255" g="255" b="255" />
 	  </light>
 
-	  <!--<light id="9">
+	  <!--<light id="9" power="1.0">
 	  	<position x="-1" y="10" z="-40" />
 		<color r="255" g="255" b="255" />
 	  </light>-->
 
-	  <!--<light id="10">
+	  <!--<light id="10" power="1.0">
 	  	<position x="0" y="40" z="40" />
 		<color r="255" g="255" b="255" />
 	  </light>-->
 
-	  <!--<light id="11">
+	  <!--<light id="11" power="1.0">
 	  	<position x="-30" y="60" z="70" />
 		<color r="255" g="255" b="255" />
 	  </light>-->

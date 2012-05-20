@@ -36,5 +36,12 @@ namespace Model {
       inline const Color &getColor () const{
         return *this;
       }
+
+      /** Sets power of light
+       *
+       */
+      void setPower(worldUnit value) {
+    	  this->power = value;
+      }
   };
 }

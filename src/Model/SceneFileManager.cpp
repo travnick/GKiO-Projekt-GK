@@ -71,11 +71,17 @@ namespace Model {
       QSharedPointer <Light> object(new Light());
       Point point;
       Color color;
+      worldUnit power;
       QDomElement elem = node.toElement();
+
+      power = static_cast <worldUnit>(getFloat(elem, "power"));
+      if (power < 0.0f)
+             throw std::logic_error("Moc światła nie może być ujemna.");
 
       getColor(node.firstChildElement("color").toElement(), color);
       getVPCommon(node.firstChildElement("position").toElement(), point);
 
+      object->setPower(power);
       object->setPosition(point);
       ( *object) = (color);
 

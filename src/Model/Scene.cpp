@@ -1,6 +1,4 @@
 /// @file Model/Scene.cpp
-/// @date 01-12-2011
-/// @author Mikołaj Milej
 
 #include <string>
 #include <exception>

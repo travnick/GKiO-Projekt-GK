@@ -1,6 +1,4 @@
 /// @file Controller/ThreadRunner.cpp
-/// @date 07-01-2012
-/// @author Mikołaj Milej
 
 #include <QMutexLocker>
 #include <QThreadPool>
@@ -17,7 +15,8 @@
 namespace Controller {
 
   ThreadRunner::ThreadRunner ()
-      : renderParams(new RenderParams), threadPool(new QThreadPool), mutex(new QMutex){
+      : renderParams(new RenderParams), threadPool(new QThreadPool), mutex(
+          new QMutex){
     threadPool->setExpiryTimeout(THREAD_EXPIRE_TIMEOUT);
   }
 
@@ -50,9 +49,13 @@ namespace Controller {
     emit renderFinished();
   }
 
-  inline void ThreadRunner::createTile (int x, int y, int tileSizeX, int tileSizeY){
+  inline void ThreadRunner::createTile (int x,
+                                        int y,
+                                        int tileSizeX,
+                                        int tileSizeY){
     //Copy common data that are needed to render
-    QSharedPointer <Model::RenderTileData> tile(new Model::RenderTileData( *image));
+    QSharedPointer <Model::RenderTileData> tile(
+        new Model::RenderTileData( *image));
 
     tile->deleteImageData = false;
 
@@ -127,7 +130,8 @@ namespace Controller {
     {
       for (int i = renderers.size(), j = tiles.size(); i < j; ++i)
       {
-        QSharedPointer <RendererThread> renderer((new RendererThread(renderParams)));
+        QSharedPointer <RendererThread> renderer(
+            (new RendererThread(renderParams)));
         renderer->setAutoDelete(false);
 
         renderers.append(renderer);

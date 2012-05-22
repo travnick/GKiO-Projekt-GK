@@ -1,6 +1,4 @@
 /// @file Controller/GlobalDefines.h
-/// @date 01-12-2011
-/// @author Mikołaj Milej
 
 #pragma once
 #include <stdint.h>

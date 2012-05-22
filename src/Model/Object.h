@@ -1,6 +1,4 @@
 /// @file Model/Object.h
-/// @date 22-12-2011
-/// @author Mikołaj Milej
 
 #pragma once
 
@@ -26,7 +24,9 @@ namespace Model {
        * @param y position at y axis
        * @param z position at z axis
        */
-      inline void setPosition (Point::dataType x, Point::dataType y, Point::dataType z){
+      inline void setPosition (Point::dataType x,
+                               Point::dataType y,
+                               Point::dataType z){
         position.set(x, y, z);
       }
 

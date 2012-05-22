@@ -1,6 +1,4 @@
 /// @file Model/SceneFileManager.cpp
-/// @date 29-03-2012
-/// @author Piotr Jawniak
 
 #include <QIODevice>
 #include <QtXml>
@@ -45,18 +43,19 @@ namespace Model {
       worldUnit transparency;
       QDomElement elem = node.toElement();
 
-      reflection = static_cast<worldUnit>(getFloat(elem, "reflection"));
-      ior = static_cast<worldUnit>(getFloat(elem, "ior"));
-      transparency = static_cast<worldUnit>(getFloat(elem, "transparency"));
+      reflection = static_cast <worldUnit>(getFloat(elem, "reflection"));
+      ior = static_cast <worldUnit>(getFloat(elem, "ior"));
+      transparency = static_cast <worldUnit>(getFloat(elem, "transparency"));
 
       if (reflection < 0.0f || reflection > 1.0f)
         throw std::logic_error("Wartość odbicia jest spoza zakresu.");
 
       if (ior < 1.0f)
-    	  throw std::logic_error("Wartość IOR powinna być większa od 1.");
+        throw std::logic_error("Wartość IOR powinna być większa od 1.");
 
       if (transparency < 0.0f || transparency > 1.0f)
-    	  throw std::logic_error("Przeźroczystość materiału powinna zawierać się w [0, 1].");
+        throw std::logic_error(
+            "Przeźroczystość materiału powinna zawierać się w [0, 1].");
 
       getColor(node.firstChildElement("diffuseColor").toElement(), color);
 
@@ -88,7 +87,7 @@ namespace Model {
 
       power = static_cast <worldUnit>(getFloat(elem, "power"));
       if (power < 0.0f)
-             throw std::logic_error("Moc światła nie może być ujemna.");
+        throw std::logic_error("Moc światła nie może być ujemna.");
 
       getColor(node.firstChildElement("color").toElement(), color);
       getVPCommon(node.firstChildElement("position").toElement(), point);
@@ -140,7 +139,8 @@ namespace Model {
           material = getInt(elem, "material");
 
           if (material >= scene.getMaterials().size())
-            throw std::logic_error("Nie ma takiego materiału. Sprawdź obiekty.");
+            throw std::logic_error(
+                "Nie ma takiego materiału. Sprawdź obiekty.");
 
           QDomNode mul = node.firstChildElement("multiply");
           if (mul.isElement())
@@ -231,17 +231,21 @@ namespace Model {
           getVPCommon(node.firstChildElement("direction").toElement(), vector);
           getVPCommon(node.firstChildElement("position").toElement(), point);
 
-          screenWidth = static_cast <Point::dataType>(getFloat(elem, "screenWidth"));
+          screenWidth = static_cast <Point::dataType>(getFloat(elem,
+                                                               "screenWidth"));
           if ( !(screenWidth > 0))
-            throw std::logic_error("Parametr screenWidth musi być większy od 0.");
+            throw std::logic_error(
+                "Parametr screenWidth musi być większy od 0.");
 
           FOV = static_cast <Camera::unitType>(getDouble(elem, "fov"));
           if ( !(FOV > 0 && FOV < 180))
             throw std::logic_error("Parametr FOV musi być z zakresu (0;180)");
 
-          viewDistance = static_cast <worldUnit>(getFloat(elem, "viewDistance"));
+          viewDistance =
+              static_cast <worldUnit>(getFloat(elem, "viewDistance"));
           if ( !(viewDistance > 0))
-            throw std::logic_error("Parametr viewDistance musi być większy od 0.");
+            throw std::logic_error(
+                "Parametr viewDistance musi być większy od 0.");
 
           cameraType = elem.attribute("type");
           object->setFOV(FOV);
@@ -281,25 +285,30 @@ namespace Model {
     int val;
     val = elem.attribute(name).toInt( &ok, 10);
     if ( !ok)
-      throw std::logic_error("Błąd podczas wczytywania elementu " + name.toStdString());
+      throw std::logic_error(
+          "Błąd podczas wczytywania elementu " + name.toStdString());
     return val;
   }
 
-  float SceneFileManager::getFloat (const QDomElement &elem, const QString &name){
+  float SceneFileManager::getFloat (const QDomElement &elem,
+                                    const QString &name){
     bool ok;
     float val;
     val = elem.attribute(name).toFloat( &ok);
     if ( !ok)
-      throw std::logic_error("Błąd podczas wczytywania elementu " + name.toStdString());
+      throw std::logic_error(
+          "Błąd podczas wczytywania elementu " + name.toStdString());
     return val;
   }
 
-  double SceneFileManager::getDouble (const QDomElement &elem, const QString &name){
+  double SceneFileManager::getDouble (const QDomElement &elem,
+                                      const QString &name){
     bool ok;
     double val;
     val = elem.attribute(name).toDouble( &ok);
     if ( !ok)
-      throw std::logic_error("Błąd podczas wczytywania elementu " + name.toStdString());
+      throw std::logic_error(
+          "Błąd podczas wczytywania elementu " + name.toStdString());
     return val;
   }
 }/* namespace Model */

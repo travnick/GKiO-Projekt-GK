@@ -1,6 +1,4 @@
 /// @file Controller/MainWindow.cpp
-/// @date 01-12-2011
-/// @author Mikołaj Milej
 
 // QApplication and QDesktopWidget are needed to center window on screen
 #include <QApplication>
@@ -45,8 +43,9 @@ namespace Controller {
   }
 
   MainWindow::MainWindow (QMainWindow *myParent)
-      : QMainWindow(myParent), image(new Model::RenderTileData), scene(new Model::Scene), renderParams(
-          new RenderParams), threadRunner(new ThreadRunner){
+      : QMainWindow(myParent), image(new Model::RenderTileData), scene(
+          new Model::Scene), renderParams(new RenderParams), threadRunner(
+          new ThreadRunner){
     ui.reset(new Ui::MainWindow);
     timer.reset(new QTimer);
 
@@ -71,7 +70,8 @@ namespace Controller {
     //Send terminate signal to thread runner and wait for end
     ui->terminateRender->click();
 
-    QThreadPool::globalInstance()->waitForDone(TIME_BEFORE_REMOVE_THREADS_ON_EXIT);
+    QThreadPool::globalInstance()->waitForDone(
+        TIME_BEFORE_REMOVE_THREADS_ON_EXIT);
   }
 
   void MainWindow::runRenderer (){
@@ -115,16 +115,18 @@ namespace Controller {
       scene->setImageHeight(image->imageHeight);
 
       ui->imageViewer->setImage(
-          new QImage(image->imageData, image->imageWidth, image->imageHeight, imageBytesPerLine,
-                     QImage::Format_RGB888),
+          new QImage(image->imageData, image->imageWidth, image->imageHeight,
+                     imageBytesPerLine, QImage::Format_RGB888),
           true);
 
       threadRunner->createTiles();
     }
 
-    scene->getCamera()->setPosition(ui->xPos->value(), ui->yPos->value(), ui->zPos->value());
+    scene->getCamera()->setPosition(ui->xPos->value(), ui->yPos->value(),
+                                    ui->zPos->value());
 
-    scene->getCamera()->getAngles().set(ui->xAngle->value(), ui->yAngle->value(),
+    scene->getCamera()->getAngles().set(ui->xAngle->value(),
+                                        ui->yAngle->value(),
                                         ui->zAngle->value());
 
     scene->getCamera()->updateRotation();
@@ -149,9 +151,9 @@ namespace Controller {
     const QImage *imageToSave = ui->imageViewer->getImage();
     if (imageToSave != 0)
     {
-      QString fileName = QFileDialog::getSaveFileName(this, tr("Zapisz obraz"), "RenderedImage.png",
-                                                      tr("Image Files (*.png)"), 0,
-                                                      QFileDialog::DontUseNativeDialog);
+      QString fileName = QFileDialog::getSaveFileName(
+          this, tr("Zapisz obraz"), "RenderedImage.png",
+          tr("Image Files (*.png)"), 0, QFileDialog::DontUseNativeDialog);
 
       if (fileName.isEmpty())
       {
@@ -167,7 +169,8 @@ namespace Controller {
   }
 
   bool MainWindow::allocateMemoryForImage (){
-    void *mem = realloc(image->imageData, image->imageDataSize * sizeof(colorType));
+    void *mem = realloc(image->imageData,
+                        image->imageDataSize * sizeof(colorType));
 
     if (mem == 0)
     {
@@ -187,7 +190,8 @@ namespace Controller {
   void MainWindow::changeWidth (int newWidth){
     imageUnit matchImageHeight = image->imageHeight;
 
-    while (matchImageHeight >= 1 && refreshMemoryRequest(newWidth, matchImageHeight) == false)
+    while (matchImageHeight >= 1
+        && refreshMemoryRequest(newWidth, matchImageHeight) == false)
     {
       --matchImageHeight;
     }
@@ -199,7 +203,8 @@ namespace Controller {
   void MainWindow::changeHeight (int newHeight){
     imageUnit matchImageWidth = image->imageWidth;
 
-    while (matchImageWidth >= 1 && refreshMemoryRequest(matchImageWidth, newHeight) == false)
+    while (matchImageWidth >= 1
+        && refreshMemoryRequest(matchImageWidth, newHeight) == false)
     {
       --matchImageWidth;
     }
@@ -208,7 +213,8 @@ namespace Controller {
     ui->imageHeight->setValue(image->imageHeight);
   }
 
-  bool MainWindow::refreshMemoryRequest (imageUnit imageWidth, imageUnit imageHeight){
+  bool MainWindow::refreshMemoryRequest (imageUnit imageWidth,
+                                         imageUnit imageHeight){
     QString sufix;
     double memoryForImage;
 
@@ -281,7 +287,8 @@ namespace Controller {
 
     ui->terminateRender->setDisabled(true);
 
-    ui->resultList->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+    ui->resultList->horizontalHeader()->setResizeMode(
+        QHeaderView::ResizeToContents);
     QErrorMessage::qtHandler()->setMinimumSize(200, 100);
 
     setRefreshTime(ui->refreshTime->value());
@@ -289,11 +296,15 @@ namespace Controller {
 
   void MainWindow::connectSignals (){
     connect(ui->render, SIGNAL(pressed()), this, SLOT(runRenderer()));
-    connect(ui->imageWidth, SIGNAL(valueChanged(int)), this, SLOT(changeWidth(int)));
-    connect(ui->imageHeight, SIGNAL(valueChanged(int)), this, SLOT(changeHeight(int)));
+    connect(ui->imageWidth, SIGNAL(valueChanged(int)), this,
+            SLOT(changeWidth(int)));
+    connect(ui->imageHeight, SIGNAL(valueChanged(int)), this,
+            SLOT(changeHeight(int)));
     connect(ui->loadScene, SIGNAL(pressed()), this, SLOT(loadScene()));
-    connect(ui->refreshTime, SIGNAL(valueChanged(int)), this, SLOT(setRefreshTime(int)));
-    connect(ui->terminateRender, SIGNAL(clicked()), this, SLOT(terminateRender()));
+    connect(ui->refreshTime, SIGNAL(valueChanged(int)), this,
+            SLOT(setRefreshTime(int)));
+    connect(ui->terminateRender, SIGNAL(clicked()), this,
+            SLOT(terminateRender()));
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveImage()));
 
     //Camera movement
@@ -313,10 +324,13 @@ namespace Controller {
     connect(ui->zAngleDec, SIGNAL(clicked()), this, SLOT(rotateCamera()));
 
     //Rendering signals
-    connect(threadRunner.data(), SIGNAL(renderFinished()), this, SLOT(renderFinished()));
+    connect(threadRunner.data(), SIGNAL(renderFinished()), this,
+            SLOT(renderFinished()));
     connect(timer.data(), SIGNAL(timeout()), ui->imageViewer, SLOT(update()));
-    connect(ui->tileSize, SIGNAL(editingFinished()), threadRunner.data(), SLOT(createTiles()));
-    connect(ui->randomRender, SIGNAL(toggled(bool)), this, SLOT(setRandomRender(bool)));
+    connect(ui->tileSize, SIGNAL(editingFinished()), threadRunner.data(),
+            SLOT(createTiles()));
+    connect(ui->randomRender, SIGNAL(toggled(bool)), this,
+            SLOT(setRandomRender(bool)));
   }
 
   void MainWindow::calibrate (){
@@ -325,22 +339,27 @@ namespace Controller {
     QRect windowFrameGeometry(this->frameGeometry());
     QPoint topLeft;
 
+    //Shrink window if it's bigger than screen area. Important for Windows users
     if (windowFrameGeometry.width() + WINDOW_MARGIN > screenGeometry.width())
     {
       int frameTotalWidth = this->frameSize().width() - this->size().width();
-      windowGeometry.setWidth(screenGeometry.width() - frameTotalWidth - WINDOW_MARGIN);
+      windowGeometry.setWidth(
+          screenGeometry.width() - frameTotalWidth - WINDOW_MARGIN);
     }
-
     if (windowFrameGeometry.height() + WINDOW_MARGIN > screenGeometry.height())
     {
       int frameTotalHeight = this->frameSize().height() - this->size().height();
-      windowGeometry.setHeight(screenGeometry.height() - frameTotalHeight - WINDOW_MARGIN);
+      windowGeometry.setHeight(
+          screenGeometry.height() - frameTotalHeight - WINDOW_MARGIN);
     }
 
+    //Place window at the center of the screen
     this->setGeometry(windowGeometry);
 
-    topLeft.setX(screenGeometry.center().x() - this->frameGeometry().width() / 2);
-    topLeft.setY(screenGeometry.center().y() - this->frameGeometry().height() / 2);
+    topLeft.setX(
+        screenGeometry.center().x() - this->frameGeometry().width() / 2);
+    topLeft.setY(
+        screenGeometry.center().y() - this->frameGeometry().height() / 2);
 
     this->move(topLeft);
 
@@ -350,6 +369,13 @@ namespace Controller {
     ui->imageWidth->setValue(DEFAULT_IMAGE_WIDTH);
     ui->imageHeight->setValue(DEFAULT_IMAGE_HEIGHT);
     ui->tileSize->setValue(DEFAULT_TILE_SIZE);
+
+    //Shrink result box
+    QList <int> sizes = ui->verticalSplitter->sizes();
+    int sizeDiff = 100;
+    sizes [0] += sizeDiff;
+    sizes [1] -= sizeDiff;
+    ui->verticalSplitter->setSizes(sizes);
   }
 
   void MainWindow::activateButtons (){
@@ -363,7 +389,8 @@ namespace Controller {
     ui->actionSave->setDisabled(false);
   }
 
-  void MainWindow::deactivateButtons (bool withLibSelect, bool withSceneLoading){
+  void MainWindow::deactivateButtons (bool withLibSelect,
+                                      bool withSceneLoading){
     ui->loadScene->setDisabled(withSceneLoading);
     ui->render->setDisabled(true);
     ui->terminateRender->setDisabled(false | ( !withLibSelect));
@@ -398,7 +425,8 @@ namespace Controller {
 
     if ( !QFile::exists(fileName))
     {
-      fileName = QFileDialog::getOpenFileName(this, QSTRING("Otwórz plik sceny"),
+      fileName = QFileDialog::getOpenFileName(this,
+                                              QSTRING("Otwórz plik sceny"),
                                               QSTRING(DEFAULT_SCENE_FILE_NAME),
                                               tr("XML files (*.xml)"), 0,
                                               QFileDialog::DontUseNativeDialog);
@@ -420,8 +448,10 @@ namespace Controller {
     }
     catch (std::exception &ex)
     {
-      showWarning(QSTRING("Błąd parsowania pliku sceny<br>"
-          "Sprawdź poprawność pliku: ") + fileName + QSTRING("<br><br>") + QSTRING(ex.what()));
+      showWarning(
+          QSTRING("Błąd parsowania pliku sceny<br>"
+              "Sprawdź poprawność pliku: ") + fileName + QSTRING("<br><br>")
+              + QSTRING(ex.what()));
     }
 
     if ( !result)
@@ -471,7 +501,8 @@ namespace Controller {
     ui->resultList->setSortingEnabled(false);
     ui->resultList->insertRow(row);
 
-    QTableWidgetItem **items = new QTableWidgetItem* [ui->resultList->columnCount()];
+    QTableWidgetItem **items =
+        new QTableWidgetItem* [ui->resultList->columnCount()];
 
     for (int i = ui->resultList->columnCount() - 1; i >= 0; --i)
     {
@@ -565,6 +596,7 @@ namespace Controller {
   }
 
   void MainWindow::getCameraParameters (){
+    //Update data in GUI
     ui->xPos->setValue(scene->getCamera()->getPosition() [Model::X]);
     ui->yPos->setValue(scene->getCamera()->getPosition() [Model::Y]);
     ui->zPos->setValue(scene->getCamera()->getPosition() [Model::Z]);

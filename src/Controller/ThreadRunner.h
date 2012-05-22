@@ -1,6 +1,4 @@
 /// @file Controller/ThreadRunner.h
-/// @date 07-01-2012
-/// @author Mikołaj Milej
 
 #pragma once
 

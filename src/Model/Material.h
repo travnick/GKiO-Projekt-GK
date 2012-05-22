@@ -1,6 +1,4 @@
 /// @file Model/Material.h
-/// @date 01-12-2011
-/// @author Mikołaj Milej
 
 #pragma once
 
@@ -36,25 +34,25 @@ namespace Model {
         diffuse = other;
       }
 
-      inline const worldUnit &getReflection () const {
+      inline const worldUnit &getReflection () const{
         return reflection;
       }
 
-      worldUnit getIOR() const {
-			return ior;
+      worldUnit getIOR () const{
+        return ior;
       }
 
-      void setIOR(worldUnit val) {
-			this->ior = val;
+      void setIOR (worldUnit val){
+        this->ior = val;
       }
 
-		worldUnit getTransparency() const {
-			return transparency;
-		}
+      worldUnit getTransparency () const{
+        return transparency;
+      }
 
-		void setTransparency(worldUnit val) {
-			this->transparency = val;
-		}
+      void setTransparency (worldUnit val){
+        this->transparency = val;
+      }
 
       inline void setReflection (const worldUnit &newReflection){
         if (newReflection > 1)

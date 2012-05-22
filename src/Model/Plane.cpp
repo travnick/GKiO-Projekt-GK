@@ -1,6 +1,4 @@
 /// @file Plane.cpp
-/// @date 18-04-2012
-/// @author Mikołaj Milej
 
 #include "Model/Plane.h"
 #include "Model/Ray.h"

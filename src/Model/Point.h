@@ -1,6 +1,4 @@
 /// @file Model/Point.h
-/// @date 01-12-2011
-/// @author Mikołaj Milej
 
 #pragma once
 
@@ -89,7 +87,8 @@ namespace Model {
         rotateMatrix.rotate(other [Y], 0, 1, 0); //rotate about Y axis
         rotateMatrix.rotate(other [X], 1, 0, 0); //rotate about X axis
 
-        QVector3D result = rotateMatrix.mapVector(QVector3D(data [X], data [Y], data [Z]));
+        QVector3D result = rotateMatrix.mapVector(
+            QVector3D(data [X], data [Y], data [Z]));
 
         data [X] = result.x();
         data [Y] = result.y();

@@ -1,6 +1,4 @@
 /// @file Model/Scene.h
-/// @date 01-12-2011
-/// @author Mikołaj Milej
 
 #pragma once
 
@@ -61,7 +59,8 @@ namespace Model {
        * @return if scene is loaded properly or not
        * @throws std::exception from XML parser
        */
-      bool init (const QString &filename, bool reload = false) throw (std::exception);
+      bool init (const QString &filename,
+                 bool reload = false) throw (std::exception);
 
       /**Returns camera
        *

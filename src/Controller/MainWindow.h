@@ -1,6 +1,4 @@
 /// @file Controller/MainWindow.h
-/// @date 01-12-2011
-/// @author Mikołaj Milej
 
 #pragma once
 
@@ -214,7 +212,8 @@ namespace Controller {
        * @param withLibSelect disable library changing ?
        * @param withSceneLoading disable scene loading ?
        */
-      void deactivateButtons (bool withLibSelect = true, bool withSceneLoading = true);
+      void deactivateButtons (bool withLibSelect = true, bool withSceneLoading =
+                                  true);
 
       /**Calculates memory requirement for image size width x height
        *

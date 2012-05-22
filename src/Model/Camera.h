@@ -1,6 +1,4 @@
 /// @file Model/Camera.h
-/// @date 01-12-2011
-/// @author Mikołaj Milej
 
 #pragma once
 
@@ -54,7 +52,8 @@ namespace Model {
        * @param point point in 3D space
        * @param direction direction from camera origin to given point
        */
-      inline void getDirection (const Point &point, Vector &directionToPoint) const{
+      inline void getDirection (const Point &point,
+                                Vector &directionToPoint) const{
         Q_ASSERT(screenImageRatio > 0);
 
         point.data.diff(origin.data, directionToPoint.data);

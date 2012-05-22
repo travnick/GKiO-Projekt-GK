@@ -1,6 +1,4 @@
 /// @file AlignedClass.h
-/// @date 28-04-2012
-/// @author Mikołaj Milej
 
 #pragma once
 

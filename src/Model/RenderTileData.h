@@ -1,6 +1,4 @@
 /// @file Model/RenderTileData.h
-/// @date 29-12-2011
-/// @author Mikołaj Milej
 
 #pragma once
 

@@ -1,6 +1,4 @@
 /// @file Model/Sphere.cpp
-/// @date 01-12-2011
-/// @author Mikołaj Milej
 
 #include <cmath>
 
@@ -24,12 +22,12 @@ namespace Model {
     normalAtPoint.normalize();
   }
 
-  bool Sphere::checkRay (const Ray& ray, worldUnit& range, Vector& e) const{
-    position.data.diff(ray.getStart().data, e.data);
+  bool Sphere::checkRay (const Ray& ray, worldUnit& range, Vector& dist) const{
+    position.data.diff(ray.getStart().data, dist.data);
 
-    worldUnit a = ray.getDir().dotProduct(e.data);
+    worldUnit a = ray.getDir().dotProduct(dist.data);
 
-    worldUnit D = squareRadius - e.dotProduct() + a * a;
+    worldUnit D = squareRadius - dist.dotProduct() + a * a;
 
     //There is no intersection with sphere if D < 0
     if (D - DEFAULT_INTERSECTION_ERROR_VALUE < 0)
@@ -39,7 +37,7 @@ namespace Model {
 
     worldUnit t = SQRT(D);
 
-    if (e.squareLength >= squareRadius)
+    if (dist.squareLength >= squareRadius)
     //We are outside sphere
     {
       t = a - t;

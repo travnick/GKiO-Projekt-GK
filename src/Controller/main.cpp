@@ -1,6 +1,4 @@
 /// @file Controller/main.cpp
-/// @date 01-12-2011
-/// @author Mikołaj Milej
 
 #include <QApplication>
 

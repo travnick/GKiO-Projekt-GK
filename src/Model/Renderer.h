@@ -1,6 +1,4 @@
 /// @file Model/Renderer.h
-/// @date 01-12-2011
-/// @author Mikołaj Milej
 
 #pragma once
 
@@ -74,7 +72,9 @@ namespace Model {
        * @param resultColor color at the intersection point
        * @param viewDistance maximum range to check intersections
        */
-      void shootRay (Ray & ray, Color &resultColor, worldUnit viewDistance) const;
+      void shootRay (Ray & ray,
+                     Color &resultColor,
+                     worldUnit viewDistance) const;
 
       Q_DISABLE_COPY (Renderer)
   };

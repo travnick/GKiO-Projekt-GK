@@ -1,6 +1,4 @@
 /// @file Model/Light.h
-/// @date 01-12-2011
-/// @author Mikołaj Milej
 
 #pragma once
 
@@ -40,8 +38,8 @@ namespace Model {
       /** Sets power of light
        *
        */
-      void setPower(worldUnit value) {
-    	  this->power = value;
+      void setPower (worldUnit value){
+        this->power = value;
       }
   };
 }

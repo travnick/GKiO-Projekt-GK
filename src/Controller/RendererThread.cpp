@@ -1,6 +1,4 @@
 /// @file Controller/RendererThread.cpp
-/// @date 06-01-2012
-/// @author Mikołaj Milej
 
 #include "Controller/RendererThread.h"
 #include "Model/Renderer.h"

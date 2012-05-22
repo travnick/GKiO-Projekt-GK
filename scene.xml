@@ -1,166 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene>
-	<materials>
-	  <mat id="0" reflection="0.55" transparency="0.0" ior="1.0">
-		<diffuseColor r="63" g="230" b="27" />
-	  </mat>
-	  <mat id="1" reflection="1" transparency="0.0" ior="1.0">
-		<diffuseColor r="72" g="208" b="203" />
-	  </mat>
-	  <mat id="2" reflection="0.4" transparency="0.0" ior="1.0">
-		<diffuseColor r="230" g="0" b="0" />
-	  </mat>
-	  <mat id="3" reflection="0.2" transparency="0.0" ior="1.0">
-		<diffuseColor r="230" g="105" b="0" />
-	  </mat>
-	  <mat id="4" reflection="0.4" transparency="0.0" ior="1.0">
-		<diffuseColor r="230" g="230" b="0" />
-	  </mat>
-	  <mat id="5" reflection="0.5" transparency="0.0" ior="1.0">
-		<diffuseColor r="135" g="208" b="230" />
-	  </mat>
-	  <mat id="6" reflection="0.05" transparency="0.0" ior="1.0">
-		<diffuseColor r="66" g="131" b="153" />
-	  </mat>
-	</materials>
-	
-	<lights>
-	  
-	 <!-- TOP -->
-	  <light id="1" power="1.0">
-	  	<position x="20" y="80" z="60" />
-		<color r="255" g="255" b="255" />
-	  </light>
-	 <!-- CENTER -->
-	  <light id="2" power="1.0">
-	  	<position x="0" y="13" z="70" />
-		<color r="150" g="150" b="150" />
-	  </light>
-	 
-	  <light id="3" power="1.0">
-	  	<position x="-35" y="25" z="50" />
-		<color r="250" g="250" b="250" />
-	  </light>
-	  
-	   <light id="4" power="1.0">
-	   	<position x="30" y="13" z="53" />
-		<color r="75" g="75" b="75" />
-	  </light>
-
-	  <light id="5" power="1.0">
-	  	<position x="30" y="45" z="100" />
-		<color r="75" g="75" b="75" />
-	  </light>
-
-	  <light id="6" power="1.0">
-	  	<position x="30" y="13" z="120" />
-		<color r="50" g="50" b="50" />
-	  </light>
-	  
-	  <light id="7" power="1.0">
-	  	<position x="-10" y="60" z="140" />
-		<color r="255" g="255" b="255" />
-	  </light>
-
-	  <light id="8" power="1.0">
-	  	<position x="1" y="50" z="70" />
-		<color r="255" g="255" b="255" />
-	  </light>
-
-	  <!--<light id="9" power="1.0">
-	  	<position x="-1" y="10" z="-40" />
-		<color r="255" g="255" b="255" />
-	  </light>-->
-
-	  <!--<light id="10" power="1.0">
-	  	<position x="0" y="40" z="40" />
-		<color r="255" g="255" b="255" />
-	  </light>-->
-
-	  <!--<light id="11" power="1.0">
-	  	<position x="-30" y="60" z="70" />
-		<color r="255" g="255" b="255" />
-	  </light>-->
-	</lights>
-	
-	<objects>
-	<!-- 48 - human like FOV -->
-	  <camera screenWidth="10" viewDistance="20000" fov="48" type="conic">
-	  	<direction x="30" y="-30" z="0" />
-	  	<position x="92" y="128" z="-66" />
-	  </camera>
-	 
-	  <!-- TOP -->
-	  <sphere r="1.0" material="5" offset="15">
-	  	<position x="-45" y="60" z="50" />
-	  	<multiply x="7" y="1" z="7" />
-	  </sphere>
-	  
-	  <!-- BACK -->
-	  <sphere r="2.0" material="3" offset="12">
-	  	<position x="-43" y="3" z="140" />
-	  	<multiply x="8" y="5" z="1" />
-	  </sphere>
-	  
-	  <!-- LEFT -->
-	  <sphere r="2.0" material="3" offset="8">
-	  	<position x="-47" y="3" z="140" />
-	  	<multiply x="1" y="8" z="-11" />
-	  </sphere>
-	  
-	  <!-- RIGHT -->
-	  <sphere r="2.0" material="3" offset="8">
-	  	<position x="47" y="3" z="140" />
-	  	<multiply x="1" y="8" z="-11" />
-	  </sphere>
-	  
-	  <!-- BOTTOM -->
-	  <sphere r="2.0" material="6" offset="7">
-	  	<position x="-45" y="-1.5" z="50" />
-	  	<multiply x="14" y="1" z="14" />
-	  </sphere>
-	  <plane angleX="0" angleY="0" angleZ="0" d="0" material="6" />
-	  
-	  <!-- CUBE-->
-	  <sphere r="1.0" material="2" offset="6">
-	  	<position x="-15" y="3" z="60" />
-	  	<multiply x="3" y="3" z="3" />
-	  </sphere>
-	  
-	  <sphere r="6.0" material="0">
-	  	<position x="-30" y="35" z="65" />
-	  </sphere>
-	  
-	  <sphere r="8.0" material="1">
-	  	<position x="-33" y="8" z="65" />
-	  </sphere>
-	  
-	  <sphere r="13.0" material="4">
-	  	<position x="-25" y="13" z="120" />
-	  </sphere>
-	   
-	  <sphere r="3.1" material="6">
-	  	<position x="42" y="15" z="75" />
-	  </sphere>
-	  
-	  <sphere r="5.0" material="2">
-	  	<position x="-13" y="7" z="110" />
-	  </sphere>
-	  
-	  <sphere r="5.0" material="4">
-	  	<position x="40" y="40" z="60" />
-	  </sphere>
-	  
-	  <sphere r="7.0" material="4">
-	  	<position x="30" y="7" z="70" />
-	  </sphere>
-	  
-	  <sphere r="5.0" material="6">
-	  	<position x="5" y="45" z="60" />
-	  </sphere>
-	  
-	  <sphere r="16.0" material="0">
-	  	<position x="10" y="20" z="100" />
-	  </sphere>
-	</objects>
+  <materials>
+    <mat id="0" reflection="0.55" transparency="0.0" ior="1.0">
+      <diffuseColor r="63" g="230" b="27" />
+    </mat>
+    <mat id="1" reflection="1" transparency="0.0" ior="1.0">
+      <diffuseColor r="72" g="208" b="203" />
+    </mat>
+    <mat id="2" reflection="0.4" transparency="0.0" ior="1.0">
+      <diffuseColor r="230" g="0" b="0" />
+    </mat>
+    <mat id="3" reflection="0.2" transparency="0.0" ior="1.0">
+      <diffuseColor r="230" g="105" b="0" />
+    </mat>
+    <mat id="4" reflection="0.4" transparency="0.0" ior="1.0">
+      <diffuseColor r="230" g="230" b="0" />
+    </mat>
+    <mat id="5" reflection="0.5" transparency="0.0" ior="1.0">
+      <diffuseColor r="135" g="208" b="230" />
+    </mat>
+    <mat id="6" reflection="0.05" transparency="0.0" ior="1.0">
+      <diffuseColor r="66" g="131" b="153" />
+    </mat>
+  </materials>
+  
+  <lights>
+    <!-- TOP -->
+    <light id="1" power="200.0">
+      <position x="0" y="1000" z="80" />
+      <color r="204" g="204" b="204" />
+    </light>
+    <!-- middle center bottom -->
+    <light id="2" power="1.0">
+      <position x="0" y="15" z="70" />
+      <color r="204" g="204" b="204" />
+    </light>
+    <!-- front left middle -->
+    <light id="3" power="1.0">
+      <position x="-35" y="25" z="50" />
+      <color r="204" g="204" b="204" />
+    </light>
+    <!-- front right bottom -->
+    <light id="4" power="1.0">
+      <position x="30" y="13" z="53" />
+      <color r="204" g="204" b="204" />
+    </light>
+    <!-- back right top -->
+    <light id="5" power="1.0">
+      <position x="30" y="45" z="100" />
+      <color r="204" g="204" b="204" />
+    </light>
+    <!-- back right bottom -->
+    <light id="6" power="1.0">
+      <position x="30" y="13" z="120" />
+      <color r="204" g="204" b="204" />
+    </light>
+    <!-- middle center top -->
+    <light id="8" power="1.0">
+      <position x="1" y="50" z="70" />
+      <color r="204" g="204" b="204" />
+    </light>
+  </lights>
+  
+  <objects>
+    <!-- 48 - human like FOV -->
+    <camera screenWidth="10" viewDistance="20000" fov="48" type="conic">
+      <direction x="30" y="-30" z="0" />
+      <position x="92" y="128" z="-66" />
+    </camera>
+    
+    <!-- TOP -->
+    <sphere r="1.0" material="5" offset="15">
+      <position x="-45" y="60" z="50" />
+      <multiply x="7" y="1" z="7" />
+    </sphere>
+    
+    <!-- BACK -->
+    <sphere r="2.0" material="3" offset="12">
+      <position x="-43" y="3" z="140" />
+      <multiply x="8" y="5" z="1" />
+    </sphere>
+    
+    <!-- LEFT -->
+    <sphere r="2.0" material="3" offset="8">
+      <position x="-47" y="3" z="140" />
+      <multiply x="1" y="8" z="-11" />
+    </sphere>
+    
+    <!-- RIGHT -->
+    <sphere r="2.0" material="3" offset="8">
+      <position x="47" y="3" z="140" />
+      <multiply x="1" y="8" z="-11" />
+    </sphere>
+    
+    <!-- BOTTOM -->
+    <sphere r="2.0" material="6" offset="7">
+      <position x="-45" y="-1.5" z="50" />
+      <multiply x="14" y="1" z="14" />
+    </sphere>
+    <plane angleX="0" angleY="0" angleZ="0" d="0" material="6" />
+    
+    <!-- CUBE-->
+    <sphere r="1.0" material="2" offset="3">
+      <position x="-15" y="10" z="60" />
+      <multiply x="3" y="3" z="3" />
+    </sphere>
+    
+    <sphere r="6.0" material="0">
+      <position x="-30" y="40" z="80" />
+    </sphere>
+    
+    <sphere r="8.0" material="1">
+      <position x="-30" y="8" z="70" />
+    </sphere>
+    
+    <sphere r="13.0" material="4">
+      <position x="-25" y="13" z="120" />
+    </sphere>
+    
+    <sphere r="3.1" material="6">
+      <position x="0" y="15" z="80" />
+    </sphere>
+    
+    <sphere r="5.0" material="2">
+      <position x="-13" y="7" z="110" />
+    </sphere>
+    
+    <sphere r="5.0" material="4">
+      <position x="40" y="40" z="60" />
+    </sphere>
+    
+    <sphere r="7.0" material="4">
+      <position x="10" y="7" z="65" />
+    </sphere>
+    
+    <sphere r="5.0" material="6">
+      <position x="5" y="45" z="80" />
+    </sphere>
+    
+    <!-- the biggest one-->
+    <sphere r="16.0" material="0">
+      <position x="15" y="20" z="100" />
+    </sphere>
+  </objects>
 </scene>

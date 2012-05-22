@@ -1,6 +1,4 @@
 /// @file Model/Camera.cpp
-/// @date 01-12-2011
-/// @author Mikołaj Milej
 
 #include <cmath>
 #include <map>

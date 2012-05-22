@@ -1,6 +1,4 @@
 /// @file Plane.h
-/// @date 18-04-2012
-/// @author Mikołaj Milej
 
 #pragma once
 
@@ -65,7 +63,9 @@ namespace Model {
        * @param tmpDist temporary ray for calculations
        * @return true if ray intersects with plane and plane is in ray range, otherwise false
        */
-      virtual bool checkRay (const Ray &ray, worldUnit &range, Vector &tmpDist) const;
+      virtual bool checkRay (const Ray &ray,
+                             worldUnit &range,
+                             Vector &tmpDist) const;
 
     private:
       Vector normal;

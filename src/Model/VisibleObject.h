@@ -1,6 +1,4 @@
 /// @file Model/VisibleObject.h
-/// @date 27-12-2011
-/// @author Mikołaj Milej
 
 #pragma once
 
@@ -45,7 +43,8 @@ namespace Model {
        * @param point point to calculate normal at
        * @param normalAtPoint vector to calculate normal in
        */
-      virtual void getNormal (const Point& point, Vector &normalAtPoint) const = 0;
+      virtual void getNormal (const Point& point,
+                              Vector &normalAtPoint) const = 0;
 
       /**Sets material of the object
        *
@@ -62,7 +61,9 @@ namespace Model {
        * @param tmpDist temporary ray for calculations
        * @return true if ray intersects with object and object is in ray range, otherwise false
        */
-      virtual bool checkRay (const Ray &ray, worldUnit &range, Vector &tmpDist) const = 0;
+      virtual bool checkRay (const Ray &ray,
+                             worldUnit &range,
+                             Vector &tmpDist) const = 0;
 
     protected:
       worldUnit size;

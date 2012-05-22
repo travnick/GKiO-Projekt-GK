@@ -1,6 +1,4 @@
 /// @file Model/Sphere.h
-/// @date 01-12-2011
-/// @author Mikołaj Milej
 
 #pragma once
 
@@ -43,7 +41,9 @@ namespace Model {
        * @param tmpDist temporary ray for calculations
        * @return true if ray intersects with sphere and sphere is in ray range, otherwise false
        */
-      virtual bool checkRay (const Ray &ray, worldUnit &range, Vector &tmpDist) const;
+      virtual bool checkRay (const Ray &ray,
+                             worldUnit &range,
+                             Vector &tmpDist) const;
 
     private:
       worldUnit squareRadius;

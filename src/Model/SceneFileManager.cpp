@@ -19,7 +19,7 @@
 
 namespace Model {
 
-  void SceneFileManager::loadScene (QIODevice & io, Scene &scene){
+  void SceneFileManager::loadScene (QIODevice & io, Scene &scene) {
     Objects::ObjectType objectType = Objects::None;
     QString tmpname;
     QDomNode node;
@@ -39,15 +39,17 @@ namespace Model {
         continue;
 
       QSharedPointer <Material> material(new Material());
-      Color color;
-      worldUnit reflection;
-      worldUnit ior;
-      worldUnit transparency;
+      Color color, specularColor;
+      float specularPower, reflection, ior, transparency;
+
       QDomElement elem = node.toElement();
 
-      reflection = static_cast<worldUnit>(getFloat(elem, "reflection"));
-      ior = static_cast<worldUnit>(getFloat(elem, "ior"));
-      transparency = static_cast<worldUnit>(getFloat(elem, "transparency"));
+      reflection =getFloat(elem, "reflection");
+      ior = getFloat(elem, "ior");
+      transparency = getFloat(elem, "transparency");
+      specularPower = getFloat(elem, "specularPower");
+      getColor(node.firstChildElement("diffuseColor").toElement(), color);
+      getColor(node.firstChildElement("specularColor").toElement(), specularColor);
 
       if (reflection < 0.0f || reflection > 1.0f)
         throw std::logic_error("Wartość odbicia jest spoza zakresu.");
@@ -56,11 +58,14 @@ namespace Model {
     	  throw std::logic_error("Wartość IOR powinna być większa od 1.");
 
       if (transparency < 0.0f || transparency > 1.0f)
-    	  throw std::logic_error("Przeźroczystość materiału powinna zawierać się w [0, 1].");
+    	  throw std::logic_error("Przeźroczystość materiału poza zakresem [0, 1].");
 
-      getColor(node.firstChildElement("diffuseColor").toElement(), color);
+      if (specularPower < 1 || specularPower > 500)
+    	  throw std::logic_error("Kolor specular poza zakresem [1, 5000].");
 
       material->setColor(color);
+      material->setSpecularColor(specularColor);
+      material->setSpecularPower(specularPower);
       material->setReflection(reflection);
       material->setTransparency(transparency);
       material->setIOR(ior);
@@ -117,8 +122,7 @@ namespace Model {
         {
           QSharedPointer <Sphere> mainbject;
           Point point;
-          worldUnit radius;
-          worldUnit offset;
+          worldUnit radius, offset;
           unsigned material;
           int multiplyX = 1, multiplyY = 1, multiplyZ = 1;
           int multiplyXSign = 1, multiplyYSign = 1, multiplyZSign = 1;
@@ -237,7 +241,7 @@ namespace Model {
 
           FOV = static_cast <Camera::unitType>(getDouble(elem, "fov"));
           if ( !(FOV > 0 && FOV < 180))
-            throw std::logic_error("Parametr FOV musi być z zakresu (0;180)");
+            throw std::logic_error("Parametr FOV musi być z zakresu (0;180).");
 
           viewDistance = static_cast <worldUnit>(getFloat(elem, "viewDistance"));
           if ( !(viewDistance > 0))
@@ -302,4 +306,4 @@ namespace Model {
       throw std::logic_error("Błąd podczas wczytywania elementu " + name.toStdString());
     return val;
   }
-}/* namespace Model */
+} /* namespace Model */

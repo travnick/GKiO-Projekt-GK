@@ -5,8 +5,6 @@
 #pragma once
 
 #include "Model/Color.h"
-//Needed for worldUnit
-#include "Model/ModelDefines.h"
 
 namespace Model {
   /**Material class
@@ -14,13 +12,6 @@ namespace Model {
    */
   class Material {
     public:
-      /**Available types of material
-       *
-       */
-      enum Type {
-        Diffuse
-      };
-
       /**Initializes color field
        *
        */
@@ -36,42 +27,53 @@ namespace Model {
         diffuse = other;
       }
 
-      inline const worldUnit &getReflection () const {
+      inline const Color &getSpecularColor() const {
+          return specularColor;
+      }
+
+      inline void setSpecularColor(Color color) {
+          this->specularColor = color;
+      }
+
+      inline float getSpecularPower() const {
+          return specularPower;
+      }
+
+      inline void setSpecularPower(float val)
+      {
+          this->specularPower = val;
+      }
+
+      inline float getReflection () const {
         return reflection;
       }
 
-      worldUnit getIOR() const {
-			return ior;
+      float getIOR() const {
+    	  return ior;
       }
 
-      void setIOR(worldUnit val) {
-			this->ior = val;
+      void setIOR(float val) {
+    	  this->ior = val;
       }
 
-		worldUnit getTransparency() const {
-			return transparency;
-		}
+	  float getTransparency() const {
+		  return transparency;
+	  }
 
-		void setTransparency(worldUnit val) {
-			this->transparency = val;
-		}
+	  void setTransparency(float val) {
+		  this->transparency = val;
+	  }
 
-      inline void setReflection (const worldUnit &newReflection){
-        if (newReflection > 1)
-        {
-          reflection = 1;
-        }
-        else
-        {
-          reflection = newReflection;
-        }
+      inline void setReflection (float val){
+          reflection = val > 1 ? 1 : val;
       }
 
     private:
       Color diffuse;
-      worldUnit reflection;
-      worldUnit transparency;
-      worldUnit ior;
-      Type type;
+      Color specularColor;
+      float specularPower;
+      float reflection;
+      float transparency;
+      float ior;
   };
 }

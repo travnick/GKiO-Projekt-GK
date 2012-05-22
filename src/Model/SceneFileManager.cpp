@@ -41,17 +41,29 @@ namespace Model {
       QSharedPointer <Material> material(new Material());
       Color color;
       worldUnit reflection;
+      worldUnit ior;
+      worldUnit transparency;
       QDomElement elem = node.toElement();
 
-      reflection = static_cast <worldUnit>(getFloat(elem, "reflection"));
+      reflection = static_cast<worldUnit>(getFloat(elem, "reflection"));
+      ior = static_cast<worldUnit>(getFloat(elem, "ior"));
+      transparency = static_cast<worldUnit>(getFloat(elem, "transparency"));
 
       if (reflection < 0.0f || reflection > 1.0f)
         throw std::logic_error("Wartość odbicia jest spoza zakresu.");
+
+      if (ior < 1.0f)
+    	  throw std::logic_error("Wartość IOR powinna być większa od 1.");
+
+      if (transparency < 0.0f || transparency > 1.0f)
+    	  throw std::logic_error("Przeźroczystość materiału powinna zawierać się w [0, 1].");
 
       getColor(node.firstChildElement("diffuseColor").toElement(), color);
 
       material->setColor(color);
       material->setReflection(reflection);
+      material->setTransparency(transparency);
+      material->setIOR(ior);
 
       scene.addMaterial(material);
     }
@@ -107,7 +119,7 @@ namespace Model {
           Point point;
           worldUnit radius;
           worldUnit offset;
-          int material;
+          unsigned material;
           int multiplyX = 1, multiplyY = 1, multiplyZ = 1;
           int multiplyXSign = 1, multiplyYSign = 1, multiplyZSign = 1;
 
@@ -127,7 +139,7 @@ namespace Model {
 
           material = getInt(elem, "material");
 
-          if (material >= scene.getMaterials().size() || material < 0)
+          if (material >= scene.getMaterials().size())
             throw std::logic_error("Nie ma takiego materiału. Sprawdź obiekty.");
 
           QDomNode mul = node.firstChildElement("multiply");

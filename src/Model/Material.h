@@ -36,9 +36,25 @@ namespace Model {
         diffuse = other;
       }
 
-      inline const worldUnit &getReflection () const{
+      inline const worldUnit &getReflection () const {
         return reflection;
       }
+
+      worldUnit getIOR() const {
+			return ior;
+      }
+
+      void setIOR(worldUnit val) {
+			this->ior = val;
+      }
+
+		worldUnit getTransparency() const {
+			return transparency;
+		}
+
+		void setTransparency(worldUnit val) {
+			this->transparency = val;
+		}
 
       inline void setReflection (const worldUnit &newReflection){
         if (newReflection > 1)
@@ -54,6 +70,8 @@ namespace Model {
     private:
       Color diffuse;
       worldUnit reflection;
+      worldUnit transparency;
+      worldUnit ior;
       Type type;
   };
 }

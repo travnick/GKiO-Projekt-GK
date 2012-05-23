@@ -181,17 +181,23 @@ namespace Model {
             worldUnit lightPower = (0.01 * pointLightDist->length
                 + 0.001 * pointLightDist->length * pointLightDist->length);
 
+            worldUnit lightPowerSpecular = ( *light)->power * pow(1.01f, -pointLightDist->length);
+
             if (lightPower < 1.0)
             {
               lightPower = 1.0;
             }
 
+            worldUnit specular = pow(pointLightDist->data.dotProduct(normalAtIntersection->data), currentMat->getSpecularPower());
+
             lightPower = ( *light)->power / lightPower;
             //<--light attenuation
 
             lightPower *= lambert * tmpLightCoef;
+            lightPowerSpecular *= specular * tmpLightCoef;
 
             resultColor += ( * *light) * currentMat->getColor() * lightPower;
+            resultColor += ( * *light) *  currentMat->getSpecularColor() * lightPowerSpecular;
           }
         }
 

@@ -94,31 +94,21 @@ namespace Model {
     position.data = positionOrig.data;
   }
 
-  void Camera::move (Direction direction, float speed){
-
+  void Camera::move (Axis direction, float speed){
     switch (direction) {
-      case Forward:
-        position.data += eyeDirection.toNormal().data * speed;
-        break;
-
-      case Backward:
-        position.data -= eyeDirection.toNormal().data * speed;
-        break;
-
-      case Left:
-        position.data -= screenWidthDelta.toNormal().data * speed;
-        break;
-
-      case Right:
+      case X:
         position.data += screenWidthDelta.toNormal().data * speed;
         break;
 
-      case Up:
+      case Y:
         position.data += screenHeightDelta.toNormal().data * speed;
         break;
 
-      case Down:
-        position.data -= screenHeightDelta.toNormal().data * speed;
+      case Z:
+        position.data += eyeDirection.toNormal().data * speed;
+        break;
+
+      case W:
         break;
     }
   }

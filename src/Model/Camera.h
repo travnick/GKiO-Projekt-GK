@@ -211,7 +211,7 @@ namespace Model {
         viewDistance = newViewDistance;
       }
 
-      void move (Direction direction, float speed);
+      void move (Axis direction, float speed);
 
       void rotate (Axis axis, float angle);
 

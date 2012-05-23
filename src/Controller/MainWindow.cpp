@@ -531,22 +531,22 @@ namespace Controller {
     //[1] because [0] == & -> shortcut
     switch (button->text() [1].toAscii()) {
       case Qt::Key_W:
-        scene->getCamera()->move(Model::Forward, speed);
+        scene->getCamera()->move(Model::Z, speed);
         break;
       case Qt::Key_S:
-        scene->getCamera()->move(Model::Backward, speed);
+        scene->getCamera()->move(Model::Z, -speed);
         break;
       case Qt::Key_A:
-        scene->getCamera()->move(Model::Left, speed);
+        scene->getCamera()->move(Model::X, speed);
         break;
       case Qt::Key_D:
-        scene->getCamera()->move(Model::Right, speed);
+        scene->getCamera()->move(Model::X, -speed);
         break;
       case Qt::Key_Q:
-        scene->getCamera()->move(Model::Up, speed);
+        scene->getCamera()->move(Model::Y, speed);
         break;
       case Qt::Key_E:
-        scene->getCamera()->move(Model::Down, speed);
+        scene->getCamera()->move(Model::Y, -speed);
         break;
     }
 

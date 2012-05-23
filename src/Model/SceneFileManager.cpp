@@ -15,300 +15,299 @@
 #include "Model/Material.h"
 #include "Model/Vector.h"
 
-namespace Model {
+using namespace Model;
 
-  void SceneFileManager::loadScene (QIODevice & io, Scene &scene){
-    Objects::ObjectType objectType = Objects::None;
-    QString tmpname;
-    QDomNode node;
-    QDomElement root;
-    QDomDocument d;
+void SceneFileManager::loadScene (QIODevice & io, Scene &scene){
+  Objects::ObjectType objectType = Objects::None;
+  QString tmpname;
+  QDomNode node;
+  QDomElement root;
+  QDomDocument d;
 
-    d.setContent( &io);
-    root = d.documentElement();
+  d.setContent( &io);
+  root = d.documentElement();
 
-    // Wczytywanie materiałów
-    tmpname = Materials::MATERIALS_NAME;
-    node = root.elementsByTagName(tmpname).item(0).firstChild();
+  // Wczytywanie materiałów
+  tmpname = Materials::MATERIALS_NAME;
+  node = root.elementsByTagName(tmpname).item(0).firstChild();
 
-    for (; !node.isNull(); node = node.nextSibling())
-    {
-      if ( !node.isElement())
-        continue;
+  for (; !node.isNull(); node = node.nextSibling())
+  {
+    if ( !node.isElement())
+      continue;
 
-      QSharedPointer <Material> material(new Material());
-      Color color;
-      worldUnit reflection;
-      worldUnit ior;
-      worldUnit transparency;
-      QDomElement elem = node.toElement();
+    QSharedPointer <Material> material(new Material());
+    Color color, specularColor;
+    float specularPower, reflection, ior, transparency;
 
-      reflection = static_cast <worldUnit>(getFloat(elem, "reflection"));
-      ior = static_cast <worldUnit>(getFloat(elem, "ior"));
-      transparency = static_cast <worldUnit>(getFloat(elem, "transparency"));
+    QDomElement elem = node.toElement();
 
-      if (reflection < 0.0f || reflection > 1.0f)
-        throw std::logic_error("Wartość odbicia jest spoza zakresu.");
+    reflection = getFloat(elem, "reflection");
+    ior = getFloat(elem, "ior");
+    transparency = getFloat(elem, "transparency");
+    specularPower = getFloat(elem, "specularPower");
+    getColor(node.firstChildElement("diffuseColor").toElement(), color);
+    getColor(node.firstChildElement("specularColor").toElement(),
+             specularColor);
 
-      if (ior < 1.0f)
-        throw std::logic_error("Wartość IOR powinna być większa od 1.");
+    if (reflection < 0.0f || reflection > 1.0f)
+      throw std::logic_error("Wartość odbicia jest spoza zakresu.");
 
-      if (transparency < 0.0f || transparency > 1.0f)
-        throw std::logic_error(
-            "Przeźroczystość materiału powinna zawierać się w [0, 1].");
+    if (ior < 1.0f)
+      throw std::logic_error("Wartość IOR powinna być większa od 1.");
 
-      getColor(node.firstChildElement("diffuseColor").toElement(), color);
+    if (transparency < 0.0f || transparency > 1.0f)
+      throw std::logic_error("Przeźroczystość materiału poza zakresem [0, 1].");
 
-      material->setColor(color);
-      material->setReflection(reflection);
-      material->setTransparency(transparency);
-      material->setIOR(ior);
+    if (specularPower < 1 || specularPower > 500)
+      throw std::logic_error("Kolor specular poza zakresem [1, 5000].");
 
-      scene.addMaterial(material);
-    }
+    material->setColor(color);
+    material->setSpecularColor(specularColor);
+    material->setSpecularPower(specularPower);
+    material->setReflection(reflection);
+    material->setTransparency(transparency);
+    material->setIOR(ior);
 
-    if (scene.getMaterials().empty())
-      throw std::logic_error("Brak zdefiniowanych materiałów");
+    scene.addMaterial(material);
+  }
 
-    // Wczytywanie świateł
-    tmpname = Lights::LIGHTS_NAME;
-    node = root.elementsByTagName(tmpname).item(0).firstChild();
+  if (scene.getMaterials().empty())
+    throw std::logic_error("Brak zdefiniowanych materiałów");
 
-    for (; !node.isNull(); node = node.nextSibling())
-    {
-      if ( !node.isElement())
-        continue;
+  // Wczytywanie świateł
+  tmpname = Lights::LIGHTS_NAME;
+  node = root.elementsByTagName(tmpname).item(0).firstChild();
 
-      QSharedPointer <Light> object(new Light());
-      Point point;
-      Color color;
-      worldUnit power;
-      QDomElement elem = node.toElement();
+  for (; !node.isNull(); node = node.nextSibling())
+  {
+    if ( !node.isElement())
+      continue;
 
-      power = static_cast <worldUnit>(getFloat(elem, "power"));
-      if (power < 0.0f)
-        throw std::logic_error("Moc światła nie może być ujemna.");
+    QSharedPointer <Light> object(new Light());
+    Point point;
+    Color color;
+    worldUnit power;
+    QDomElement elem = node.toElement();
 
-      getColor(node.firstChildElement("color").toElement(), color);
-      getVPCommon(node.firstChildElement("position").toElement(), point);
+    power = static_cast <worldUnit>(getFloat(elem, "power"));
+    if (power < 0.0f)
+      throw std::logic_error("Moc światła nie może być ujemna.");
 
-      object->setPower(power);
-      object->setPosition(point);
-      ( *object) = (color);
+    getColor(node.firstChildElement("color").toElement(), color);
+    getVPCommon(node.firstChildElement("position").toElement(), point);
 
-      scene.addLight(object);
-    }
+    object->setPower(power);
+    object->setPosition(point);
+    ( *object) = (color);
 
-    // Wczytywanie obiektów
-    tmpname = Objects::OBJECTS_NAME;
-    node = root.elementsByTagName(tmpname).item(0).firstChild();
+    scene.addLight(object);
+  }
 
-    for (; !node.isNull(); node = node.nextSibling())
-    {
-      if ( !node.isElement())
-        continue;
+  // Wczytywanie obiektów
+  tmpname = Objects::OBJECTS_NAME;
+  node = root.elementsByTagName(tmpname).item(0).firstChild();
 
-      QDomElement elem = node.toElement();
-      objectType = Object::getObjectType(elem.tagName());
+  for (; !node.isNull(); node = node.nextSibling())
+  {
+    if ( !node.isElement())
+      continue;
 
-      switch (objectType) {
-        case Objects::Sphere:
+    QDomElement elem = node.toElement();
+    objectType = Object::getObjectType(elem.tagName());
+
+    switch (objectType) {
+      case Objects::Sphere:
+      {
+        QSharedPointer <Sphere> mainbject;
+        Point point;
+        worldUnit radius, offset;
+        unsigned material;
+        int multiplyX = 1, multiplyY = 1, multiplyZ = 1;
+        int multiplyXSign = 1, multiplyYSign = 1, multiplyZSign = 1;
+
+        getVPCommon(node.firstChildElement("position").toElement(), point);
+        radius = getFloat(elem, "r");
+
+        if ( !(radius > 0))
         {
-          QSharedPointer <Sphere> mainbject;
-          Point point;
-          worldUnit radius;
-          worldUnit offset;
-          unsigned material;
-          int multiplyX = 1, multiplyY = 1, multiplyZ = 1;
-          int multiplyXSign = 1, multiplyYSign = 1, multiplyZSign = 1;
+          throw std::logic_error("Promień musi być dodatni.");
+        }
 
-          getVPCommon(node.firstChildElement("position").toElement(), point);
-          radius = getFloat(elem, "r");
+        offset = radius * 2;
+        if (elem.hasAttribute("offset"))
+        {
+          offset = static_cast <worldUnit>(getFloat(elem, "offset"));
+        }
 
-          if ( !(radius > 0))
+        material = getInt(elem, "material");
+
+        if (material >= scene.getMaterials().size())
+          throw std::logic_error("Nie ma takiego materiału. Sprawdź obiekty.");
+
+        QDomNode mul = node.firstChildElement("multiply");
+        if (mul.isElement())
+        {
+          QDomElement mulelem = mul.toElement();
+          multiplyX = getInt(mulelem, "x");
+          multiplyY = getInt(mulelem, "y");
+          multiplyZ = getInt(mulelem, "z");
+        }
+
+        mainbject = QSharedPointer <Sphere>(new Sphere(radius));
+        mainbject->setPosition(point);
+        mainbject->setMaterial(material);
+
+        if (multiplyX < 0)
+        {
+          multiplyXSign = -1;
+          multiplyX = -multiplyX;
+        }
+
+        if (multiplyY < 0)
+        {
+          multiplyYSign = -1;
+          multiplyY = -multiplyY;
+        }
+
+        if (multiplyZ < 0)
+        {
+          multiplyZSign = -1;
+          multiplyZ = -multiplyZ;
+        }
+
+        for (int i = 0; i < multiplyX; ++i)
+        {
+          for (int j = 0; j < multiplyY; ++j)
           {
-            throw std::logic_error("Promień musi być dodatni.");
-          }
-
-          offset = radius * 2;
-          if (elem.hasAttribute("offset"))
-          {
-            offset = static_cast <worldUnit>(getFloat(elem, "offset"));
-          }
-
-          material = getInt(elem, "material");
-
-          if (material >= scene.getMaterials().size())
-            throw std::logic_error(
-                "Nie ma takiego materiału. Sprawdź obiekty.");
-
-          QDomNode mul = node.firstChildElement("multiply");
-          if (mul.isElement())
-          {
-            QDomElement mulelem = mul.toElement();
-            multiplyX = getInt(mulelem, "x");
-            multiplyY = getInt(mulelem, "y");
-            multiplyZ = getInt(mulelem, "z");
-          }
-
-          mainbject = QSharedPointer <Sphere>(new Sphere(radius));
-          mainbject->setPosition(point);
-          mainbject->setMaterial(material);
-
-          if (multiplyX < 0)
-          {
-            multiplyXSign = -1;
-            multiplyX = -multiplyX;
-          }
-
-          if (multiplyY < 0)
-          {
-            multiplyYSign = -1;
-            multiplyY = -multiplyY;
-          }
-
-          if (multiplyZ < 0)
-          {
-            multiplyZSign = -1;
-            multiplyZ = -multiplyZ;
-          }
-
-          for (int i = 0; i < multiplyX; ++i)
-          {
-            for (int j = 0; j < multiplyY; ++j)
+            for (int k = 0; k < multiplyZ; ++k)
             {
-              for (int k = 0; k < multiplyZ; ++k)
-              {
-                QSharedPointer <VisibleObject> object(new Sphere( *mainbject));
-                point = object->getPosition();
+              QSharedPointer <VisibleObject> object(new Sphere( *mainbject));
+              point = object->getPosition();
 
-                point [X] += offset * i * multiplyXSign;
-                point [Y] += offset * j * multiplyYSign;
-                point [Z] += offset * k * multiplyZSign;
+              point [X] += offset * i * multiplyXSign;
+              point [Y] += offset * j * multiplyYSign;
+              point [Z] += offset * k * multiplyZSign;
 
-                object->setPosition(point);
+              object->setPosition(point);
 
-                scene.addVisibleObject(object);
-              }
+              scene.addVisibleObject(object);
             }
           }
         }
-          break;
-
-        case Objects::Plane:
-        {
-          QSharedPointer <Plane> object(new Plane());
-          Vector angles;
-          int material;
-
-          angles [X] = getFloat(elem, "angleX");
-          angles [Y] = getFloat(elem, "angleY");
-          angles [Z] = getFloat(elem, "angleZ");
-          angles.length = getFloat(elem, "d");
-          material = getInt(elem, "material");
-
-          object->setAngles(angles);
-          object->setMaterial(material);
-          scene.addVisibleObject(object);
-        }
-          break;
-
-        case Objects::Camera:
-        {
-          if ( !(scene.getCamera().isNull()))
-          {
-            throw std::logic_error("Może być zdefiniowana tylko jedna kamera.");
-          }
-
-          QSharedPointer <Camera> object(new Camera());
-          Point point;
-          Vector vector;
-          Point::dataType screenWidth;
-          worldUnit viewDistance;
-          Camera::unitType FOV;
-          QString cameraType;
-
-          getVPCommon(node.firstChildElement("direction").toElement(), vector);
-          getVPCommon(node.firstChildElement("position").toElement(), point);
-
-          screenWidth = static_cast <Point::dataType>(getFloat(elem,
-                                                               "screenWidth"));
-          if ( !(screenWidth > 0))
-            throw std::logic_error(
-                "Parametr screenWidth musi być większy od 0.");
-
-          FOV = static_cast <Camera::unitType>(getDouble(elem, "fov"));
-          if ( !(FOV > 0 && FOV < 180))
-            throw std::logic_error("Parametr FOV musi być z zakresu (0;180)");
-
-          viewDistance =
-              static_cast <worldUnit>(getFloat(elem, "viewDistance"));
-          if ( !(viewDistance > 0))
-            throw std::logic_error(
-                "Parametr viewDistance musi być większy od 0.");
-
-          cameraType = elem.attribute("type");
-          object->setFOV(FOV);
-          object->setViewDistance(viewDistance);
-          object->setScreenWidth(screenWidth);
-          object->setPosition(point);
-          object->setAngles(vector);
-          object->setType(cameraType);
-
-          scene.setCamera(object);
-        }
-          break;
-        default:
-          break;
       }
+        break;
+
+      case Objects::Plane:
+      {
+        QSharedPointer <Plane> object(new Plane());
+        Vector angles;
+        int material;
+
+        angles [X] = getFloat(elem, "angleX");
+        angles [Y] = getFloat(elem, "angleY");
+        angles [Z] = getFloat(elem, "angleZ");
+        angles.length = getFloat(elem, "d");
+        material = getInt(elem, "material");
+
+        object->setAngles(angles);
+        object->setMaterial(material);
+        scene.addVisibleObject(object);
+      }
+        break;
+
+      case Objects::Camera:
+      {
+        if ( !(scene.getCamera().isNull()))
+        {
+          throw std::logic_error("Może być zdefiniowana tylko jedna kamera.");
+        }
+
+        QSharedPointer <Camera> object(new Camera());
+        Point point;
+        Vector vector;
+        Point::dataType screenWidth;
+        worldUnit viewDistance;
+        Camera::unitType FOV;
+        QString cameraType;
+
+        getVPCommon(node.firstChildElement("direction").toElement(), vector);
+        getVPCommon(node.firstChildElement("position").toElement(), point);
+
+        screenWidth = static_cast <Point::dataType>(getFloat(elem,
+                                                             "screenWidth"));
+        if ( !(screenWidth > 0))
+          throw std::logic_error("Parametr screenWidth musi być większy od 0.");
+
+        FOV = static_cast <Camera::unitType>(getDouble(elem, "fov"));
+        if ( !(FOV > 0 && FOV < 180))
+          throw std::logic_error("Parametr FOV musi być z zakresu (0;180).");
+
+        viewDistance = static_cast <worldUnit>(getFloat(elem, "viewDistance"));
+        if ( !(viewDistance > 0))
+          throw std::logic_error(
+              "Parametr viewDistance musi być większy od 0.");
+
+        cameraType = elem.attribute("type");
+        object->setFOV(FOV);
+        object->setViewDistance(viewDistance);
+        object->setScreenWidth(screenWidth);
+        object->setPosition(point);
+        object->setAngles(vector);
+        object->setType(cameraType);
+
+        scene.setCamera(object);
+      }
+        break;
+      default:
+        break;
     }
-
-    if (scene.getCamera().isNull())
-      throw std::logic_error("Brak kamery w scenie");
-
-    if (scene.getLights().empty())
-      throw std::logic_error("Brak świateł w scenie");
   }
 
-  void SceneFileManager::getColor (const QDomElement & value, Color &color){
-    color.setColor(getInt(value, "r"), getInt(value, "g"), getInt(value, "b"));
-  }
+  if (scene.getCamera().isNull())
+    throw std::logic_error("Brak kamery w scenie");
 
-  void SceneFileManager::getVPCommon (const QDomElement & value, Point &object){
-    object [X] = getFloat(value, "x");
-    object [Y] = getFloat(value, "y");
-    object [Z] = getFloat(value, "z");
-  }
+  if (scene.getLights().empty())
+    throw std::logic_error("Brak świateł w scenie");
+}
 
-  int SceneFileManager::getInt (const QDomElement &elem, const QString &name){
-    bool ok;
-    int val;
-    val = elem.attribute(name).toInt( &ok, 10);
-    if ( !ok)
-      throw std::logic_error(
-          "Błąd podczas wczytywania elementu " + name.toStdString());
-    return val;
-  }
+void SceneFileManager::getColor (const QDomElement & value, Color &color){
+  color.setColor(getInt(value, "r"), getInt(value, "g"), getInt(value, "b"));
+}
 
-  float SceneFileManager::getFloat (const QDomElement &elem,
+void SceneFileManager::getVPCommon (const QDomElement & value, Point &object){
+  object [X] = getFloat(value, "x");
+  object [Y] = getFloat(value, "y");
+  object [Z] = getFloat(value, "z");
+}
+
+int SceneFileManager::getInt (const QDomElement &elem, const QString &name){
+  bool ok;
+  int val;
+  val = elem.attribute(name).toInt( &ok, 10);
+  if ( !ok)
+    throw std::logic_error(
+        "Błąd podczas wczytywania elementu " + name.toStdString());
+  return val;
+}
+
+float SceneFileManager::getFloat (const QDomElement &elem, const QString &name){
+  bool ok;
+  float val;
+  val = elem.attribute(name).toFloat( &ok);
+  if ( !ok)
+    throw std::logic_error(
+        "Błąd podczas wczytywania elementu " + name.toStdString());
+  return val;
+}
+
+double SceneFileManager::getDouble (const QDomElement &elem,
                                     const QString &name){
-    bool ok;
-    float val;
-    val = elem.attribute(name).toFloat( &ok);
-    if ( !ok)
-      throw std::logic_error(
-          "Błąd podczas wczytywania elementu " + name.toStdString());
-    return val;
-  }
-
-  double SceneFileManager::getDouble (const QDomElement &elem,
-                                      const QString &name){
-    bool ok;
-    double val;
-    val = elem.attribute(name).toDouble( &ok);
-    if ( !ok)
-      throw std::logic_error(
-          "Błąd podczas wczytywania elementu " + name.toStdString());
-    return val;
-  }
-}/* namespace Model */
+  bool ok;
+  double val;
+  val = elem.attribute(name).toDouble( &ok);
+  if ( !ok)
+    throw std::logic_error(
+        "Błąd podczas wczytywania elementu " + name.toStdString());
+  return val;
+}

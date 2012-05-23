@@ -437,8 +437,9 @@ namespace Model {
       }
 
       inline void negate (){
-        SSEData tmp(0, 0, 0);
-        *this = tmp - *this;
+        ( *this) [X] = -( *this) [X];
+        ( *this) [Y] = -( *this) [Y];
+        ( *this) [Z] = -( *this) [Z];
       }
 
     private:

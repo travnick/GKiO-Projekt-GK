@@ -22,14 +22,14 @@ namespace Model {
     public:
       worldUnit sizeOnImage;
 
-      inline virtual ~VisibleObject (){
+      inline virtual ~VisibleObject () {
       }
 
       /**Returns id of material that object has
        *
        * @return material id
        */
-      inline const MaterialPtr &getMaterial () const{
+      inline const MaterialPtr &getMaterial () const {
         return material;
       }
 
@@ -37,7 +37,7 @@ namespace Model {
        *
        * @return size of object
        */
-      inline const worldUnit &getSize () const{
+      inline const worldUnit &getSize () const {
         return size;
       }
 
@@ -53,7 +53,7 @@ namespace Model {
        *
        * @param materialId id of material to set
        */
-      inline void setMaterial (const MaterialPtr &newMaterialId){
+      inline void setMaterial (const MaterialPtr &newMaterialId) {
         material = newMaterialId;
       }
 

@@ -13,54 +13,54 @@ namespace Model {
       /**Initializes color field
        *
        */
-      inline Material (){
+      inline Material () {
       }
 
-      inline const Color &getColor () const{
+      inline const Color &getColor () const {
         return diffuse;
       }
 
-      inline void setColor (const Color &other){
+      inline void setColor (const Color &other) {
         diffuse = other;
       }
 
-      inline const Color &getSpecularColor () const{
+      inline const Color &getSpecularColor () const {
         return specularColor;
       }
 
-      inline void setSpecularColor (const Color &color){
+      inline void setSpecularColor (const Color &color) {
         this->specularColor = color;
       }
 
-      inline float getSpecularPower () const{
+      inline float getSpecularPower () const {
         return specularPower;
       }
 
-      inline void setSpecularPower (float val){
+      inline void setSpecularPower (float val) {
         this->specularPower = val;
       }
 
-      inline float getReflection () const{
+      inline float getReflection () const {
         return reflection;
       }
 
-      float getIOR () const{
+      float getIOR () const {
         return ior;
       }
 
-      void setIOR (float val){
+      void setIOR (float val) {
         this->ior = val;
       }
 
-      float getTransparency () const{
+      float getTransparency () const {
         return transparency;
       }
 
-      void setTransparency (float val){
+      void setTransparency (float val) {
         this->transparency = val;
       }
 
-      inline void setReflection (float val){
+      inline void setReflection (float val) {
         reflection = val > 1 ? 1 : val;
       }
 

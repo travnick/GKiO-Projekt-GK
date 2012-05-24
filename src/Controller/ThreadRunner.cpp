@@ -16,23 +16,23 @@ namespace Controller {
 
   ThreadRunner::ThreadRunner ()
       : renderParams(new RenderParams), threadPool(new QThreadPool), mutex(
-          new QMutex){
+          new QMutex) {
     threadPool->setExpiryTimeout(THREAD_EXPIRE_TIMEOUT);
   }
 
-  ThreadRunner::~ThreadRunner (){
+  ThreadRunner::~ThreadRunner () {
     QMutexLocker locker(mutex.data());
   }
 
   void ThreadRunner::setParams (const QSharedPointer <Model::RenderTileData>& newImage,
-                                const QSharedPointer <RenderParams> &newRenderParams){
+                                const QSharedPointer <RenderParams> &newRenderParams) {
     QMutexLocker locker(mutex.data());
     this->image = newImage;
 
     renderParams = newRenderParams;
   }
 
-  void ThreadRunner::run (){
+  void ThreadRunner::run () {
     QMutexLocker locker(mutex.data());
     threadPool->setMaxThreadCount(renderParams->maxThreadCount);
 
@@ -52,7 +52,7 @@ namespace Controller {
   inline void ThreadRunner::createTile (int x,
                                         int y,
                                         int tileSizeX,
-                                        int tileSizeY){
+                                        int tileSizeY) {
     //Copy common data that are needed to render
     QSharedPointer <Model::RenderTileData> tile(
         new Model::RenderTileData( *image));
@@ -70,7 +70,7 @@ namespace Controller {
     tiles.append(tile);
   }
 
-  void ThreadRunner::createTiles (){
+  void ThreadRunner::createTiles () {
     QMutexLocker locker(mutex.data());
     tiles.clear();
 
@@ -139,7 +139,7 @@ namespace Controller {
     }
   }
 
-  void ThreadRunner::randomizeTiles (){
+  void ThreadRunner::randomizeTiles () {
     qsrand(time(NULL));
 
     while ( !tiles.empty())
@@ -153,7 +153,7 @@ namespace Controller {
     tiles.swap(tilesRandomized);
   }
 
-  void ThreadRunner::terminate (){
+  void ThreadRunner::terminate () {
     QMutexLocker locker(mutex.data());
 
     renderParams->allowRunning = false;

@@ -10,13 +10,13 @@ namespace Model {
 
   typedef std::map <QString, Camera::Type> cameraTypesMap;
 
-  Camera::Camera (){
+  Camera::Camera () {
     screenImageRatio = 0;
     imageWidth = 0;
     screenWidth = 0;
   }
 
-  void Camera::calibrate (){
+  void Camera::calibrate () {
     Q_ASSERT(imageWidth > 0);
     Vector tmpVector;
     QMatrix4x4 transformMatrix;
@@ -54,7 +54,7 @@ namespace Model {
     screenHeightDelta.data *= 1.0f / imageHeight;
   }
 
-  void Camera::setType (const QString & typeName){
+  void Camera::setType (const QString & typeName) {
     static cameraTypesMap cameraTypes;
     cameraTypesMap::iterator iterator;
     type = Camera::None;
@@ -73,16 +73,16 @@ namespace Model {
     }
   }
 
-  void Camera::setDirection (const Vector &vector){
+  void Camera::setDirection (const Vector &vector) {
     eyeDirection = vector;
   }
 
-  void Camera::setAngles (const Vector& vector){
+  void Camera::setAngles (const Vector& vector) {
     angles = vector;
     updateRotation();
   }
 
-  void Camera::updateRotation (){
+  void Camera::updateRotation () {
     Point positionOrig(position);
 
     position.set(0, 0, 0);
@@ -94,7 +94,7 @@ namespace Model {
     position.data = positionOrig.data;
   }
 
-  void Camera::move (Axis direction, float speed){
+  void Camera::move (Axis direction, float speed) {
     switch (direction) {
       case X:
         position.data += screenWidthDelta.toNormal().data * speed;
@@ -113,7 +113,7 @@ namespace Model {
     }
   }
 
-  void Camera::rotate (Axis axis, float angle){
+  void Camera::rotate (Axis axis, float angle) {
     switch (axis) {
       case X:
         angles [X] += angle;

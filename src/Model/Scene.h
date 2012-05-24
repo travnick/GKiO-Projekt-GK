@@ -55,7 +55,7 @@ namespace Model {
        *
        * @return camera
        */
-      inline const CameraPtr &getCamera () const{
+      inline const CameraPtr &getCamera () const {
         return camera;
       }
 
@@ -63,7 +63,7 @@ namespace Model {
        *
        * @return camera
        */
-      inline CameraPtr &getCamera (){
+      inline CameraPtr &getCamera () {
         return camera;
       }
 
@@ -71,7 +71,7 @@ namespace Model {
        *
        * @return objects scene
        */
-      inline const ObjectContainer &getObjects () const{
+      inline const ObjectContainer &getObjects () const {
         return objects;
       }
 
@@ -79,7 +79,7 @@ namespace Model {
        *
        * @return lights
        */
-      inline const LighContainer &getLights () const{
+      inline const LighContainer &getLights () const {
         return lights;
       }
 
@@ -87,7 +87,7 @@ namespace Model {
        *
        * @return materials
        */
-      inline const MaterialContainer &getMaterials () const{
+      inline const MaterialContainer &getMaterials () const {
         return materials;
       }
 
@@ -95,7 +95,7 @@ namespace Model {
        *
        * @return object count
        */
-      inline int getObjectCount () const{
+      inline int getObjectCount () const {
         return objects.size();
       }
 
@@ -104,7 +104,7 @@ namespace Model {
        *
        * @param imageWidth image width
        */
-      inline void setImageWidth (imageUnit imageWidth){
+      inline void setImageWidth (imageUnit imageWidth) {
         camera->setImageWidth(imageWidth);
       }
 
@@ -113,7 +113,7 @@ namespace Model {
        *
        * @param imageHeight image height
        */
-      inline void setImageHeight (imageUnit imageHeight){
+      inline void setImageHeight (imageUnit imageHeight) {
         camera->setImageHeight(imageHeight);
       }
 
@@ -121,7 +121,7 @@ namespace Model {
        *
        * @param camera camera to set in scene
        */
-      inline void setCamera (const CameraPtr &newCamera){
+      inline void setCamera (const CameraPtr &newCamera) {
         this->camera = newCamera;
       }
 
@@ -129,7 +129,7 @@ namespace Model {
        *
        * @param object light to add
        */
-      inline void addLight (const LightPtr &object){
+      inline void addLight (const LightPtr &object) {
         lights.push_back(object);
       }
 
@@ -137,7 +137,7 @@ namespace Model {
        *
        * @param object material to add
        */
-      inline void addMaterial (const MaterialPtr &object){
+      inline void addMaterial (const MaterialPtr &object) {
         materials.push_back(object);
       }
 
@@ -145,7 +145,7 @@ namespace Model {
        *
        * @param object visible object to add
        */
-      inline void addVisibleObject (const ObjectPtr &object){
+      inline void addVisibleObject (const ObjectPtr &object) {
         objects.push_back(object);
 
         calculateObjectSizeOnImage(object);
@@ -162,7 +162,7 @@ namespace Model {
        *
        * @return true if scene is already loaded, otherwise false
        */
-      inline const bool &isLoaded (){
+      inline const bool &isLoaded () {
         return loaded;
       }
 

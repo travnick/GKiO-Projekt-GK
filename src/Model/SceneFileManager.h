@@ -19,7 +19,7 @@ namespace Model {
    */
   class SceneFileManager {
     public:
-      inline SceneFileManager (){
+      inline SceneFileManager () {
       }
 
       /**Loads scene from stream

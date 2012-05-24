@@ -48,7 +48,7 @@ namespace Model {
        *
        * @param scene 3d scene to render
        */
-      inline void setRenderParams (const Controller::RenderParams * newRenderParams){
+      inline void setRenderParams (const Controller::RenderParams * newRenderParams) {
         renderParams = newRenderParams;
       }
 

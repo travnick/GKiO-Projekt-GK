@@ -15,14 +15,14 @@ namespace Model {
       float power;
 
       Light ()
-          : power(1){
+          : power(1) {
       }
 
       /**Sets color of light
        *
        * @return this
        */
-      inline Light &operator= (const Color &color){
+      inline Light &operator= (const Color &color) {
         Color::operator =(color);
         return *this;
       }
@@ -31,7 +31,7 @@ namespace Model {
        *
        * @return color of light
        */
-      inline const Color &getColor () const{
+      inline const Color &getColor () const {
         return *this;
       }
   };

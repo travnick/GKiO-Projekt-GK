@@ -10,27 +10,27 @@
 namespace View {
 
   ImageViewer::ImageViewer (QWidget *myParent)
-      : QLabel(myParent){
+      : QLabel(myParent) {
     image = 0;
     imageOwner = false;
     scrollArea = 0;
   }
 
-  ImageViewer::~ImageViewer (){
+  ImageViewer::~ImageViewer () {
     if (imageOwner)
     {
       delete image;
     }
   }
 
-  void ImageViewer::setScrollArea (QScrollArea *newScrollArea){
+  void ImageViewer::setScrollArea (QScrollArea *newScrollArea) {
     if (newScrollArea != 0)
     {
       this->scrollArea = newScrollArea;
     }
   }
 
-  void ImageViewer::setImage (QImage *newImage, bool giveOwnership){
+  void ImageViewer::setImage (QImage *newImage, bool giveOwnership) {
     if (imageOwner)
     {
       delete this->image;
@@ -51,11 +51,11 @@ namespace View {
     }
   }
 
-  QImage *ImageViewer::getImage (){
+  QImage *ImageViewer::getImage () {
     return image;
   }
 
-  void ImageViewer::paintEvent (QPaintEvent *){
+  void ImageViewer::paintEvent (QPaintEvent *) {
     if (image != 0 && scrollArea != 0)
     {
       QPainter painter(this);

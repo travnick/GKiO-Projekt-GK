@@ -51,7 +51,7 @@ namespace Controller {
        *
        * @param newTile description of image part to render
        */
-      void setTile (const QSharedPointer <Model::RenderTileData> &newTile){
+      void setTile (const QSharedPointer <Model::RenderTileData> &newTile) {
         tile = newTile;
       }
 

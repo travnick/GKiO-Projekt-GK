@@ -12,7 +12,7 @@ namespace Model {
    */
   class Ray {
     public:
-      inline Ray (){
+      inline Ray () {
       }
 
       /**Creates ray with given start point and direction
@@ -21,7 +21,7 @@ namespace Model {
        * @param direction direction of vector
        */
       inline Ray (const Point &newStart, const Vector &newDirection)
-          : start(newStart), direction(newDirection){
+          : start(newStart), direction(newDirection) {
       }
 
       /**Sets ray start point and direction
@@ -29,7 +29,8 @@ namespace Model {
        * @param start start point of vector
        * @param direction direction of vector
        */
-      inline void setParams (const Point &newStart, const Vector &newDirection){
+      inline void setParams (const Point &newStart,
+                             const Vector &newDirection) {
         start = newStart;
         direction = newDirection;
       }
@@ -38,7 +39,7 @@ namespace Model {
        *
        * @param start start point of vector
        */
-      inline void setParams (const Point &newStart){
+      inline void setParams (const Point &newStart) {
         start = newStart;
       }
 
@@ -46,7 +47,7 @@ namespace Model {
        *
        * @return start point of vector
        */
-      inline const Point &getStart () const{
+      inline const Point &getStart () const {
         return start;
       }
 
@@ -54,7 +55,7 @@ namespace Model {
        *
        * @return direction of vector
        */
-      inline Vector &getDir (){
+      inline Vector &getDir () {
         return direction;
       }
 
@@ -62,7 +63,7 @@ namespace Model {
        *
        * @return direction of vector
        */
-      inline const Vector &getDir () const{
+      inline const Vector &getDir () const {
         return direction;
       }
 

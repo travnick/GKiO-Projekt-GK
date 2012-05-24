@@ -33,7 +33,7 @@ namespace Model {
       /**Destructor of the plane
        *
        */
-      inline virtual ~Plane (){
+      inline virtual ~Plane () {
       }
 
       /**Set angles of the plane

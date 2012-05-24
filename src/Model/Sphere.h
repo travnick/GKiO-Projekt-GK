@@ -24,7 +24,7 @@ namespace Model {
        */
       Sphere (const Sphere &other);
 
-      inline virtual ~Sphere (){
+      inline virtual ~Sphere () {
       }
 
       /**Calculates normal vector at given point
@@ -51,7 +51,7 @@ namespace Model {
       /**Prevent creation of sphere without radius
        *
        */
-      Sphere (){
+      Sphere () {
       }
   };
 }

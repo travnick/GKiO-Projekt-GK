@@ -20,11 +20,11 @@ namespace Model {
 
       SSEData data;
 
-      inline Point (){
+      inline Point () {
       }
 
       inline Point (const SSEData &newData)
-          : data(newData){
+          : data(newData) {
       }
 
       /**Constructs object with given parameters
@@ -34,7 +34,7 @@ namespace Model {
        * @param z position on z axis in 3D space
        */
       inline Point (const dataType &x, const dataType &y, const dataType &z)
-          : data(x, y, z){
+          : data(x, y, z) {
       }
 
       /**Sets coordinates of object
@@ -43,7 +43,7 @@ namespace Model {
        * @param y position on y axis in 3D space
        * @param z position on z axis in 3D space
        */
-      inline void set (dataType x, dataType y, dataType z){
+      inline void set (dataType x, dataType y, dataType z) {
         data [X] = x;
         data [Y] = y;
         data [Z] = z;
@@ -54,16 +54,16 @@ namespace Model {
        * @param x position on x axis in 3D space
        * @param y position on y axis in 3D space
        */
-      inline void set (const dataType &x, const dataType &y){
+      inline void set (const dataType &x, const dataType &y) {
         data [X] = x;
         data [Y] = y;
       }
 
-      inline float &operator [] (int idx){
+      inline float &operator [] (int idx) {
         return data [idx];
       }
 
-      inline float operator [] (int idx) const{
+      inline float operator [] (int idx) const {
         return data [idx];
       }
 
@@ -71,7 +71,7 @@ namespace Model {
        *
        * @param other angles
        */
-      void rotate (const Point &other){
+      void rotate (const Point &other) {
         QMatrix4x4 rotateMatrix;
         rotateMatrix.rotate(other [Z], 0, 0, 1); //rotate about Z axis
         rotateMatrix.rotate(other [Y], 0, 1, 0); //rotate about Y axis
@@ -85,11 +85,11 @@ namespace Model {
         data [Z] = result.z();
       }
 
-      inline &operator SSEData (){
+      inline &operator SSEData () {
         return data;
       }
 
-      inline &operator const SSEData () const{
+      inline &operator const SSEData () const {
         return data;
       }
   };

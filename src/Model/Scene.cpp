@@ -14,11 +14,11 @@ using namespace std;
 
 namespace Model {
 
-  Scene::Scene (){
+  Scene::Scene () {
     loaded = false;
   }
 
-  bool Scene::init (const QString &filename, bool reload) throw (std::exception){
+  bool Scene::init (const QString &filename, bool reload) throw (std::exception) {
     bool result = false;
     QFile infile(filename);
 
@@ -44,11 +44,11 @@ namespace Model {
     return result;
   }
 
-  void Scene::updateCamera (){
+  void Scene::updateCamera () {
     camera->calibrate();
   }
 
-  void Scene::calculateObjectSizeOnImage (const ObjectPtr &){
+  void Scene::calculateObjectSizeOnImage (const ObjectPtr &) {
     //TODO: implement
   }
 }

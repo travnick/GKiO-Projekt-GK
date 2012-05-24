@@ -10,7 +10,7 @@ namespace Model {
   typedef std::map <Objects::ObjectType, QString> objectTypeNamesMap;
   typedef std::map <QString, Objects::ObjectType> objectTypesMap;
 
-  Objects::ObjectType Object::getObjectType (const QString & typeName){
+  Objects::ObjectType Object::getObjectType (const QString & typeName) {
     static objectTypesMap objectTypes;
     objectTypesMap::iterator iterator;
     Objects::ObjectType objectType = Objects::None;
@@ -33,7 +33,7 @@ namespace Model {
     return objectType;
   }
 
-  const QString & Object::getObjectTypeName (const Objects::ObjectType objectType){
+  const QString & Object::getObjectTypeName (const Objects::ObjectType objectType) {
     static objectTypeNamesMap objectTypeNames;
     objectTypeNamesMap::iterator iterator;
     static QString objectTypeName;

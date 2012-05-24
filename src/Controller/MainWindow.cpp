@@ -33,7 +33,7 @@
 
 namespace Controller {
 
-  void MainWindow::showWarning (QString message){
+  void MainWindow::showWarning (QString message) {
     QErrorMessage *errorMessage = new QErrorMessage(this);
     //No memory leaks here
     errorMessage->setAttribute(Qt::WA_DeleteOnClose);
@@ -45,7 +45,7 @@ namespace Controller {
   MainWindow::MainWindow (QMainWindow *myParent)
       : QMainWindow(myParent), image(new Model::RenderTileData), scene(
           new Model::Scene), renderParams(new RenderParams), threadRunner(
-          new ThreadRunner){
+          new ThreadRunner) {
     ui.reset(new Ui::MainWindow);
     timer.reset(new QTimer);
 
@@ -66,7 +66,7 @@ namespace Controller {
     loadScene();
   }
 
-  MainWindow::~MainWindow (){
+  MainWindow::~MainWindow () {
     //Send terminate signal to thread runner and wait for end
     ui->terminateRender->click();
 
@@ -74,7 +74,7 @@ namespace Controller {
         TIME_BEFORE_REMOVE_THREADS_ON_EXIT);
   }
 
-  void MainWindow::runRenderer (){
+  void MainWindow::runRenderer () {
     renderingInProgress = true;
 
     deactivateButtons();
@@ -100,7 +100,7 @@ namespace Controller {
     QThreadPool::globalInstance()->start(threadRunner.data());
   }
 
-  void MainWindow::updateCamera (){
+  void MainWindow::updateCamera () {
     image->width = ui->tileSize->value();
     image->height = image->width;
 
@@ -136,18 +136,18 @@ namespace Controller {
     scene->updateCamera();
   }
 
-  void MainWindow::terminateRender (){
+  void MainWindow::terminateRender () {
     addResult = false;
 
     //stop all threads
     renderParams->allowRunning = false;
   }
 
-  void MainWindow::setRefreshTime (int refreshTime){
+  void MainWindow::setRefreshTime (int refreshTime) {
     timer->setInterval(refreshTime);
   }
 
-  void MainWindow::saveImage (){
+  void MainWindow::saveImage () {
     const QImage *imageToSave = ui->imageViewer->getImage();
     if (imageToSave != 0)
     {
@@ -168,7 +168,7 @@ namespace Controller {
     }
   }
 
-  bool MainWindow::allocateMemoryForImage (){
+  bool MainWindow::allocateMemoryForImage () {
     void *mem = realloc(image->imageData,
                         image->imageDataSize * sizeof(colorType));
 
@@ -187,7 +187,7 @@ namespace Controller {
     return true;
   }
 
-  void MainWindow::changeWidth (int newWidth){
+  void MainWindow::changeWidth (int newWidth) {
     imageUnit matchImageHeight = image->imageHeight;
 
     while (matchImageHeight >= 1
@@ -200,7 +200,7 @@ namespace Controller {
     ui->imageHeight->setValue(image->imageHeight);
   }
 
-  void MainWindow::changeHeight (int newHeight){
+  void MainWindow::changeHeight (int newHeight) {
     imageUnit matchImageWidth = image->imageWidth;
 
     while (matchImageWidth >= 1
@@ -214,7 +214,7 @@ namespace Controller {
   }
 
   bool MainWindow::refreshMemoryRequest (imageUnit imageWidth,
-                                         imageUnit imageHeight){
+                                         imageUnit imageHeight) {
     QString sufix;
     double memoryForImage;
 
@@ -264,7 +264,7 @@ namespace Controller {
     return true;
   }
 
-  void MainWindow::setUpGUI (){
+  void MainWindow::setUpGUI () {
     //Create gui
     ui->setupUi(this);
 
@@ -294,7 +294,7 @@ namespace Controller {
     setRefreshTime(ui->refreshTime->value());
   }
 
-  void MainWindow::connectSignals (){
+  void MainWindow::connectSignals () {
     connect(ui->render, SIGNAL(pressed()), this, SLOT(runRenderer()));
     connect(ui->imageWidth, SIGNAL(valueChanged(int)), this,
             SLOT(changeWidth(int)));
@@ -333,7 +333,7 @@ namespace Controller {
             SLOT(setRandomRender(bool)));
   }
 
-  void MainWindow::calibrate (){
+  void MainWindow::calibrate () {
     QRect screenGeometry(QApplication::desktop()->screenGeometry(this));
     QRect windowGeometry(this->geometry());
     QRect windowFrameGeometry(this->frameGeometry());
@@ -378,7 +378,7 @@ namespace Controller {
     ui->verticalSplitter->setSizes(sizes);
   }
 
-  void MainWindow::activateButtons (){
+  void MainWindow::activateButtons () {
     ui->loadScene->setDisabled(false);
     ui->render->setDisabled(false);
     ui->terminateRender->setDisabled(true);
@@ -390,7 +390,7 @@ namespace Controller {
   }
 
   void MainWindow::deactivateButtons (bool withLibSelect,
-                                      bool withSceneLoading){
+                                      bool withSceneLoading) {
     ui->loadScene->setDisabled(withSceneLoading);
     ui->render->setDisabled(true);
     ui->terminateRender->setDisabled(false | ( !withLibSelect));
@@ -402,11 +402,11 @@ namespace Controller {
     ui->actionSave->setDisabled(true);
   }
 
-  void MainWindow::updateImage () const{
+  void MainWindow::updateImage () const {
     ui->imageViewer->update();
   }
 
-  void MainWindow::renderFinished (){
+  void MainWindow::renderFinished () {
     qint64 elapsedTime = timeCounter->elapsed();
     timeCounter.reset();
     timer->stop();
@@ -419,7 +419,7 @@ namespace Controller {
     renderingInProgress = false;
   }
 
-  void MainWindow::loadScene (){
+  void MainWindow::loadScene () {
     bool result = false;
     QString fileName(DEFAULT_SCENE_FILE_NAME);
 
@@ -477,7 +477,7 @@ namespace Controller {
     }
   }
 
-  void MainWindow::showRenderTime (qint64 time){
+  void MainWindow::showRenderTime (qint64 time) {
     ui->lastTime->setValue(time / static_cast <float>(KILO));
 
     if ( !ui->liveCamera->isChecked())
@@ -495,7 +495,7 @@ namespace Controller {
     addResult = true;
   }
 
-  void MainWindow::addTimeToResultList (double time){
+  void MainWindow::addTimeToResultList (double time) {
     int row = ui->resultList->rowCount();
     int col = 0;
     ui->resultList->setSortingEnabled(false);
@@ -523,7 +523,7 @@ namespace Controller {
     ui->resultList->setSortingEnabled(true);
   }
 
-  void MainWindow::moveCamera (){
+  void MainWindow::moveCamera () {
     QPushButton *button = dynamic_cast <QPushButton *>(sender());
 
     float speed = ui->movementSpeed->value();
@@ -558,7 +558,7 @@ namespace Controller {
     }
   }
 
-  void MainWindow::rotateCamera (){
+  void MainWindow::rotateCamera () {
     QPushButton *button = dynamic_cast <QPushButton *>(sender());
 
     float speed = ui->rotateAngle->value();
@@ -595,7 +595,7 @@ namespace Controller {
     }
   }
 
-  void MainWindow::getCameraParameters (){
+  void MainWindow::getCameraParameters () {
     //Update data in GUI
     ui->xPos->setValue(scene->getCamera()->getPosition() [Model::X]);
     ui->yPos->setValue(scene->getCamera()->getPosition() [Model::Y]);
@@ -608,7 +608,7 @@ namespace Controller {
     ui->fov->setValue(scene->getCamera()->getFOV());
   }
 
-  void MainWindow::setRandomRender (bool value){
+  void MainWindow::setRandomRender (bool value) {
     renderParams->randomRender = value;
     threadRunner->createTiles();
   }

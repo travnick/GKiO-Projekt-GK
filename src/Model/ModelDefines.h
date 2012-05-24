@@ -11,7 +11,7 @@
  * @param string
  * @return
  */
-inline QString toLowerCase (const char* string){
+inline QString toLowerCase (const char* string) {
   return QString::fromStdString(string).toLower();
 }
 
@@ -48,13 +48,13 @@ const float DEFAULT_INTERSECTION_ERROR_VALUE = 0.1f;
 
 //Templates -->
 template <typename T>
-T SQRT (T value){
+T SQRT (T value) {
   return sqrt(value);
 }
 
 //inline is important because of "multiple definition of" error
 template <>
-inline float SQRT (float value){
+inline float SQRT (float value) {
   return sqrtf(value);
 }
 // <--Templates
@@ -118,7 +118,7 @@ namespace Model {
    * @return rounded value
    */
   template <typename T>
-  inline T uRound (float value){
+  inline T uRound (float value) {
     return static_cast <T>(value + 0.5f);
   }
 

@@ -55,11 +55,11 @@ namespace Model {
 
     public:
 
-      inline SSEDataPrivate (){
+      inline SSEDataPrivate () {
         setDefaults();
       }
 
-      inline SSEDataPrivate (float x, float y, float z){
+      inline SSEDataPrivate (float x, float y, float z) {
         setDefaults();
 
         ( *this) [X] = x;
@@ -67,36 +67,36 @@ namespace Model {
         ( *this) [Z] = z;
       }
 
-      inline void setDefaults (){
+      inline void setDefaults () {
 #if USE_SSE == 1
         // It's important, without determining W value there is random performance loss
         ( *this) [W] = 0;
 #endif
       }
 
-      inline SSEDataPrivate (const __m128 &other){
+      inline SSEDataPrivate (const __m128 &other) {
         *this = other;
       }
 
-      inline SSEDataPrivate (const SSEDataPrivate &other){
+      inline SSEDataPrivate (const SSEDataPrivate &other) {
         *this = other;
       }
 
 #if USE_SSE == 1
-      inline & operator __m128 (){
+      inline & operator __m128 () {
         return sse();
       }
 
-      inline __m128 & sse (){
+      inline __m128 & sse () {
         return data;
       }
 
-      inline const __m128 & sse () const{
+      inline const __m128 & sse () const {
         return data;
       }
 #endif
 
-      inline SSEDataPrivate & operator = (const SSEDataBaseType &other){
+      inline SSEDataPrivate & operator = (const SSEDataBaseType &other) {
 #if USE_SSE == 1
         data = other;
 #else
@@ -107,27 +107,27 @@ namespace Model {
         return ( *this);
       }
 
-      inline float & operator[] (int idx){
+      inline float & operator[] (int idx) {
         return dataArray [idx];
       }
 
-      inline float operator[] (int idx) const{
+      inline float operator[] (int idx) const {
         return dataArray [idx];
       }
 
       //Some hacks to act like pointer. It's needed in version with pointers
-      inline const SSEDataPrivate *operator -> () const{
+      inline const SSEDataPrivate *operator -> () const {
         return this;
       }
-      inline SSEDataPrivate *operator -> (){
+      inline SSEDataPrivate *operator -> () {
         return this;
       }
 
-      inline SSEDataPrivate &operator * (){
+      inline SSEDataPrivate &operator * () {
         return *this;
       }
 
-      inline const SSEDataPrivate &operator * () const{
+      inline const SSEDataPrivate &operator * () const {
         return *this;
       }
   };
@@ -172,34 +172,34 @@ namespace Model {
 
 #else
 
-      inline SSEData (){
+      inline SSEData () {
       }
 
       inline SSEData (const SSEDataBaseType &newData)
-          : internalData(newData){
+          : internalData(newData) {
       }
 
       inline SSEData (float newX, float newY, float newZ)
-          : internalData(newX, newY, newZ){
+          : internalData(newX, newY, newZ) {
       }
 
 #endif
 
-      inline SSEData & operator = (const SSEData &other){
+      inline SSEData & operator = (const SSEData &other) {
         *internalData = *other.internalData;
         return ( *this);
       }
 
-      inline SSEData & operator = (const SSEDataBaseType &sseData){
+      inline SSEData & operator = (const SSEDataBaseType &sseData) {
         *internalData = sseData;
         return ( *this);
       }
 
-      inline float & operator[] (int idx){
+      inline float & operator[] (int idx) {
         return ( *internalData) [idx];
       }
 
-      inline float operator[] (int idx) const{
+      inline float operator[] (int idx) const {
         return ( *internalData) [idx];
       }
 
@@ -211,7 +211,7 @@ namespace Model {
        * @param vector __m128
        * @param result __m128
        */
-      inline void move (const SSEData &vector, SSEData &result) const{
+      inline void move (const SSEData &vector, SSEData &result) const {
         result = ( *this) + vector;
       }
 
@@ -221,7 +221,7 @@ namespace Model {
        * @param vector __m128
        * @param result __m128
        */
-      inline void negMove (const SSEData &vector, SSEData &result) const{
+      inline void negMove (const SSEData &vector, SSEData &result) const {
         result = ( *this) - vector;
       }
 
@@ -231,7 +231,7 @@ namespace Model {
        * @param point2 __m128
        * @param result __m128
        */
-      inline void diff (const SSEData &point2, SSEData &result) const{
+      inline void diff (const SSEData &point2, SSEData &result) const {
         result = ( *this) - point2;
       }
 
@@ -242,7 +242,7 @@ namespace Model {
        * @param vector2 __m128
        * @param result __m128
        */
-      inline void addVectors (const SSEData &vector2, SSEData &result) const{
+      inline void addVectors (const SSEData &vector2, SSEData &result) const {
         result = ( *this) + vector2;
       }
 
@@ -253,7 +253,7 @@ namespace Model {
        * @param vector2 __m128
        * @param result __m128
        */
-      inline void subVectors (const SSEData &vector2, SSEData &result) const{
+      inline void subVectors (const SSEData &vector2, SSEData &result) const {
         result = ( *this) - vector2;
       }
 
@@ -262,7 +262,7 @@ namespace Model {
        * @param constant worldUnit
        * @param result __m128
        */
-      inline void multiply (const worldUnit &constant, SSEData &result) const{
+      inline void multiply (const worldUnit &constant, SSEData &result) const {
         result = ( *this) * constant;
       }
 
@@ -272,7 +272,7 @@ namespace Model {
        * @param other SSEData
        * @param result SSEData
        */
-      inline SSEDataBaseType operator + (const SSEData &other) const{
+      inline SSEDataBaseType operator + (const SSEData &other) const {
 #if USE_SSE == 1
         return _mm_add_ps(const_cast <SSEData&>( *this),
                           const_cast <SSEData&>(other));
@@ -288,7 +288,7 @@ namespace Model {
        * @param other SSEData
        * @param result SSEData
        */
-      inline SSEData &operator += (const SSEData &other){
+      inline SSEData &operator += (const SSEData &other) {
         *internalData = *this + other;
         return *this;
       }
@@ -299,7 +299,7 @@ namespace Model {
        * @param other SSEData
        * @param result SSEData
        */
-      inline SSEDataBaseType operator - (const SSEData &other) const{
+      inline SSEDataBaseType operator - (const SSEData &other) const {
 #if USE_SSE == 1
         return _mm_sub_ps(const_cast <SSEData&>( *this),
                           const_cast <SSEData&>(other));
@@ -315,7 +315,7 @@ namespace Model {
        * @param other SSEData
        * @param result SSEData
        */
-      inline SSEData &operator -= (const SSEData &other){
+      inline SSEData &operator -= (const SSEData &other) {
         *internalData = ( *this) - other;
         return *this;
       }
@@ -326,7 +326,7 @@ namespace Model {
        * @param constant worldUnit
        * @param result __m128
        */
-      inline SSEDataBaseType operator * (worldUnit constant) const{
+      inline SSEDataBaseType operator * (worldUnit constant) const {
         SSEData tmpData(constant, constant, constant);
         return *this * tmpData;
       }
@@ -337,7 +337,7 @@ namespace Model {
        * @param constant worldUnit
        * @param result __m128
        */
-      inline SSEDataBaseType operator * (const SSEData &other) const{
+      inline SSEDataBaseType operator * (const SSEData &other) const {
 #if USE_SSE == 1
         return _mm_mul_ps(const_cast <SSEData&>( *this),
                           const_cast <SSEData&>(other));
@@ -353,7 +353,7 @@ namespace Model {
        * @param constant worldUnit
        * @param result __m128
        */
-      inline SSEData &operator *= (worldUnit constant){
+      inline SSEData &operator *= (worldUnit constant) {
         *internalData = ( *this) * constant;
         return *this;
       }
@@ -364,7 +364,7 @@ namespace Model {
        * @param constant worldUnit
        * @param result __m128
        */
-      inline SSEData &operator *= (const SSEData &other){
+      inline SSEData &operator *= (const SSEData &other) {
         *internalData = *this * other;
         return *this;
       }
@@ -378,7 +378,7 @@ namespace Model {
        * @param other __m128 secondVector
        * @return dotProduct
        */
-      inline float dotProduct (const SSEData &other) const{
+      inline float dotProduct (const SSEData &other) const {
         float dotProd;
         IGNORE_WARNINGS_BEGIN
 
@@ -406,7 +406,7 @@ namespace Model {
        * @param other __m128 secondVector
        * @return dotProduct
        */
-      inline SSEData crossProduct (const SSEData &other) const{
+      inline SSEData crossProduct (const SSEData &other) const {
         SSEData crossProd;
 
         crossProd [X] = ( *this) [Y] * other [Z] - ( *this) [Z] * other [Y];
@@ -424,32 +424,32 @@ namespace Model {
        *
        * @return dotProduct
        */
-      inline float dotProduct () const{
+      inline float dotProduct () const {
         return dotProduct( *this);
       }
 // <-- operations on data
 
-      inline SSEDataBaseType operator - () const{
-        return SSEDataPrivate( -( *this) [X], -( *this) [Y], -( *this) [Z]);
+      inline SSEDataBaseType operator - () const {
+        return SSEDataPrivate( - ( *this) [X], - ( *this) [Y], - ( *this) [Z]);
       }
 
-      inline void negate (){
-        ( *this) [X] = -( *this) [X];
-        ( *this) [Y] = -( *this) [Y];
-        ( *this) [Z] = -( *this) [Z];
+      inline void negate () {
+        ( *this) [X] = - ( *this) [X];
+        ( *this) [Y] = - ( *this) [Y];
+        ( *this) [Z] = - ( *this) [Z];
       }
 
     private:
 #if USE_SSE == 1
-      inline & operator __m128 (){
+      inline & operator __m128 () {
         return sse();
       }
 
-      inline const __m128 & sse () const{
+      inline const __m128 & sse () const {
         return internalData->sse();
       }
 
-      inline __m128 & sse (){
+      inline __m128 & sse () {
         return *internalData;
       }
 #endif

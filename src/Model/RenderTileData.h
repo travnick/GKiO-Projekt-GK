@@ -24,12 +24,12 @@ namespace Model {
       colorType *imageData;
       bool deleteImageData;
 
-      inline RenderTileData (){
+      inline RenderTileData () {
         imageData = 0;
         deleteImageData = true;
       }
 
-      inline ~RenderTileData (){
+      inline ~RenderTileData () {
         if (deleteImageData)
         {
           free(imageData);

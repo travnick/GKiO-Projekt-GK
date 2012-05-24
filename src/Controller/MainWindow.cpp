@@ -13,13 +13,13 @@
 #include <QThreadPool>
 #include <QTimer>
 
-#include "View/ui_MainWindow.h"
-#include "Controller/MainWindow.h"
 #include "Controller/GlobalDefines.h"
+#include "Controller/MainWindow.h"
+#include "Controller/RendererThread.h"
 #include "Controller/ThreadRunner.h"
 #include "Model/RenderTileData.h"
 #include "Model/Scene.h"
-#include "Controller/RendererThread.h"
+#include "View/ui_MainWindow.h"
 
 #define TIME_BEFORE_REMOVE_THREADS 60000 //[ms]
 #define TIME_BEFORE_REMOVE_THREADS_ON_EXIT 1000 //[ms]
@@ -537,10 +537,10 @@ namespace Controller {
         scene->getCamera()->move(Model::Z, -speed);
         break;
       case Qt::Key_A:
-        scene->getCamera()->move(Model::X, speed);
+        scene->getCamera()->move(Model::X, -speed);
         break;
       case Qt::Key_D:
-        scene->getCamera()->move(Model::X, -speed);
+        scene->getCamera()->move(Model::X, speed);
         break;
       case Qt::Key_Q:
         scene->getCamera()->move(Model::Y, speed);

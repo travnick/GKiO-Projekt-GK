@@ -10,8 +10,8 @@ class QString;
 namespace Model {
   //Forward declarations -->
   class Color;
-  class Scene;
   class Point;
+  class Scene;
   // <-- Forward declarations
 
   /**Scene loader class
@@ -35,7 +35,7 @@ namespace Model {
        * @param value xml value
        * @param color color object
        */
-      static void getColor (QDomElement const &value, Color &color);
+      static void getColor (const QDomElement &value, Color &color);
 
       /**Loads data from value to Point object
        * Point is class with common data for Vector and Point
@@ -43,7 +43,7 @@ namespace Model {
        * @param value xml value
        * @param object object to load data in
        */
-      static void getVPCommon (QDomElement const &value, Point &object);
+      static void getVPCommon (const QDomElement &value, Point &object);
 
       static int getInt (const QDomElement &elem, const QString &name);
       static float getFloat (const QDomElement &elem, const QString &name);

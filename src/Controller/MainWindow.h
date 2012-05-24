@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QSharedPointer>
 #include <QScopedPointer>
+#include <QSharedPointer>
 
 #include <QMainWindow>
 

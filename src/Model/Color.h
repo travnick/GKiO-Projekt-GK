@@ -18,6 +18,7 @@ namespace Model {
       enum ColorEnum {
         R = X, G = Y, B = Z
       };
+
       typedef float dataType;
 
       inline Color (){
@@ -28,6 +29,10 @@ namespace Model {
       }
 
       inline Color (const SSEData &newData)
+          : data(newData){
+      }
+
+      inline Color (const SSEDataBaseType &newData)
           : data(newData){
       }
 
@@ -62,7 +67,7 @@ namespace Model {
        * @return
        */
       inline Color operator * (float mulValue) const{
-        return SSEData(data * mulValue);
+        return data * mulValue;
       }
 
       /**
@@ -81,7 +86,7 @@ namespace Model {
        * @return
        */
       inline Color operator * (const Color& other) const{
-        return SSEData(data * other.data);
+        return data * other.data;
       }
 
       /**

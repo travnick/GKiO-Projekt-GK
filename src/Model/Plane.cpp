@@ -10,7 +10,7 @@ using Model::Plane;
 Plane::Plane (){
 }
 
-Plane::Plane (Vector newAngles)
+Plane::Plane (const Vector &newAngles)
     : angles(newAngles){
 }
 
@@ -39,12 +39,12 @@ bool Plane::checkRay (const Ray& ray, worldUnit& range, Vector&) const{
   return false;
 }
 
-void Plane::setAngles (Vector newAngles){
+void Plane::setAngles (const Vector &newAngles){
   angles = newAngles;
   calculateNormal();
 }
 
-void Plane::setNormal (Vector newNormal){
+void Plane::setNormal (const Vector &newNormal){
   normal = newNormal;
 }
 
@@ -65,5 +65,3 @@ void Plane::getNormal (const Point &point, Vector &normalAtPoint) const{
     normalAtPoint.data.negate();
   }
 }
-
-/* namespace Model */

@@ -17,7 +17,6 @@ namespace Model {
   class Point {
     public:
       typedef worldUnit dataType;
-      typedef float coordsUnit;
 
       SSEData data;
 
@@ -68,27 +67,18 @@ namespace Model {
         return data [idx];
       }
 
-      void rotate (float x, float y, float z){
-        QMatrix4x4 rotateMatrix;
-        rotateMatrix.rotate(data [Z], 0, 0, z);
-        rotateMatrix.rotate(data [Y], 0, y, 0);
-        rotateMatrix.rotate(data [X], x, 0, 0);
-
-        QVector3D result = rotateMatrix.mapVector(QVector3D(0, 1, 0));
-
-        data [X] = result.x();
-        data [Y] = result.y();
-        data [Z] = result.z();
-      }
-
+      /**Rotates coordinates through angle degrees given in other
+       *
+       * @param other angles
+       */
       void rotate (const Point &other){
         QMatrix4x4 rotateMatrix;
         rotateMatrix.rotate(other [Z], 0, 0, 1); //rotate about Z axis
         rotateMatrix.rotate(other [Y], 0, 1, 0); //rotate about Y axis
         rotateMatrix.rotate(other [X], 1, 0, 0); //rotate about X axis
 
-        QVector3D result = rotateMatrix.mapVector(
-            QVector3D(data [X], data [Y], data [Z]));
+        QVector3D result(
+            rotateMatrix.mapVector(QVector3D(data [X], data [Y], data [Z])));
 
         data [X] = result.x();
         data [Y] = result.y();

@@ -8,8 +8,8 @@
 #include <QSharedPointer>
 
 #include "Controller/GlobalDefines.h"
-#include "Model/ModelDefines.h"
 #include "Model/Camera.h"
+#include "Model/ModelDefines.h"
 
 //Forward declarations -->
 namespace std {
@@ -19,30 +19,19 @@ namespace std {
 
 namespace Model {
 
-  //Forward declarations -->
-  class Light;
-  class Material;
-  class VisibleObject;
-  // <-- Forward declarations
-
   /**3D scene class
    *
    */
   class Scene {
     public:
-      typedef QSharedPointer <Camera> CameraType;
-      typedef QSharedPointer <Light> LightType;
-      typedef QSharedPointer <Material> MaterialType;
-      typedef QSharedPointer <VisibleObject> ObjectType;
+      typedef std::vector <LightPtr> LighContainer;
+      typedef LighContainer::const_iterator LighIt;
 
-      typedef std::vector <LightType> LighContainer;
-      typedef LighContainer::const_iterator LighContainerIterator;
+      typedef std::vector <MaterialPtr> MaterialContainer;
+      typedef MaterialContainer::const_iterator MaterialIt;
 
-      typedef std::vector <MaterialType> MaterialContainer;
-      typedef MaterialContainer::const_iterator MaterialContainerIterator;
-
-      typedef std::vector <ObjectType> ObjectContainer;
-      typedef ObjectContainer::const_iterator ObjectContainerIterator;
+      typedef std::vector <ObjectPtr> ObjectContainer;
+      typedef ObjectContainer::const_iterator ObjectIt;
 
       /**Sets loaded = false
        *
@@ -66,7 +55,7 @@ namespace Model {
        *
        * @return camera
        */
-      inline const CameraType &getCamera () const{
+      inline const CameraPtr &getCamera () const{
         return camera;
       }
 
@@ -74,7 +63,7 @@ namespace Model {
        *
        * @return camera
        */
-      inline CameraType &getCamera (){
+      inline CameraPtr &getCamera (){
         return camera;
       }
 
@@ -132,7 +121,7 @@ namespace Model {
        *
        * @param camera camera to set in scene
        */
-      inline void setCamera (const CameraType &newCamera){
+      inline void setCamera (const CameraPtr &newCamera){
         this->camera = newCamera;
       }
 
@@ -140,7 +129,7 @@ namespace Model {
        *
        * @param object light to add
        */
-      inline void addLight (const LightType &object){
+      inline void addLight (const LightPtr &object){
         lights.push_back(object);
       }
 
@@ -148,7 +137,7 @@ namespace Model {
        *
        * @param object material to add
        */
-      inline void addMaterial (const MaterialType &object){
+      inline void addMaterial (const MaterialPtr &object){
         materials.push_back(object);
       }
 
@@ -156,7 +145,7 @@ namespace Model {
        *
        * @param object visible object to add
        */
-      inline void addVisibleObject (const ObjectType &object){
+      inline void addVisibleObject (const ObjectPtr &object){
         objects.push_back(object);
 
         calculateObjectSizeOnImage(object);
@@ -178,13 +167,12 @@ namespace Model {
       }
 
     private:
-      bool loaded;
-      CameraType camera;
+      CameraPtr camera;
       LighContainer lights;
       MaterialContainer materials;
       ObjectContainer objects;
+      bool loaded;
 
-      void calculateObjectSizeOnImage (const ObjectType &object);
+      void calculateObjectSizeOnImage (const ObjectPtr &object);
   };
 }
-

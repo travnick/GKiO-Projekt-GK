@@ -22,7 +22,7 @@ namespace Model {
        *
        * @param newAngles
        */
-      Plane (Vector newAngles);
+      Plane (const Vector &newAngles);
 
       /**Creates new plane and copies data from other
        *
@@ -41,13 +41,13 @@ namespace Model {
        *
        * @param newAngles angles of the plane
        */
-      void setAngles (Vector newAngles);
+      void setAngles (const Vector &newAngles);
 
       /**Set normal vector of the plane
        *
        * @param newNormal normal of the plane
        */
-      void setNormal (Vector newNormal);
+      void setNormal (const Vector &newNormal);
 
       /**Calculates normal vector at given point
        *

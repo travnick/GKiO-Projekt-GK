@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <string>
-
 #include "Model/ModelDefines.h"
 #include "Model/Point.h"
 

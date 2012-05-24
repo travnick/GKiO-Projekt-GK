@@ -4,15 +4,15 @@
 #include <QtXml>
 #include <stdexcept>
 
-#include "Model/ModelDefines.h"
-#include "Model/SceneFileManager.h"
-#include "Model/Scene.h"
 #include "Model/Camera.h"
 #include "Model/Light.h"
-#include "Model/Object.h"
-#include "Model/Sphere.h"
-#include "Model/Plane.h"
 #include "Model/Material.h"
+#include "Model/ModelDefines.h"
+#include "Model/Object.h"
+#include "Model/Plane.h"
+#include "Model/Scene.h"
+#include "Model/SceneFileManager.h"
+#include "Model/Sphere.h"
 #include "Model/Vector.h"
 
 using namespace Model;
@@ -59,8 +59,8 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene){
     if (transparency < 0.0f || transparency > 1.0f)
       throw std::logic_error("Przeźroczystość materiału poza zakresem [0, 1].");
 
-    if (specularPower < 1 || specularPower > 500)
-      throw std::logic_error("Kolor specular poza zakresem [1, 5000].");
+    if (specularPower < 0)
+      throw std::logic_error("\"Moc\" specular mniejszy od 0.");
 
     material->setColor(color);
     material->setSpecularColor(specularColor);
@@ -97,7 +97,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene){
     getColor(node.firstChildElement("color").toElement(), color);
     getVPCommon(node.firstChildElement("position").toElement(), point);
 
-    object->setPower(power);
+    object->power = power;
     object->setPosition(point);
     ( *object) = (color);
 
@@ -156,7 +156,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene){
 
         mainbject = QSharedPointer <Sphere>(new Sphere(radius));
         mainbject->setPosition(point);
-        mainbject->setMaterial(material);
+        mainbject->setMaterial(scene.getMaterials() [material]);
 
         if (multiplyX < 0)
         {
@@ -211,7 +211,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene){
         material = getInt(elem, "material");
 
         object->setAngles(angles);
-        object->setMaterial(material);
+        object->setMaterial(scene.getMaterials() [material]);
         scene.addVisibleObject(object);
       }
         break;

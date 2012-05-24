@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <QString>
 #include <cmath>
+#include <QSharedPointer>
+#include <QString>
 
 /**
  *
@@ -79,11 +80,11 @@ namespace Model {
     /**String representation of object types
      *
      */
-    const QString OBJECTS_NAME = LCSTRING(Objects);
     const QString CAMERA_NAME = LCSTRING(Camera);
     const QString LIGHT_NAME = LCSTRING(Light);
-    const QString SPHERE_NAME = LCSTRING(Sphere);
+    const QString OBJECTS_NAME = LCSTRING(Objects);
     const QString PLANE_NAME = LCSTRING(Plane);
+    const QString SPHERE_NAME = LCSTRING(Sphere);
 
   }
 
@@ -127,4 +128,20 @@ namespace Model {
   enum Direction {
     Forward, Backward, Left, Right, Up, Down
   };
-}
+
+  //Forward declarations -->
+  class Camera;
+  class Light;
+  class Material;
+  class Renderer;
+  class RenderTileData;
+  class Scene;
+  class VisibleObject;
+  // <-- Forward declarations
+
+  typedef QSharedPointer <Camera> CameraPtr;
+  typedef QSharedPointer <Light> LightPtr;
+  typedef QSharedPointer <Material> MaterialPtr;
+  typedef QSharedPointer <Scene> ScenePtr;
+  typedef QSharedPointer <VisibleObject> ObjectPtr;
+} //namespace Model

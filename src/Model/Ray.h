@@ -67,8 +67,8 @@ namespace Model {
       }
 
     private:
-      Point start;
       Vector direction;
+      Point start;
   };
 }
 

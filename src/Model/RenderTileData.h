@@ -17,10 +17,10 @@ namespace Model {
       quint64 imageDataSize;
       Point2D topLeft;
       Point2D bottomRight;
-      imageUnit width;
       imageUnit height;
-      imageUnit imageWidth;
+      imageUnit width;
       imageUnit imageHeight;
+      imageUnit imageWidth;
       colorType *imageData;
       bool deleteImageData;
 

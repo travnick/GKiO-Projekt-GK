@@ -1,13 +1,13 @@
 /// @file Controller/ThreadRunner.cpp
 
+#include <ctime>
 #include <QMutexLocker>
 #include <QThreadPool>
-#include <ctime>
 
-#include "Controller/ThreadRunner.h"
+#include "Controller/GlobalDefines.h"
 #include "Controller/MainWindow.h"
 #include "Controller/RendererThread.h"
-#include "Controller/GlobalDefines.h"
+#include "Controller/ThreadRunner.h"
 #include "Model/RenderTileData.h"
 
 #define THREAD_EXPIRE_TIMEOUT 5

@@ -6,9 +6,9 @@
 
 namespace Model {
   //Forward declarations -->
+  class Point;
   class Ray;
   class Vector;
-  class Point;
   // <-- Forward declarations
 
   /**Visible object class
@@ -16,6 +16,9 @@ namespace Model {
    *
    */
   class VisibleObject: public Object {
+    private:
+      MaterialPtr material;
+
     public:
       worldUnit sizeOnImage;
 
@@ -26,8 +29,8 @@ namespace Model {
        *
        * @return material id
        */
-      inline const uint &getMaterial () const{
-        return materialId;
+      inline const MaterialPtr &getMaterial () const{
+        return material;
       }
 
       /**Returns approximated size of object
@@ -50,8 +53,8 @@ namespace Model {
        *
        * @param materialId id of material to set
        */
-      inline void setMaterial (uint newMaterialId){
-        materialId = newMaterialId;
+      inline void setMaterial (const MaterialPtr &newMaterialId){
+        material = newMaterialId;
       }
 
       /**All visible objects have to implement this function
@@ -67,9 +70,6 @@ namespace Model {
 
     protected:
       worldUnit size;
-
-    private:
-      uint materialId;
   };
 
 } /* namespace Model */

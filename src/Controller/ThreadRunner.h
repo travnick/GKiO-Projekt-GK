@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <QSharedPointer>
 #include <QScopedPointer>
+#include <QSharedPointer>
 
-#include <QRunnable>
-#include <QObject>
 #include <QList>
+#include <QObject>
+#include <QRunnable>
 #include <QVector>
 
 //Forward declarations -->

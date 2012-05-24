@@ -2,23 +2,18 @@
 
 #pragma once
 
-#include <QSharedPointer>
 #include <QScopedPointer>
-#include <QRunnable>
-#include <QObject>
+#include <QSharedPointer>
 
-//Forward declarations -->
-namespace Model {
-  class Renderer;
-  class RenderTileData;
-  class Scene;
-}
-// <-- Forward declarations
+#include <QObject>
+#include <QRunnable>
+
+#include "Model/ModelDefines.h"
 
 namespace Controller {
 
   struct RenderParams {
-      QSharedPointer <Model::Scene> scene;
+      Model::ScenePtr scene;
       bool allowRunning;
       bool randomRender;
       bool shadows;

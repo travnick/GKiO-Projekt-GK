@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "Model/Object.h"
 #include "Model/Color.h"
+#include "Model/Object.h"
 
 namespace Model {
 
@@ -12,7 +12,7 @@ namespace Model {
    */
   class Light: public Object, public Color {
     public:
-      worldUnit power;
+      float power;
 
       Light ()
           : power(1){
@@ -33,13 +33,6 @@ namespace Model {
        */
       inline const Color &getColor () const{
         return *this;
-      }
-
-      /** Sets power of light
-       *
-       */
-      void setPower (worldUnit value){
-        this->power = value;
       }
   };
 }

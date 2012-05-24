@@ -2,15 +2,12 @@
 
 #pragma once
 
-#include "Model/Vector.h"
 #include "Model/Object.h"
+#include "Model/Vector.h"
 
 #define MAX_VIEW_ANGLE 180
 
 namespace Model {
-  //Forward declarations -->
-  class Point;
-  // <-- Forward declarations
 
   /**Camera class
    *
@@ -110,16 +107,14 @@ namespace Model {
        * @param FOV new Field of View
        */
       inline void setFOV (unitType newFOV){
-        if (newFOV < 0)
-        {
-          newFOV = 0;
-        }
-        //No angle >= MAX_VIEW_ANGLE
+        //FOV has to be <= MAX_VIEW_ANGLE
         while (newFOV >= MAX_VIEW_ANGLE)
         {
           newFOV -= MAX_VIEW_ANGLE;
         }
-        FOV = newFOV;
+
+        //FOV has to be > 0
+        FOV = newFOV < 0 ? 0 : newFOV;
       }
 
       /**Returns FOV of camera
@@ -215,23 +210,23 @@ namespace Model {
 
       void rotate (Axis axis, float angle);
 
-      Vector screenWidthDelta;
       Vector screenHeightDelta;
+      Vector screenWidthDelta;
     private:
-      unitType FOV;
-      worldUnit viewDistance;
-      imageUnit imageWidth;
-      imageUnit imageHeight;
-      worldUnit screenWidth;
-      worldUnit screenHeight;
-      worldUnit screenImageRatio;
-      Type type;
-      Vector eyeDirection;
       Vector angles;
+      Vector eyeDirection;
       Point origin;
       Point screenTopLeft;
       Point screenTopRight;
       Point screenBottomLeft;
+      unitType FOV;
+      imageUnit imageHeight;
+      imageUnit imageWidth;
+      worldUnit screenHeight;
+      worldUnit screenWidth;
+      worldUnit screenImageRatio;
+      worldUnit viewDistance;
+      Type type;
   };
 }
 

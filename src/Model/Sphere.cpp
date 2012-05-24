@@ -2,8 +2,8 @@
 
 #include <cmath>
 
-#include "Model/Sphere.h"
 #include "Model/Ray.h"
+#include "Model/Sphere.h"
 
 namespace Model {
 

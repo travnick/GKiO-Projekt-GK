@@ -7,8 +7,8 @@
 
 namespace Model {
 
-  typedef std::map <QString, Objects::ObjectType> objectTypesMap;
   typedef std::map <Objects::ObjectType, QString> objectTypeNamesMap;
+  typedef std::map <QString, Objects::ObjectType> objectTypesMap;
 
   Objects::ObjectType Object::getObjectType (const QString & typeName){
     static objectTypesMap objectTypes;
@@ -19,8 +19,8 @@ namespace Model {
     {
       objectTypes [Objects::CAMERA_NAME] = Objects::Camera;
       objectTypes [Objects::LIGHT_NAME] = Objects::Light;
-      objectTypes [Objects::SPHERE_NAME] = Objects::Sphere;
       objectTypes [Objects::PLANE_NAME] = Objects::Plane;
+      objectTypes [Objects::SPHERE_NAME] = Objects::Sphere;
     }
 
     iterator = objectTypes.find(typeName);

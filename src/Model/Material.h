@@ -14,7 +14,6 @@ namespace Model {
        *
        */
       inline Material (){
-
       }
 
       inline const Color &getColor () const{
@@ -29,7 +28,7 @@ namespace Model {
         return specularColor;
       }
 
-      inline void setSpecularColor (Color color){
+      inline void setSpecularColor (const Color &color){
         this->specularColor = color;
       }
 
@@ -68,9 +67,9 @@ namespace Model {
     private:
       Color diffuse;
       Color specularColor;
-      float specularPower;
-      float reflection;
-      float transparency;
       float ior;
+      float reflection;
+      float specularPower;
+      float transparency;
   };
 }

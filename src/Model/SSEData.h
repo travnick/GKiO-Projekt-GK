@@ -327,10 +327,7 @@ namespace Model {
        * @param result __m128
        */
       inline SSEDataBaseType operator * (worldUnit constant) const{
-        SSEData tmpData;
-        tmpData [X] = constant;
-        tmpData [Y] = constant;
-        tmpData [Z] = constant;
+        SSEData tmpData(constant, constant, constant);
         return *this * tmpData;
       }
 

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "Model/Point.h"
 #include "Controller/GlobalDefines.h"
+#include "Model/Point.h"
 
 namespace Model {
 

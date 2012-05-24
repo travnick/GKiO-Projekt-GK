@@ -1,14 +1,13 @@
 /// @file Model/Scene.cpp
 
-#include <string>
 #include <exception>
 #include <QFile>
 
-#include "Model/Scene.h"
-#include "Model/SceneFileManager.h"
-#include "Model/Object.h"
 #include "Model/Camera.h"
 #include "Model/Light.h"
+#include "Model/Object.h"
+#include "Model/Scene.h"
+#include "Model/SceneFileManager.h"
 #include "Model/Sphere.h"
 
 using namespace std;
@@ -49,13 +48,7 @@ namespace Model {
     camera->calibrate();
   }
 
-  void Scene::calculateObjectSizeOnImage (const ObjectType &){
-    //TODO: make implementation here
-//    __attribute__((aligned(16))) float distance [4];
-//    PVOperations::diff(object->getPosition().data, camera->getPosition().data, distance);
-//
-//    object->sizeOnImage = object->getSize()
-//        - sin(RAD(camera->getFOV() / 2)) * PVOperations::length(distance);
+  void Scene::calculateObjectSizeOnImage (const ObjectPtr &){
+    //TODO: implement
   }
-
 }

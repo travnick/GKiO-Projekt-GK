@@ -7,7 +7,8 @@
 class QDomElement;
 class QString;
 
-namespace Model {
+namespace Model
+{
   //Forward declarations -->
   class Color;
   class Point;
@@ -17,9 +18,11 @@ namespace Model {
   /**Scene loader class
    *
    */
-  class SceneFileManager {
+  class SceneFileManager
+  {
     public:
-      inline SceneFileManager () {
+      inline SceneFileManager ()
+      {
       }
 
       /**Loads scene from stream

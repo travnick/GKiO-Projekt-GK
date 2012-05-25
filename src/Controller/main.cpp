@@ -9,9 +9,9 @@ int main (int argc, char *argv [])
 #else
 #include <windows.h>
 
-    INT WINAPI WinMain (HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT)
+INT WINAPI WinMain (HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT)
 #endif
-    {
+{
 #ifdef Q_WS_WIN
   // Get argc and argv.
   int argc = __argc;

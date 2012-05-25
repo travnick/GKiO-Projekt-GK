@@ -2,6 +2,7 @@
 
 #include "Model/Material.h"
 
-namespace Model {
+namespace Model
+{
 
 }

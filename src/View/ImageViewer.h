@@ -9,14 +9,16 @@ class QImage;
 class QScrollArea;
 // <-- Forward declarations
 
-namespace View {
+namespace View
+{
 
   /**Reimplemented QLabel
    * It's customized to better image displaying.
    * It refresh only part of image visible in QScrollArea.
    *
    */
-  class ImageViewer: public QLabel {
+  class ImageViewer: public QLabel
+  {
     public:
       ImageViewer (QWidget *parent = 0);
 

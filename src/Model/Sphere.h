@@ -4,12 +4,14 @@
 
 #include "Model/VisibleObject.h"
 
-namespace Model {
+namespace Model
+{
 
   /**Sphere class
    *
    */
-  class Sphere: public VisibleObject {
+  class Sphere: public VisibleObject
+  {
     public:
       /**Creates sphere with given radius.
        * Calculates square radius for future optimization
@@ -24,7 +26,8 @@ namespace Model {
        */
       Sphere (const Sphere &other);
 
-      inline virtual ~Sphere () {
+      inline virtual ~Sphere ()
+      {
       }
 
       /**Calculates normal vector at given point
@@ -51,7 +54,8 @@ namespace Model {
       /**Prevent creation of sphere without radius
        *
        */
-      Sphere () {
+      Sphere ()
+      {
       }
   };
 }

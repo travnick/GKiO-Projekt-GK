@@ -11,7 +11,8 @@
  * @param string
  * @return
  */
-inline QString toLowerCase (const char* string) {
+inline QString toLowerCase (const char* string)
+{
   return QString::fromStdString(string).toLower();
 }
 
@@ -48,13 +49,15 @@ const float DEFAULT_INTERSECTION_ERROR_VALUE = 0.1f;
 
 //Templates -->
 template <typename T>
-T SQRT (T value) {
+T SQRT (T value)
+{
   return sqrt(value);
 }
 
 //inline is important because of "multiple definition of" error
 template <>
-inline float SQRT (float value) {
+inline float SQRT (float value)
+{
   return sqrtf(value);
 }
 // <--Templates
@@ -65,15 +68,18 @@ QString toLowerCase (const char* string);
 
 // <-- Functions
 
-namespace Model {
+namespace Model
+{
   //Defines world unit for all project
   typedef float worldUnit;
 
-  namespace Objects {
+  namespace Objects
+  {
     /**Available object types
      *
      */
-    enum ObjectType {
+    enum ObjectType
+    {
       None, Camera, Light, Sphere, Plane
     };
 
@@ -88,7 +94,8 @@ namespace Model {
 
   }
 
-  namespace Cameras {
+  namespace Cameras
+  {
     /**String representation of camera types
      *
      */
@@ -96,14 +103,16 @@ namespace Model {
     const QString CONIC = LCSTRING(CONIC);
   }
 
-  namespace Materials {
+  namespace Materials
+  {
     /**String representation of materials section name in scene file
      *
      */
     const QString MATERIALS_NAME = LCSTRING(Materials);
   }
 
-  namespace Lights {
+  namespace Lights
+  {
     /**String representation of light section name in scene file
      *
      */
@@ -118,14 +127,16 @@ namespace Model {
    * @return rounded value
    */
   template <typename T>
-  inline T uRound (float value) {
+  inline T uRound (float value)
+  {
     return static_cast <T>(value + 0.5f);
   }
 
   /**Movement directions
    *
    */
-  enum Direction {
+  enum Direction
+  {
     Forward, Backward, Left, Right, Up, Down
   };
 

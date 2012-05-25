@@ -17,7 +17,8 @@
 
 using namespace Model;
 
-void SceneFileManager::loadScene (QIODevice & io, Scene &scene) {
+void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
+{
   Objects::ObjectType objectType = Objects::None;
   QString tmpname;
   QDomNode node;
@@ -116,7 +117,8 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene) {
     QDomElement elem = node.toElement();
     objectType = Object::getObjectType(elem.tagName());
 
-    switch (objectType) {
+    switch (objectType)
+    {
       case Objects::Sphere:
       {
         QSharedPointer <Sphere> mainbject;
@@ -271,17 +273,20 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene) {
     throw std::logic_error("Brak świateł w scenie");
 }
 
-void SceneFileManager::getColor (const QDomElement & value, Color &color) {
+void SceneFileManager::getColor (const QDomElement & value, Color &color)
+{
   color.setColor(getInt(value, "r"), getInt(value, "g"), getInt(value, "b"));
 }
 
-void SceneFileManager::getVPCommon (const QDomElement & value, Point &object) {
+void SceneFileManager::getVPCommon (const QDomElement & value, Point &object)
+{
   object [X] = getFloat(value, "x");
   object [Y] = getFloat(value, "y");
   object [Z] = getFloat(value, "z");
 }
 
-int SceneFileManager::getInt (const QDomElement &elem, const QString &name) {
+int SceneFileManager::getInt (const QDomElement &elem, const QString &name)
+{
   bool ok;
   int val;
   val = elem.attribute(name).toInt( &ok, 10);
@@ -291,8 +296,8 @@ int SceneFileManager::getInt (const QDomElement &elem, const QString &name) {
   return val;
 }
 
-float SceneFileManager::getFloat (const QDomElement &elem,
-                                  const QString &name) {
+float SceneFileManager::getFloat (const QDomElement &elem, const QString &name)
+{
   bool ok;
   float val;
   val = elem.attribute(name).toFloat( &ok);
@@ -303,7 +308,8 @@ float SceneFileManager::getFloat (const QDomElement &elem,
 }
 
 double SceneFileManager::getDouble (const QDomElement &elem,
-                                    const QString &name) {
+                                    const QString &name)
+{
   bool ok;
   double val;
   val = elem.attribute(name).toDouble( &ok);

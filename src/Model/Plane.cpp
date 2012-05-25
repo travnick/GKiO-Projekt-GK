@@ -7,19 +7,23 @@ const float ANGLE_ERROR_VALUE = 0.0001f;
 
 using Model::Plane;
 
-Plane::Plane () {
+Plane::Plane ()
+{
 }
 
 Plane::Plane (const Vector &newAngles)
-    : angles(newAngles) {
+    : angles(newAngles)
+{
 }
 
-Plane::Plane (const Plane& other) {
+Plane::Plane (const Plane& other)
+{
   angles = other.angles;
   normal = other.normal;
 }
 
-bool Plane::checkRay (const Ray& ray, worldUnit& range, Vector&) const {
+bool Plane::checkRay (const Ray& ray, worldUnit& range, Vector&) const
+{
 
   worldUnit rayNormalDot = ray.getDir().dotProduct(normal.data);
 
@@ -39,16 +43,19 @@ bool Plane::checkRay (const Ray& ray, worldUnit& range, Vector&) const {
   return false;
 }
 
-void Plane::setAngles (const Vector &newAngles) {
+void Plane::setAngles (const Vector &newAngles)
+{
   angles = newAngles;
   calculateNormal();
 }
 
-void Plane::setNormal (const Vector &newNormal) {
+void Plane::setNormal (const Vector &newNormal)
+{
   normal = newNormal;
 }
 
-void Plane::calculateNormal () {
+void Plane::calculateNormal ()
+{
   normal.set(0, 1, 0);
   normal.rotate(angles);
 
@@ -57,7 +64,8 @@ void Plane::calculateNormal () {
   normal.length = angles.length;
 }
 
-void Plane::getNormal (const Point &point, Vector &normalAtPoint) const {
+void Plane::getNormal (const Point &point, Vector &normalAtPoint) const
+{
   normalAtPoint = normal;
 
   if (normal.data.dotProduct(point.data) - normal.length < 0)

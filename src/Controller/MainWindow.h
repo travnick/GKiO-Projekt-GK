@@ -13,17 +13,20 @@
 class QElapsedTimer;
 class QThreadPool;
 
-namespace Ui {
+namespace Ui
+{
   class MainWindow;
 }
 
-namespace Model {
+namespace Model
+{
   struct RenderTileData;
   class Scene;
 }
 // <-- Forward declarations
 
-namespace Controller {
+namespace Controller
+{
   //Forward declarations -->
   struct RenderParams;
   class ThreadRunner;
@@ -32,7 +35,8 @@ namespace Controller {
   /**
    * Main window controller
    */
-  class MainWindow: public QMainWindow {
+  class MainWindow: public QMainWindow
+  {
     Q_OBJECT
 
     public:

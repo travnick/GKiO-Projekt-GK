@@ -5,12 +5,14 @@
 #include <Model/VisibleObject.h>
 #include <Model/Vector.h>
 
-namespace Model {
+namespace Model
+{
 
   /*Plane class
    *
    */
-  class Plane: public Model::VisibleObject {
+  class Plane: public Model::VisibleObject
+  {
     public:
 
       /**Creates plane
@@ -33,7 +35,8 @@ namespace Model {
       /**Destructor of the plane
        *
        */
-      inline virtual ~Plane () {
+      inline virtual ~Plane ()
+      {
       }
 
       /**Set angles of the plane

@@ -7,19 +7,22 @@
 
 #define MAX_VIEW_ANGLE 180
 
-namespace Model {
+namespace Model
+{
 
   /**Camera class
    *
    */
-  class Camera: public Object {
+  class Camera: public Object
+  {
     public:
       typedef double unitType;
 
       /**Available camera types
        *
        */
-      enum Type {
+      enum Type
+      {
         None, Orthogonal, Conic
       };
 
@@ -32,7 +35,8 @@ namespace Model {
        *
        * @return current camera type
        */
-      inline const Camera::Type & getType () const {
+      inline const Camera::Type & getType () const
+      {
         return type;
       }
 
@@ -40,7 +44,8 @@ namespace Model {
        *
        * @return current camera direction
        */
-      inline const Vector &getDirection () const {
+      inline const Vector &getDirection () const
+      {
         return eyeDirection;
       }
 
@@ -50,7 +55,8 @@ namespace Model {
        * @param direction direction from camera origin to given point
        */
       inline void getDirection (const Point &point,
-                                Vector &directionToPoint) const {
+                                Vector &directionToPoint) const
+      {
         Q_ASSERT(screenImageRatio > 0);
 
         point.data.diff(origin.data, directionToPoint.data);
@@ -63,7 +69,8 @@ namespace Model {
        *
        * @return ratio of screen width to image width
        */
-      inline const worldUnit &getScreenImageWidthRatio () const {
+      inline const worldUnit &getScreenImageWidthRatio () const
+      {
         return screenImageRatio;
       }
 
@@ -71,7 +78,8 @@ namespace Model {
        *
        * @return top left corner of camera screen
        */
-      inline const Point &getScreenTopLeft () const {
+      inline const Point &getScreenTopLeft () const
+      {
         return screenTopLeft;
       }
 
@@ -79,7 +87,8 @@ namespace Model {
        *
        * @return camera screen height
        */
-      inline const worldUnit &getScreenHeight () const {
+      inline const worldUnit &getScreenHeight () const
+      {
         return screenHeight;
       }
 
@@ -87,7 +96,8 @@ namespace Model {
        *
        * @return camera screen width
        */
-      inline const worldUnit &getScreenWidth () const {
+      inline const worldUnit &getScreenWidth () const
+      {
         return screenWidth;
       }
 
@@ -95,7 +105,8 @@ namespace Model {
        *
        * @return camera view distance
        */
-      inline const worldUnit &getViewDistance () const {
+      inline const worldUnit &getViewDistance () const
+      {
         return viewDistance;
       }
 
@@ -106,7 +117,8 @@ namespace Model {
        *
        * @param FOV new Field of View
        */
-      inline void setFOV (unitType newFOV) {
+      inline void setFOV (unitType newFOV)
+      {
         //FOV has to be <= MAX_VIEW_ANGLE
         while (newFOV >= MAX_VIEW_ANGLE)
         {
@@ -121,7 +133,8 @@ namespace Model {
        *
        * @return FOV
        */
-      inline unitType getFOV () {
+      inline unitType getFOV ()
+      {
         return FOV;
       }
 
@@ -138,7 +151,8 @@ namespace Model {
        *
        * @param screenWidth new screen width
        */
-      inline void setScreenWidth (worldUnit newScreenWidth) {
+      inline void setScreenWidth (worldUnit newScreenWidth)
+      {
         screenWidth = newScreenWidth;
       }
 
@@ -146,7 +160,8 @@ namespace Model {
        *
        * @param imageWidth new image width
        */
-      inline void setImageWidth (imageUnit newImageWidth) {
+      inline void setImageWidth (imageUnit newImageWidth)
+      {
         imageWidth = newImageWidth;
       }
 
@@ -154,7 +169,8 @@ namespace Model {
        *
        * @param imageHeight
        */
-      inline void setImageHeight (imageUnit newImageHeight) {
+      inline void setImageHeight (imageUnit newImageHeight)
+      {
         imageHeight = newImageHeight;
       }
 
@@ -162,7 +178,8 @@ namespace Model {
        *
        * @param typeName new camera type
        */
-      inline void setType (Type typeName) {
+      inline void setType (Type typeName)
+      {
         type = typeName;
       }
 
@@ -190,11 +207,13 @@ namespace Model {
        */
       void updateRotation ();
 
-      const Vector &getAngles () const {
+      const Vector &getAngles () const
+      {
         return angles;
       }
 
-      Vector &getAngles () {
+      Vector &getAngles ()
+      {
         return angles;
       }
 
@@ -202,7 +221,8 @@ namespace Model {
        *
        * @param viewDistance new view distance
        */
-      inline void setViewDistance (const worldUnit &newViewDistance) {
+      inline void setViewDistance (const worldUnit &newViewDistance)
+      {
         viewDistance = newViewDistance;
       }
 

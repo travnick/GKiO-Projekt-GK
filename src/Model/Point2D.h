@@ -2,11 +2,13 @@
 
 #pragma once
 
-namespace Model {
+namespace Model
+{
   /**2D point class
    *
    */
-  struct Point2D {
+  struct Point2D
+  {
       imageUnit x;
       imageUnit y;
   };

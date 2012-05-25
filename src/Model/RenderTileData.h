@@ -7,12 +7,14 @@
 #include "Controller/GlobalDefines.h"
 #include "Model/Point2D.h"
 
-namespace Model {
+namespace Model
+{
 
   /**Tile information class
    *
    */
-  class RenderTileData {
+  class RenderTileData
+  {
     public:
       quint64 imageDataSize;
       Point2D topLeft;
@@ -24,12 +26,14 @@ namespace Model {
       colorType *imageData;
       bool deleteImageData;
 
-      inline RenderTileData () {
+      inline RenderTileData ()
+      {
         imageData = 0;
         deleteImageData = true;
       }
 
-      inline ~RenderTileData () {
+      inline ~RenderTileData ()
+      {
         if (deleteImageData)
         {
           free(imageData);

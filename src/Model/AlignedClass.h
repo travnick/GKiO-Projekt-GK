@@ -2,13 +2,15 @@
 
 #pragma once
 
-namespace Model {
+namespace Model
+{
 
   /**Class that provides data alignment
    *
    */
   template <int alignmentSize>
-  class AlignedClass {
+  class AlignedClass
+  {
     public:
       //For x86_64 we don't need this because of default 16B heap alignment (ABI)
 #if USE_SSE == 1

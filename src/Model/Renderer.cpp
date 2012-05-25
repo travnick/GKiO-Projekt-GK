@@ -23,14 +23,17 @@ const float COLOR_MIN_VALUE = 0.5f / COLOR_MAX_VALUE;
 Renderer::Renderer (const Controller::RenderParams &newRenderParams)
     : tmpDistance(new Vector), pointLightDist(new Vector), distanceToIntersection(
         new Vector), lightRay(new Ray), normalAtIntersection(new Vector), intersection(
-        new Point) {
+        new Point)
+{
   setRenderParams( &newRenderParams);
 }
 
-Renderer::~Renderer () {
+Renderer::~Renderer ()
+{
 }
 
-void Renderer::render (const RenderTileData &tile) {
+void Renderer::render (const RenderTileData &tile)
+{
   const Camera *camera = renderParams->scene->getCamera().data();
   worldUnit viewDistance = renderParams->scene->getCamera()->getViewDistance();
   Vector direction;
@@ -87,7 +90,8 @@ void Renderer::render (const RenderTileData &tile) {
 
 inline void Renderer::shootRay (Ray & ray,
                                 Color &resultColor,
-                                worldUnit mainViewDistance) const {
+                                worldUnit mainViewDistance) const
+{
   Scene::ObjectIt endObjects = renderParams->scene->getObjects().end();
   Scene::ObjectIt currentObject = endObjects;
   worldUnit coef = 1;

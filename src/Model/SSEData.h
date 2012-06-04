@@ -6,18 +6,18 @@
 
 #ifdef __x86_64__
 
-#if USE_SSE == 1
-#define USE_POINTERS 0
-#endif
+# if USE_SSE == 1
+#   define USE_POINTERS 0
+# endif
 
 #else
 
 //There is no gain with using SSE and wasting time for mallocs.
-#undef USE_SSE
+# undef USE_SSE
 
-#if USE_SSE == 1
-#define USE_POINTERS 1
-#endif
+# if USE_SSE == 1
+#   define USE_POINTERS 1
+# endif
 
 #endif
 
@@ -115,9 +115,7 @@ namespace Model
    */
   union SSEData
   {
-#if USE_SSE == 1
       __m128 data;
-#endif
       float dataArray [4];
 
       //------------------
@@ -129,7 +127,13 @@ namespace Model
 
       inline SSEData (const SSEData &other)
       {
+#if USE_SSE == 1
         data = other.data;
+#else
+        ( *this) [X] = other [X];
+        ( *this) [Y] = other [Y];
+        ( *this) [Z] = other [Z];
+#endif
       }
 
       inline SSEData (float x, float y, float z)
@@ -146,20 +150,19 @@ namespace Model
       {
         data = other;
       }
+#endif
 
       inline SSEData & operator = (const SSEData &other)
       {
+#if USE_SSE == 1
         data = other.data;
-        return ( *this);
-      }
 #else
-      inline SSEData (const SSEData &other)
-      {
         ( *this) [X] = other [X];
         ( *this) [Y] = other [Y];
         ( *this) [Z] = other [Z];
-      }
 #endif
+        return ( *this);
+      }
 
       inline void setDefaults ()
       {
@@ -201,14 +204,10 @@ namespace Model
         return *this;
       }
 
-#if USE_SSE == 1
-
       inline & operator __m128 ()
       {
         return data;
       }
-
-#endif
   };
 
   //---------------------------------------------------------------------------------
@@ -218,7 +217,6 @@ namespace Model
    */
   class SSEVector
   {
-
 #if USE_POINTERS == 1
       SSEData *internalData;
 #else
@@ -421,8 +419,8 @@ namespace Model
 #if __SSE4_1__ == 1 &&  USE_SSE == 1
         _mm_store_ss(
             &dotProd,
-            _mm_dp_ps(const_cast <SSEVector&>( *this), const_cast <BaseSSEData&>(other), DOT_PROD_MASK));
-#elif __SSE3__ &&  USE_SSE == 1
+            _mm_dp_ps(const_cast <__m128 &>(internalData->data), const_cast <__m128 &>(other.data), DOT_PROD_MASK));
+#elif __SSE3__ == 1 &&  USE_SSE == 1
         __m128 result = _mm_mul_ps(const_cast <SSEVector&>( *this), const_cast <BaseSSEData&>(other));
         result = _mm_hadd_ps(result, result);
         result = _mm_hadd_ps(result, result);
@@ -436,7 +434,7 @@ namespace Model
       }
 
       /**Calculates cross product with other vector
-       * You should give here Point::date
+       * You should give here Point::data
        *
        * @param other SSEVector secondVector
        * @return crossProduct SSEVector
@@ -488,14 +486,10 @@ namespace Model
         return *internalData;
       }
 
-#if USE_SSE == 1
-
       inline & operator __m128 ()
       {
         return internalData->data;
       }
-
-#endif
 
     private:
 

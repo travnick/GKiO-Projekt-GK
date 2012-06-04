@@ -3,7 +3,7 @@
 #include "Model/Plane.h"
 #include "Model/Ray.h"
 
-const float ANGLE_ERROR_VALUE = 0.0001f;
+const float ANGLE_ERROR_VALUE = 0.001f;
 
 using Model::Plane;
 
@@ -68,8 +68,8 @@ void Plane::getNormal (const Point &point, Vector &normalAtPoint) const
 {
   normalAtPoint = normal;
 
-  if (normal.data.dotProduct(point.data) - normal.length < 0)
-  {
-    normalAtPoint.data.negate();
-  }
+//  if (normal.data.dotProduct(point.data) - normal.length < 0)
+//  {
+//    normalAtPoint.data.negate();
+//  }
 }

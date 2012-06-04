@@ -109,7 +109,6 @@ inline void Renderer::shootRay (Ray & ray,
     {
       if ( ( *object)->checkRay(ray, viewDistance, *tmpDistance) == true)
       {
-        viewDistance -= DEFAULT_INTERSECTION_ERROR_VALUE;
         currentObject = object;
       }
     }
@@ -125,6 +124,10 @@ inline void Renderer::shootRay (Ray & ray,
 
       //Get normal vector at intersection point
       ( *currentObject)->getNormal( *intersection, *normalAtIntersection);
+
+      //move intersection point by epsilon, needed for error correction
+      Vector correction(normalAtIntersection->data * FLOAT_EPSILON);
+      intersection->data += correction;
 
       //(1.0f / COLOR_COUNT) because few lines bellow we do color * color
       tmpLightCoef = (1.0f - ( *currentObject)->getMaterial()->getReflection())
@@ -145,7 +148,7 @@ inline void Renderer::shootRay (Ray & ray,
 
         pointLightDist->normalize();
 
-        if (pointLightDist->length < DEFAULT_INTERSECTION_ERROR_VALUE)
+        if (pointLightDist->length < FLOAT_EPSILON)
         {
           continue;
         }

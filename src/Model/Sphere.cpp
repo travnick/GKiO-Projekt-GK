@@ -35,7 +35,7 @@ namespace Model
     worldUnit D = squareRadius - dist.dotProduct() + a * a;
 
     //There is no intersection with sphere if D < 0
-    if (D - DEFAULT_INTERSECTION_ERROR_VALUE < 0)
+    if (D < 0.f)
     {
       return false;
     }
@@ -45,17 +45,17 @@ namespace Model
     if (dist.squareLength >= squareRadius)
     //We are outside sphere
     {
-      t = a - t;
+      a -= t;
     }
     else
     //We are inside sphere
     {
-      t += a;
+      a += t;
     }
 
-    if ( (t > 0.f) && (t < range))
+    if ( (a > 0.0f) && (a < range))
     {
-      range = t;
+      range = a;
       return true;
     }
 

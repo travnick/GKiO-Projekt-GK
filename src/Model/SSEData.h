@@ -47,9 +47,7 @@ namespace Model {
    */
   class SSEDataPrivate: public AlignedClass <16> {
       union {
-#if USE_SSE == 1
           __m128 data;
-#endif
           float dataArray [4];
       };
 

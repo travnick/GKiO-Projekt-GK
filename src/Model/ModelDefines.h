@@ -19,7 +19,7 @@ const float PI = 3.14159265;
 
 #define FLOAT_PRECISION 6
 
-const float DEFAULT_INTERSECTION_ERROR_VALUE = 0.1f;
+const float DEFAULT_INTERSECTION_ERROR_VALUE = 0.001f;
 // <-- Constants
 
 //Macros -->

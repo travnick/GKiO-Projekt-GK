@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene>
   <materials>
-    <mat id="0" reflection="0.55" transparency="0.0" ior="1.0" specularPower="100">
+    <mat id="0" reflection="0.5" transparency="0.5" ior="2.501" specularPower="100">
       <diffuseColor r="63" g="230" b="27" />
       <specularColor r="204" g="204" b="204" />
     </mat>
@@ -105,7 +105,7 @@
       <position x="-45" y="-1.5" z="50" />
       <multiply x="14" y="1" z="14" />
     </sphere>
-    <plane angleX="0" angleY="0" angleZ="0" d="0" material="6" />
+    <plane angleX="0" angleY="0" angleZ="0" d="-10" material="6" />
     
     <!-- CUBE-->
     <sphere r="1.0" material="2" offset="3">
@@ -146,8 +146,8 @@
     </sphere>
     
     <!-- the biggest one-->
-    <sphere r="16.0" material="0">
-      <position x="15" y="20" z="100" />
+    <sphere r="10.0" material="0">
+      <position x="15" y="30" z="100" />
     </sphere>
   </objects>
 </scene>

@@ -537,10 +537,10 @@ namespace Controller {
         scene->getCamera()->move(Model::Z, -speed);
         break;
       case Qt::Key_A:
-        scene->getCamera()->move(Model::X, speed);
+        scene->getCamera()->move(Model::X, -speed);
         break;
       case Qt::Key_D:
-        scene->getCamera()->move(Model::X, -speed);
+        scene->getCamera()->move(Model::X, speed);
         break;
       case Qt::Key_Q:
         scene->getCamera()->move(Model::Y, speed);

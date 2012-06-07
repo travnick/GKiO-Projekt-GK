@@ -7,25 +7,29 @@
 #include "Controller/GlobalDefines.h"
 #include "Model/ModelDefines.h"
 
-namespace Controller {
+namespace Controller
+{
   //Forward declarations -->
   struct RenderParams;
 // <-- Forward declarations
 }
 
-namespace Model {
+namespace Model
+{
   //Forward declarations -->
   class Ray;
   class Color;
   struct RenderTileData;
   class Vector;
   class Point;
+  class VisibleObject;
   // <-- Forward declarations
 
   /**Renderer class
    *
    */
-  class Renderer {
+  class Renderer
+  {
     public:
 
       /**Initializes temporary fields
@@ -48,7 +52,8 @@ namespace Model {
        *
        * @param scene 3d scene to render
        */
-      inline void setRenderParams (const Controller::RenderParams * newRenderParams){
+      inline void setRenderParams (const Controller::RenderParams * newRenderParams)
+      {
         renderParams = newRenderParams;
       }
 
@@ -58,8 +63,6 @@ namespace Model {
       QScopedPointer <Vector> pointLightDist;
       QScopedPointer <Vector> distanceToIntersection;
       QScopedPointer <Ray> lightRay;
-      QScopedPointer <Vector> normalAtIntersection;
-      QScopedPointer <Point> intersection;
       // <-- Internal temporary
 
       const Controller::RenderParams * renderParams;
@@ -71,10 +74,18 @@ namespace Model {
        * @param ray ray to check intersection with
        * @param resultColor color at the intersection point
        * @param viewDistance maximum range to check intersections
+       * @param refractionDepth maximum depth of refraction
        */
       void shootRay (Ray & ray,
                      Color &resultColor,
-                     worldUnit viewDistance) const;
+                     worldUnit viewDistance,
+                     int refractionDepth) const;
+
+      /**
+       *
+       */
+      int calculateRefraction (Ray &ray,
+                                VisibleObject &currentObject, Vector *normalAtIntersection) const;
 
       Q_DISABLE_COPY (Renderer)
   };

@@ -191,11 +191,29 @@ inline void Renderer::shootRay (Ray & ray,
             lightPower = 1.0;
           }
 
+         if (lightPowerSpecular < 1.0)
+             {
+              lightPowerSpecular = 1.0;
+              }
+
+
+         //Calculate reflection vector
+         normalAtIntersection->data *= ray.getDir().dotProduct(
+              normalAtIntersection->data) * 2;
+         ray.getDir().data -= normalAtIntersection->data;
+         ray.getDir().normalize();
+         lightRay->getDir().normalize();
+
+        // odpsucie normalnej
+         ( *currentObject)->getNormal( *intersection, *normalAtIntersection);
+
           float specular = pow(
-              pointLightDist->data.dotProduct(normalAtIntersection->data),
+        		  ray.getDir().dotProduct(lightRay->getDir()),
               ( *currentObject)->getMaterial()->getSpecularPower());
 
+
           lightPower = ( *light)->power / lightPower;
+          lightPowerSpecular = ( *light)->power / lightPowerSpecular;
           //<--light attenuation
 
           lightPower *= lambert * tmpLightCoef;

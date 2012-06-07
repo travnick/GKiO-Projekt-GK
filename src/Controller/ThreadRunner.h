@@ -2,25 +2,27 @@
 
 #pragma once
 
-#include <QSharedPointer>
 #include <QScopedPointer>
+#include <QSharedPointer>
 
-#include <QRunnable>
-#include <QObject>
 #include <QList>
+#include <QObject>
+#include <QRunnable>
 #include <QVector>
 
 //Forward declarations -->
 class QMutex;
 class QThreadPool;
 
-namespace Model {
+namespace Model
+{
   struct RenderTileData;
   class Scene;
 }  // namespace Model
 // <-- Forward declarations
 
-namespace Controller {
+namespace Controller
+{
   //Forward declarations -->
   class MainWindow;
   class RendererThread;
@@ -30,7 +32,8 @@ namespace Controller {
   /**Creates threads for image rendering
    *
    */
-  class ThreadRunner: public QObject, public QRunnable {
+  class ThreadRunner: public QObject, public QRunnable
+  {
     Q_OBJECT
 
     public:

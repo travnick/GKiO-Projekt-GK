@@ -2,15 +2,17 @@
 
 #pragma once
 
-#include "Model/Point.h"
 #include "Controller/GlobalDefines.h"
+#include "Model/Point.h"
 
-namespace Model {
+namespace Model
+{
 
   /**3D Vector class
    *
    */
-  class Vector: public Point {
+  class Vector: public Point
+  {
     public:
       worldUnit length;
 
@@ -20,11 +22,13 @@ namespace Model {
       worldUnit squareLength;
 
       Vector ()
-          : length(0), squareLength(0){
+          : length(0), squareLength(0)
+      {
       }
 
-      Vector (const SSEData &newData)
-          : Point(newData), length(0), squareLength(0){
+      Vector (const SSEVector &newData)
+          : Point(newData), length(0), squareLength(0)
+      {
       }
 
       /**Constructs object with given parameters
@@ -34,14 +38,16 @@ namespace Model {
        * @param z position on z axis in 3D space
        */
       inline Vector (const dataType &x, const dataType &y, const dataType &z)
-          : Point(x, y, z), length(0), squareLength(0){
+          : Point(x, y, z), length(0), squareLength(0)
+      {
       }
 
       /**Normalizes vector
        * Length before normalization is stored to length
        *
        */
-      inline void normalize (){
+      inline void normalize ()
+      {
         calculateLength();
 
         worldUnit constant = 1.0f / length;
@@ -53,7 +59,8 @@ namespace Model {
        * Length before normalization is stored to length
        *
        */
-      inline Vector toNormal () const{
+      inline Vector toNormal () const
+      {
         Vector other( *this);
         other.normalize();
         return other;
@@ -62,7 +69,8 @@ namespace Model {
       /**Calculate length of vector
        *
        */
-      inline void calculateLength (){
+      inline void calculateLength ()
+      {
         length = SQRT(dotProduct());
       }
 
@@ -74,7 +82,8 @@ namespace Model {
        *
        * @return dotProduct
        */
-      inline worldUnit dotProduct (){
+      inline worldUnit dotProduct ()
+      {
         return squareLength = data.dotProduct();
       }
 
@@ -84,7 +93,8 @@ namespace Model {
        * @param vector2 other vector or point
        * @return dotProduct
        */
-      inline worldUnit dotProduct (const SSEData &vector2) const{
+      inline worldUnit dotProduct (const SSEVector &vector2) const
+      {
         return data.dotProduct(vector2);
       }
 
@@ -94,7 +104,8 @@ namespace Model {
        * @param y length on y axis in 3D space
        * @param z length on z axis in 3D space
        */
-      inline void set (const dataType &x, const dataType &y, const dataType &z){
+      inline void set (const dataType &x, const dataType &y, const dataType &z)
+      {
         Point::set(x, y, z);
 
         //previous data are invalid
@@ -102,11 +113,13 @@ namespace Model {
         squareLength = -1;
       }
 
-      inline Vector operator * (const Vector &other) const{
+      inline Vector operator * (const Vector &other) const
+      {
         return data.crossProduct(other.data);
       }
 
-      inline Vector &operator *= (const Vector &other){
+      inline Vector &operator *= (const Vector &other)
+      {
         data = data.crossProduct(other.data);
         return *this;
       }

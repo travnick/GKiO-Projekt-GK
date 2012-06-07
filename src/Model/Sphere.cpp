@@ -2,27 +2,32 @@
 
 #include <cmath>
 
-#include "Model/Sphere.h"
 #include "Model/Ray.h"
+#include "Model/Sphere.h"
 
-namespace Model {
+namespace Model
+{
 
-  Sphere::Sphere (worldUnit radius){
+  Sphere::Sphere (worldUnit radius)
+  {
     size = radius;
     squareRadius = radius * radius;
   }
 
-  Sphere::Sphere (const Sphere &other){
+  Sphere::Sphere (const Sphere &other)
+  {
     squareRadius = other.squareRadius;
     VisibleObject::operator=(other);
   }
 
-  void Sphere::getNormal (const Point& point, Vector &normalAtPoint) const{
+  void Sphere::getNormal (const Point& point, Vector &normalAtPoint) const
+  {
     point.data.diff(getPosition().data, normalAtPoint.data);
     normalAtPoint.normalize();
   }
 
-  bool Sphere::checkRay (const Ray& ray, worldUnit& range, Vector& dist) const{
+  bool Sphere::checkRay (const Ray& ray, worldUnit& range, Vector& dist) const
+  {
     position.data.diff(ray.getStart().data, dist.data);
 
     worldUnit a = ray.getDir().dotProduct(dist.data);
@@ -30,7 +35,7 @@ namespace Model {
     worldUnit D = squareRadius - dist.dotProduct() + a * a;
 
     //There is no intersection with sphere if D < 0
-    if (D - DEFAULT_INTERSECTION_ERROR_VALUE < 0)
+    if (D < 0.f)
     {
       return false;
     }
@@ -40,17 +45,17 @@ namespace Model {
     if (dist.squareLength >= squareRadius)
     //We are outside sphere
     {
-      t = a - t;
+      a -= t;
     }
     else
     //We are inside sphere
     {
-      t += a;
+      a += t;
     }
 
-    if ((t > 0.f) && (t < range))
+    if ( (a > 0.0f) && (a < range))
     {
-      range = t;
+      range = a;
       return true;
     }
 

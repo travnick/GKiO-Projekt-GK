@@ -5,12 +5,14 @@
 #include "Model/ModelDefines.h"
 #include "Model/Object.h"
 
-namespace Model {
+namespace Model
+{
 
-  typedef std::map <QString, Objects::ObjectType> objectTypesMap;
   typedef std::map <Objects::ObjectType, QString> objectTypeNamesMap;
+  typedef std::map <QString, Objects::ObjectType> objectTypesMap;
 
-  Objects::ObjectType Object::getObjectType (const QString & typeName){
+  Objects::ObjectType Object::getObjectType (const QString & typeName)
+  {
     static objectTypesMap objectTypes;
     objectTypesMap::iterator iterator;
     Objects::ObjectType objectType = Objects::None;
@@ -19,8 +21,8 @@ namespace Model {
     {
       objectTypes [Objects::CAMERA_NAME] = Objects::Camera;
       objectTypes [Objects::LIGHT_NAME] = Objects::Light;
-      objectTypes [Objects::SPHERE_NAME] = Objects::Sphere;
       objectTypes [Objects::PLANE_NAME] = Objects::Plane;
+      objectTypes [Objects::SPHERE_NAME] = Objects::Sphere;
     }
 
     iterator = objectTypes.find(typeName);
@@ -33,7 +35,8 @@ namespace Model {
     return objectType;
   }
 
-  const QString & Object::getObjectTypeName (const Objects::ObjectType objectType){
+  const QString & Object::getObjectTypeName (const Objects::ObjectType objectType)
+  {
     static objectTypeNamesMap objectTypeNames;
     objectTypeNamesMap::iterator iterator;
     static QString objectTypeName;

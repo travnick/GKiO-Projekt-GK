@@ -2,15 +2,17 @@
 
 #pragma once
 
-#include <QString>
 #include <cmath>
+#include <QSharedPointer>
+#include <QString>
 
 /**
  *
  * @param string
  * @return
  */
-inline QString toLowerCase (const char* string){
+inline QString toLowerCase (const char* string)
+{
   return QString::fromStdString(string).toLower();
 }
 
@@ -19,7 +21,7 @@ const float PI = 3.14159265;
 
 #define FLOAT_PRECISION 6
 
-const float DEFAULT_INTERSECTION_ERROR_VALUE = 0.001f;
+const float FLOAT_EPSILON = 0.01f;
 // <-- Constants
 
 //Macros -->
@@ -47,13 +49,15 @@ const float DEFAULT_INTERSECTION_ERROR_VALUE = 0.001f;
 
 //Templates -->
 template <typename T>
-T SQRT (T value){
+T SQRT (T value)
+{
   return sqrt(value);
 }
 
 //inline is important because of "multiple definition of" error
 template <>
-inline float SQRT (float value){
+inline float SQRT (float value)
+{
   return sqrtf(value);
 }
 // <--Templates
@@ -64,30 +68,34 @@ QString toLowerCase (const char* string);
 
 // <-- Functions
 
-namespace Model {
+namespace Model
+{
   //Defines world unit for all project
   typedef float worldUnit;
 
-  namespace Objects {
+  namespace Objects
+  {
     /**Available object types
      *
      */
-    enum ObjectType {
+    enum ObjectType
+    {
       None, Camera, Light, Sphere, Plane
     };
 
     /**String representation of object types
      *
      */
-    const QString OBJECTS_NAME = LCSTRING(Objects);
     const QString CAMERA_NAME = LCSTRING(Camera);
     const QString LIGHT_NAME = LCSTRING(Light);
-    const QString SPHERE_NAME = LCSTRING(Sphere);
+    const QString OBJECTS_NAME = LCSTRING(Objects);
     const QString PLANE_NAME = LCSTRING(Plane);
+    const QString SPHERE_NAME = LCSTRING(Sphere);
 
   }
 
-  namespace Cameras {
+  namespace Cameras
+  {
     /**String representation of camera types
      *
      */
@@ -95,14 +103,16 @@ namespace Model {
     const QString CONIC = LCSTRING(CONIC);
   }
 
-  namespace Materials {
+  namespace Materials
+  {
     /**String representation of materials section name in scene file
      *
      */
     const QString MATERIALS_NAME = LCSTRING(Materials);
   }
 
-  namespace Lights {
+  namespace Lights
+  {
     /**String representation of light section name in scene file
      *
      */
@@ -117,14 +127,32 @@ namespace Model {
    * @return rounded value
    */
   template <typename T>
-  inline T uRound (float value){
+  inline T uRound (float value)
+  {
     return static_cast <T>(value + 0.5f);
   }
 
   /**Movement directions
    *
    */
-  enum Direction {
+  enum Direction
+  {
     Forward, Backward, Left, Right, Up, Down
   };
-}
+
+  //Forward declarations -->
+  class Camera;
+  class Light;
+  class Material;
+  class Renderer;
+  class RenderTileData;
+  class Scene;
+  class VisibleObject;
+  // <-- Forward declarations
+
+  typedef QSharedPointer <Camera> CameraPtr;
+  typedef QSharedPointer <Light> LightPtr;
+  typedef QSharedPointer <Material> MaterialPtr;
+  typedef QSharedPointer <Scene> ScenePtr;
+  typedef QSharedPointer <VisibleObject> ObjectPtr;
+} //namespace Model

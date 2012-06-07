@@ -8,27 +8,34 @@
 
 #define DEFAULT_COLOR_VALUE 0
 
-namespace Model {
+namespace Model
+{
 
   /**Color class
    *
    */
-  class Color {
+  class Color
+  {
     public:
-      enum ColorEnum {
+      enum ColorEnum
+      {
         R = X, G = Y, B = Z
       };
+
       typedef float dataType;
 
-      inline Color (){
+      inline Color ()
+      {
       }
 
       inline Color (dataType r, dataType g, dataType b)
-          : data(r, g, b){
+          : data(r, g, b)
+      {
       }
 
-      inline Color (const SSEData &newData)
-          : data(newData){
+      inline Color (const BaseSSEData &newData)
+          : data(newData)
+      {
       }
 
       /**Sets color
@@ -38,7 +45,8 @@ namespace Model {
        * @param g green
        * @param b blue
        */
-      inline void setColor (dataType r, dataType g, dataType b){
+      inline void setColor (dataType r, dataType g, dataType b)
+      {
         data [R] = r;
         data [G] = g;
         data [B] = b;
@@ -52,7 +60,8 @@ namespace Model {
        *  b = 0
        *
        */
-      inline void setDefaultColor (){
+      inline void setDefaultColor ()
+      {
         setColor(DEFAULT_COLOR_VALUE, DEFAULT_COLOR_VALUE, DEFAULT_COLOR_VALUE);
       }
 
@@ -61,8 +70,9 @@ namespace Model {
        * @param mulValue
        * @return
        */
-      inline Color operator * (float mulValue) const{
-        return SSEData(data * mulValue);
+      inline Color operator * (float mulValue) const
+      {
+        return data * mulValue;
       }
 
       /**
@@ -70,7 +80,8 @@ namespace Model {
        * @param mulValue
        * @return
        */
-      inline Color &operator *= (float mulValue){
+      inline Color &operator *= (float mulValue)
+      {
         data *= mulValue;
         return *this;
       }
@@ -80,8 +91,9 @@ namespace Model {
        * @param other
        * @return
        */
-      inline Color operator * (const Color& other) const{
-        return SSEData(data * other.data);
+      inline Color operator * (const Color& other) const
+      {
+        return data * other.data;
       }
 
       /**
@@ -89,7 +101,8 @@ namespace Model {
        * @param other
        * @return
        */
-      inline Color &operator *= (const Color& other){
+      inline Color &operator *= (const Color& other)
+      {
         data *= other.data;
         return *this;
       }
@@ -99,32 +112,37 @@ namespace Model {
        * @param other
        * @return
        */
-      inline Color &operator += (const Color& other){
+      inline Color &operator += (const Color& other)
+      {
         data += other.data;
         return *this;
       }
 
-      inline colorType red () const{
+      inline colorType red () const
+      {
         return retCol(data [R]);
       }
 
-      inline colorType green () const{
+      inline colorType green () const
+      {
         return retCol(data [G]);
       }
 
-      inline colorType blue () const{
+      inline colorType blue () const
+      {
         return retCol(data [B]);
       }
 
     private:
-      SSEData data;
+      SSEVector data;
 
       /**Returns color value saturated to COLOR_MAX_VALUE
        *
        * @param color float representation of color
        * @return color value
        */
-      inline colorType retCol (float color) const{
+      inline colorType retCol (float color) const
+      {
         saturate(color);
 
         return uRound <colorType>(color);
@@ -134,7 +152,8 @@ namespace Model {
        *
        * @param color RGB data
        */
-      inline void saturate (SSEData &color) const{
+      inline void saturate (SSEVector &color) const
+      {
         saturate(color [R]);
         saturate(color [G]);
         saturate(color [B]);
@@ -144,7 +163,8 @@ namespace Model {
        *
        * @param color float representation of color
        */
-      inline void saturate (float &color) const{
+      inline void saturate (float &color) const
+      {
         if (color > COLOR_MAX_VALUE)
         {
           color = COLOR_MAX_VALUE;

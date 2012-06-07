@@ -2,19 +2,20 @@
 
 #pragma once
 
-#include <string>
-
 #include "Model/ModelDefines.h"
 #include "Model/Point.h"
 
-namespace Model {
+namespace Model
+{
 
   /**Common object class
    *
    */
-  class Object {
+  class Object
+  {
     public:
-      Object (){
+      Object ()
+      {
       }
 
       /**Sets position of object in 3D space
@@ -26,7 +27,8 @@ namespace Model {
        */
       inline void setPosition (Point::dataType x,
                                Point::dataType y,
-                               Point::dataType z){
+                               Point::dataType z)
+      {
         position.set(x, y, z);
       }
 
@@ -34,7 +36,8 @@ namespace Model {
        *
        * @param position other point in 3D space
        */
-      inline void setPosition (const Point &newPosition){
+      inline void setPosition (const Point &newPosition)
+      {
         position = newPosition;
       }
 
@@ -42,7 +45,8 @@ namespace Model {
        *
        * @return object position
        */
-      inline const Point & getPosition () const{
+      inline const Point & getPosition () const
+      {
         return position;
       }
 

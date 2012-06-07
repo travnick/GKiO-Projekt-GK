@@ -4,19 +4,24 @@
 #include "Model/Renderer.h"
 #include "Model/RenderTileData.h"
 
-namespace Controller {
+namespace Controller
+{
 
   RendererThread::RendererThread (const QSharedPointer <RenderParams> &newRenderParams)
-      : renderer(new Model::Renderer( *newRenderParams)){
+      : renderer(new Model::Renderer( *newRenderParams))
+  {
   }
 
-  RendererThread::~RendererThread (){
+  RendererThread::~RendererThread ()
+  {
   }
 
-  void RendererThread::setRenderParams (const RenderParams &){
+  void RendererThread::setRenderParams (const RenderParams &)
+  {
   }
 
-  void RendererThread::run (){
+  void RendererThread::run ()
+  {
     renderer->render( *tile);
   }
 

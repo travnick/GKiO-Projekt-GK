@@ -17,12 +17,12 @@ namespace Controller
 namespace Model
 {
   //Forward declarations -->
-  class Ray;
   class Color;
-  struct RenderTileData;
-  class Vector;
   class Point;
   class VisibleObject;
+  class Ray;
+  class Vector;
+  struct RenderTileData;
   // <-- Forward declarations
 
   /**Renderer class
@@ -59,10 +59,10 @@ namespace Model
 
     private:
       //Internal temporary -->
-      QScopedPointer <Vector> tmpDistance;
-      QScopedPointer <Vector> pointLightDist;
-      QScopedPointer <Vector> distanceToIntersection;
+      QScopedPointer <Point> intersection;
       QScopedPointer <Ray> lightRay;
+      QScopedPointer <Vector> distanceToIntersection;
+      QScopedPointer <Vector> tmpDistance;
       // <-- Internal temporary
 
       const Controller::RenderParams * renderParams;

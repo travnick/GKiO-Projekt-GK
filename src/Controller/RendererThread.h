@@ -2,23 +2,20 @@
 
 #pragma once
 
-#include <QSharedPointer>
 #include <QScopedPointer>
-#include <QRunnable>
+#include <QSharedPointer>
+
 #include <QObject>
+#include <QRunnable>
 
-//Forward declarations -->
-namespace Model {
-  class Renderer;
-  class RenderTileData;
-  class Scene;
-}
-// <-- Forward declarations
+#include "Model/ModelDefines.h"
 
-namespace Controller {
+namespace Controller
+{
 
-  struct RenderParams {
-      QSharedPointer <Model::Scene> scene;
+  struct RenderParams
+  {
+      Model::ScenePtr scene;
       bool allowRunning;
       bool randomRender;
       bool shadows;
@@ -31,7 +28,8 @@ namespace Controller {
    * It renders part of image which is described in tile parameter
    *
    */
-  class RendererThread: public QObject, public QRunnable {
+  class RendererThread: public QObject, public QRunnable
+  {
     Q_OBJECT
 
     public:
@@ -56,7 +54,8 @@ namespace Controller {
        *
        * @param newTile description of image part to render
        */
-      void setTile (const QSharedPointer <Model::RenderTileData> &newTile){
+      void setTile (const QSharedPointer <Model::RenderTileData> &newTile)
+      {
         tile = newTile;
       }
 

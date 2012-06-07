@@ -6,18 +6,18 @@
 
 #ifdef __x86_64__
 
-#if USE_SSE == 1
-#define USE_POINTERS 0
-#endif
+# if USE_SSE == 1
+#   define USE_POINTERS 0
+# endif
 
 #else
 
 //There is no gain with using SSE and wasting time for mallocs.
-#undef USE_SSE
+# undef USE_SSE
 
-#if USE_SSE == 1
-#define USE_POINTERS 1
-#endif
+# if USE_SSE == 1
+#   define USE_POINTERS 1
+# endif
 
 #endif
 
@@ -26,38 +26,118 @@
 #include "Model/AlignedClass.h"
 #include "Model/ModelDefines.h"
 
-// Calculate dot product from xmm[3/2/1] and store sesult to xmm[0]
+// Calculate dot product from xmm[3/2/1] and store result to xmm[0]
 #define  DOT_PROD_MASK  0b11100001
 
-namespace Model {
+namespace Model
+{
 
-#if USE_SSE == 1
-  typedef __m128 SSEDataBaseType;
-#else
-  class SSEDataPrivate;
-  typedef SSEDataPrivate SSEDataBaseType;
-#endif
+  union SSEData;
+  typedef SSEData BaseSSEData;
 
-  enum Axis {
+  class SSEVector;
+
+  enum Axis
+  {
     X = 3, Y = 2, Z = 1, W = 0
   };
 
-  /**Internal private struct that provides aligned data for SSE
+  /**Multiplies two vectors
    *
+   * @param first T
+   * @param other T
+   * @return BaseSSEData
    */
-  class SSEDataPrivate: public AlignedClass <16> {
-      union {
-          __m128 data;
-          float dataArray [4];
-      };
+  template <typename T>
+  inline BaseSSEData operator * (const T &first, const T &other);
 
-    public:
+  /**Multiplies vector by a constant
+   *
+   * @param first T
+   * @param constant worldUnit
+   * @return BaseSSEData
+   */
+  template <typename T>
+  inline BaseSSEData operator * (const T &first, worldUnit constant);
 
-      inline SSEDataPrivate (){
+  /**Multiplies vector by a constant
+   *
+   * @param constant worldUnit
+   * @param other T
+   * @return BaseSSEData
+   */
+  template <typename T>
+  inline BaseSSEData operator * (worldUnit constant, const T &other);
+
+  /**Multiplies two vectors
+   *
+   * @param first BaseSSEData
+   * @param other SSEVector
+   * @return BaseSSEData
+   */
+  inline BaseSSEData operator * (const BaseSSEData &first,
+                                 const SSEVector &other);
+
+  /**Multiplies two vectors
+   *
+   * @param first SSEVector
+   * @param other BaseSSEData
+   * @return BaseSSEData
+   */
+  inline BaseSSEData operator * (const SSEVector &first,
+                                 const BaseSSEData &other);
+
+  /**Adds two vectors
+   *
+   * @param first T
+   * @param other T
+   * @return BaseSSEData
+   */
+  template <typename T>
+  inline BaseSSEData operator + (const T &first, const T &other);
+
+  /**Subtracts two vectors
+   *
+   * @param first T
+   * @param other T
+   * @return BaseSSEData
+   */
+  template <typename T>
+  inline BaseSSEData operator - (const T &first, const T &other);
+
+  //---------------------------------------------------------------------------------
+
+  /**union that provides aligned data for SSE with easy access to them
+   *
+   * __m128 and float [4] are nearly the same but compiler require __m128
+   * to SSE operations so there is hack to do easy access to manipulate
+   * this data without shuffles, moves etc.
+   */
+  union SSEData
+  {
+      __m128 data;
+      float dataArray [4];
+
+      //------------------
+
+      inline SSEData ()
+      {
         setDefaults();
       }
 
-      inline SSEDataPrivate (float x, float y, float z){
+      inline SSEData (const SSEData &other)
+      {
+#if USE_SSE == 1
+        data = other.data;
+#else
+        ( *this) [X] = other [X];
+        ( *this) [Y] = other [Y];
+        ( *this) [Z] = other [Z];
+#endif
+      }
+
+      inline SSEData (float x, float y, float z)
+      {
         setDefaults();
 
         ( *this) [X] = x;
@@ -65,38 +145,17 @@ namespace Model {
         ( *this) [Z] = z;
       }
 
-      inline void setDefaults (){
 #if USE_SSE == 1
-        // It's important, without determining W value there is random performance loss
-        ( *this) [W] = 0;
-#endif
-      }
-
-      inline SSEDataPrivate (const __m128 &other){
-        *this = other;
-      }
-
-      inline SSEDataPrivate (const SSEDataPrivate &other){
-        *this = other;
-      }
-
-#if USE_SSE == 1
-      inline & operator __m128 (){
-        return sse();
-      }
-
-      inline __m128 & sse (){
-        return data;
-      }
-
-      inline const __m128 & sse () const{
-        return data;
-      }
-#endif
-
-      inline SSEDataPrivate & operator = (const SSEDataBaseType &other){
-#if USE_SSE == 1
+      inline SSEData (const __m128 &other)
+      {
         data = other;
+      }
+#endif
+
+      inline SSEData & operator = (const SSEData &other)
+      {
+#if USE_SSE == 1
+        data = other.data;
 #else
         ( *this) [X] = other [X];
         ( *this) [Y] = other [Y];
@@ -105,99 +164,130 @@ namespace Model {
         return ( *this);
       }
 
-      inline float & operator[] (int idx){
+      inline void setDefaults ()
+      {
+#if USE_SSE == 1
+        // It's important, without determining W value there is performance loss
+        // because of operating on NaNs etc.
+        ( *this) [W] = 0;
+#endif
+      }
+
+      inline float & operator[] (int idx)
+      {
         return dataArray [idx];
       }
 
-      inline float operator[] (int idx) const{
+      inline float operator[] (int idx) const
+      {
         return dataArray [idx];
       }
 
       //Some hacks to act like pointer. It's needed in version with pointers
-      inline const SSEDataPrivate *operator -> () const{
-        return this;
-      }
-      inline SSEDataPrivate *operator -> (){
+      inline const SSEData *operator -> () const
+      {
         return this;
       }
 
-      inline SSEDataPrivate &operator * (){
+      inline SSEData *operator -> ()
+      {
+        return this;
+      }
+
+      inline SSEData &operator * ()
+      {
         return *this;
       }
 
-      inline const SSEDataPrivate &operator * () const{
+      inline const SSEData &operator * () const
+      {
         return *this;
+      }
+
+      inline & operator __m128 ()
+      {
+        return data;
       }
   };
 
-  /**Class that provides easy access to SSE __m128 data structure
+  //---------------------------------------------------------------------------------
+
+  /**Class that provides operations on SSE Data
    *
    */
-  class SSEData {
-
+  class SSEVector
+  {
 #if USE_POINTERS == 1
-      SSEDataPrivate *internalData;
+      SSEData *internalData;
 #else
-      SSEDataPrivate internalData;
+      SSEData internalData;
 #endif
 
     public:
 
 #if USE_POINTERS == 1
-      SSEData ()
-      : internalData(new SSEDataPrivate)
+      SSEVector ()
+      : internalData(new SSEData)
       {
       }
 
-      SSEData (const SSEData &other)
-      : internalData(new SSEDataPrivate( *other.internalData))
+      SSEVector (const SSEVector &other)
+      : internalData(new SSEData(other.getInternalData()))
       {
       }
 
-      SSEData (const SSEDataBaseType &newData)
-      : internalData(new SSEDataPrivate(newData))
-      {
-      }
-      inline SSEData (float newX, float newY, float newZ)
-      : internalData(new SSEDataPrivate(newX, newY, newZ))
+      SSEVector (const BaseSSEData &other)
+      : internalData(new SSEData(other))
       {
       }
 
-      ~SSEData ()
+      inline SSEVector (float newX, float newY, float newZ)
+      : internalData(new SSEData(newX, newY, newZ))
+      {
+      }
+
+      ~SSEVector ()
       {
         delete internalData;
       }
 
+      inline SSEVector & operator = (const SSEVector &other)
+      {
+        *internalData = other.getInternalData();
+        return ( *this);
+      }
+
 #else
 
-      inline SSEData (){
+      inline SSEVector ()
+      {
       }
 
-      inline SSEData (const SSEDataBaseType &newData)
-          : internalData(newData){
+      inline SSEVector (const BaseSSEData &newData)
+          : internalData(newData)
+      {
       }
 
-      inline SSEData (float newX, float newY, float newZ)
-          : internalData(newX, newY, newZ){
+      inline SSEVector (float newX, float newY, float newZ)
+          : internalData(newX, newY, newZ)
+      {
       }
 
 #endif
 
-      inline SSEData & operator = (const SSEData &other){
-        *internalData = *other.internalData;
+      inline SSEVector & operator = (const BaseSSEData &other)
+      {
+        *internalData = other;
         return ( *this);
       }
 
-      inline SSEData & operator = (const SSEDataBaseType &sseData){
-        *internalData = sseData;
-        return ( *this);
-      }
-
-      inline float & operator[] (int idx){
+      inline float & operator[] (int idx)
+      {
         return ( *internalData) [idx];
       }
 
-      inline float operator[] (int idx) const{
+      inline float operator[] (int idx) const
+      {
         return ( *internalData) [idx];
       }
 
@@ -206,209 +296,152 @@ namespace Model {
       /**Moves point by a vector and save new point in result
        * You should give here Point::data
        *
-       * @param vector __m128
-       * @param result __m128
+       * @param vector SSEVector
+       * @param result SSEVector
        */
-      inline void move (const SSEData &vector, SSEData &result) const{
-        result = ( *this) + vector;
+      inline void move (const SSEVector &vector, SSEVector &result) const
+      {
+        result = *this + vector;
       }
 
       /**Moves point by a reversed vector and save new point in result
        * You should give here Point::data
        *
-       * @param vector __m128
-       * @param result __m128
+       * @param vector SSEVector
+       * @param result SSEVector
        */
-      inline void negMove (const SSEData &vector, SSEData &result) const{
-        result = ( *this) - vector;
+      inline void negMove (const SSEVector &vector, SSEVector &result) const
+      {
+        result = *this - vector;
       }
 
       /**Calculates distance between two points
        * You should give here Point::data
        *
-       * @param point2 __m128
-       * @param result __m128
+       * @param point2 SSEVector
+       * @param result SSEVector
        */
-      inline void diff (const SSEData &point2, SSEData &result) const{
-        result = ( *this) - point2;
+      inline void diff (const SSEVector &point2, SSEVector &result) const
+      {
+        result = *this - point2;
       }
 
-      /**Adds two vectors
+      /**Adds vector2 to self and store it in result
        * You should give here Point::data
        *
-       * @param vector1 __m128
-       * @param vector2 __m128
-       * @param result __m128
+       * @param vector2 SSEVector
+       * @param result SSEVector
        */
-      inline void addVectors (const SSEData &vector2, SSEData &result) const{
-        result = ( *this) + vector2;
+      inline void addVectors (const SSEVector &vector2, SSEVector &result) const
+      {
+        result = *this + vector2;
       }
 
-      /**Subtracts two vectors
+      /**Subtracts vector2 from self and store it in result
        * You should give here Point::data
        *
-       * @param vector1 __m128
-       * @param vector2 __m128
-       * @param result __m128
+       * @param vector2 SSEVector
+       * @param result SSEVector
        */
-      inline void subVectors (const SSEData &vector2, SSEData &result) const{
-        result = ( *this) - vector2;
+      inline void subVectors (const SSEVector &vector2, SSEVector &result) const
+      {
+        result = *this - vector2;
       }
 
-      /**Multiplies vector by a constant
+      /**Multiplies self by a constant
        *
        * @param constant worldUnit
-       * @param result __m128
+       * @param result SSEVector
        */
-      inline void multiply (const worldUnit &constant, SSEData &result) const{
-        result = ( *this) * constant;
+      inline void multiply (const worldUnit &constant, SSEVector &result) const
+      {
+        result = *this * constant;
       }
 
-      /**adds vector by a constant
+      /**Adds vector to self
        * You should give here Point::data
        *
-       * @param other SSEData
-       * @param result SSEData
+       * @param other SSEVector
+       * @return this SSEVector
        */
-      inline SSEDataBaseType operator + (const SSEData &other) const{
-#if USE_SSE == 1
-        return _mm_add_ps(const_cast <SSEData&>( *this),
-                          const_cast <SSEData&>(other));
-#else
-        return SSEDataBaseType(( *this) [X] + other [X], ( *this) [Y] + other [Y],
-            ( *this) [Z] + other [Z]);
-#endif
-      }
-
-      /**adds vector by a constant
-       * You should give here Point::data
-       *
-       * @param other SSEData
-       * @param result SSEData
-       */
-      inline SSEData &operator += (const SSEData &other){
+      inline SSEVector &operator += (const SSEVector &other)
+      {
         *internalData = *this + other;
         return *this;
       }
 
-      /**Subtracts other data from this
+      /**Subtracts other vector from this
        * You should give here Point::data
        *
-       * @param other SSEData
-       * @param result SSEData
+       * @param other SSEVector
+       * @return this SSEVector
        */
-      inline SSEDataBaseType operator - (const SSEData &other) const{
-#if USE_SSE == 1
-        return _mm_sub_ps(const_cast <SSEData&>( *this),
-                          const_cast <SSEData&>(other));
-#else
-        return SSEDataBaseType(( *this) [X] - other [X], ( *this) [Y] - other [Y],
-            ( *this) [Z] - other [Z]);
-#endif
-      }
-
-      /**Subtracts other data from this and store to this
-       * You should give here Point::data
-       *
-       * @param other SSEData
-       * @param result SSEData
-       */
-      inline SSEData &operator -= (const SSEData &other){
+      inline SSEVector &operator -= (const SSEVector &other)
+      {
         *internalData = ( *this) - other;
         return *this;
       }
 
-      /**Multiplies vector by a constant
-       * You should give here Point::data
+      /**Multiplies self by a constant
        *
        * @param constant worldUnit
-       * @param result __m128
+       * @param result this SSEVector
        */
-      inline SSEDataBaseType operator * (worldUnit constant) const{
-        SSEData tmpData;
-        tmpData [X] = constant;
-        tmpData [Y] = constant;
-        tmpData [Z] = constant;
-        return *this * tmpData;
-      }
-
-      /**Multiplies vector by a constant
-       * You should give here Point::data
-       *
-       * @param constant worldUnit
-       * @param result __m128
-       */
-      inline SSEDataBaseType operator * (const SSEData &other) const{
-#if USE_SSE == 1
-        return _mm_mul_ps(const_cast <SSEData&>( *this),
-                          const_cast <SSEData&>(other));
-#else
-        return SSEDataBaseType(( *this) [X] * other [X], ( *this) [Y] * other [Y],
-            ( *this) [Z] * other [Z]);
-#endif
-      }
-
-      /**Multiplies vector by a constant
-       * You should give here Point::data
-       *
-       * @param constant worldUnit
-       * @param result __m128
-       */
-      inline SSEData &operator *= (worldUnit constant){
-        *internalData = ( *this) * constant;
+      inline SSEVector &operator *= (worldUnit constant)
+      {
+        *internalData = *this * constant;
         return *this;
       }
 
-      /**Multiplies vector by a constant
+      /**Multiplies self by other vector
        * You should give here Point::data
        *
-       * @param constant worldUnit
-       * @param result __m128
+       * @param other SSEVector
+       * @return this SSEVector
        */
-      inline SSEData &operator *= (const SSEData &other){
-        *internalData = *this * other;
+      inline SSEVector &operator *= (const SSEVector &other)
+      {
+        *internalData = *this * (other);
         return *this;
       }
 
-      /**Calculates dot product of two vectors
+      /**Calculates dot product with other vector
        * You should give here Point::date
        *
-       * It uses SSE4.1 if avaliable or SSE3 instead.
-       * No SSE2 support now.
-       *
-       * @param other __m128 secondVector
+       * @param other SSEVector secondVector
        * @return dotProduct
        */
-      inline float dotProduct (const SSEData &other) const{
+      inline float dotProduct (const BaseSSEData &other) const
+      {
         float dotProd;
         IGNORE_WARNINGS_BEGIN
 
-#if USE_SSE == 1
-#ifdef __SSE4_1__
+#if __SSE4_1__ == 1 &&  USE_SSE == 1
         _mm_store_ss(
             &dotProd,
-            _mm_dp_ps(const_cast <SSEData&>( *this), const_cast <SSEData&>(other), DOT_PROD_MASK));
-#else
-        __m128 result = _mm_mul_ps(const_cast <SSEData&>( *this), const_cast <SSEData&>(other));
+            _mm_dp_ps(const_cast <__m128 &>(internalData->data), const_cast <__m128 &>(other.data), DOT_PROD_MASK));
+#elif __SSE3__ == 1 &&  USE_SSE == 1
+        __m128 result = _mm_mul_ps(const_cast <SSEVector&>( *this), const_cast <BaseSSEData&>(other));
         result = _mm_hadd_ps(result, result);
         result = _mm_hadd_ps(result, result);
         _mm_store_ss( &dotProd, result);
-#endif
 #else
-        dotProd = ( *this) [X] * other [X] + ( *this) [Y] * other [Y] + ( *this) [Z] * other [Z];
+        dotProd = ( *this) [X] * other [X] + ( *this) [Y] * other [Y]
+        + ( *this) [Z] * other [Z];
 #endif
         IGNORE_WARNINGS_END
         return dotProd;
       }
 
-      /**Calculates cross product of two vectors
-       * You should give here Point::date
+      /**Calculates cross product with other vector
+       * You should give here Point::data
        *
-       * @param other __m128 secondVector
-       * @return dotProduct
+       * @param other SSEVector secondVector
+       * @return crossProduct SSEVector
        */
-      inline SSEData crossProduct (const SSEData &other) const{
-        SSEData crossProd;
+      inline SSEVector crossProduct (const SSEVector &other) const
+      {
+        SSEVector crossProd;
 
         crossProd [X] = ( *this) [Y] * other [Z] - ( *this) [Z] * other [Y];
         crossProd [Y] = ( *this) [Z] * other [X] - ( *this) [X] * other [Z];
@@ -425,34 +458,121 @@ namespace Model {
        *
        * @return dotProduct
        */
-      inline float dotProduct () const{
+      inline float dotProduct () const
+      {
         return dotProduct( *this);
+      }
+
+      inline BaseSSEData operator - () const
+      {
+        return BaseSSEData( - ( *this) [X], - ( *this) [Y], - ( *this) [Z]);
+      }
+
+      inline void negate ()
+      {
+        ( *this) [X] = - ( *this) [X];
+        ( *this) [Y] = - ( *this) [Y];
+        ( *this) [Z] = - ( *this) [Z];
       }
 // <-- operations on data
 
-      inline SSEDataBaseType operator - () const{
-        return SSEDataPrivate( -( *this) [X], -( *this) [Y], -( *this) [Z]);
+      inline & operator SSEData ()
+      {
+        return *internalData;
       }
 
-      inline void negate (){
-        SSEData tmp(0, 0, 0);
-        *this = tmp - *this;
+      inline & operator const SSEData () const
+      {
+        return *internalData;
+      }
+
+      inline & operator __m128 ()
+      {
+        return internalData->data;
       }
 
     private:
-#if USE_SSE == 1
-      inline & operator __m128 (){
-        return sse();
+
+      //Some hacks to act like pointer. It's needed in version with pointers
+      inline const SSEVector *operator -> () const
+      {
+        return this;
       }
 
-      inline const __m128 & sse () const{
-        return internalData->sse();
+      inline SSEVector *operator -> ()
+      {
+        return this;
       }
 
-      inline __m128 & sse (){
-        return *internalData;
+      inline SSEVector &operator * ()
+      {
+        return *this;
       }
-#endif
+
+      inline const SSEVector &operator * () const
+      {
+        return *this;
+      }
   };
+
+  //---------------------------------------------------------------------------------
+
+  template <typename T>
+  inline BaseSSEData operator * (const T &first, const T &other)
+  {
+#if USE_SSE == 1
+    return _mm_mul_ps(const_cast <T&>(first), const_cast <T&>(other));
+#else
+    return BaseSSEData(first [X] * other [X], first [Y] * other [Y],
+        first [Z] * other [Z]);
+#endif
+  }
+
+  template <typename T>
+  inline BaseSSEData operator * (const T &first, worldUnit constant)
+  {
+    T tmpData(constant, constant, constant);
+    return tmpData * first;
+  }
+
+  template <typename T>
+  inline BaseSSEData operator * (worldUnit constant, const T &other)
+  {
+    return other * constant;
+  }
+
+  inline BaseSSEData operator * (const BaseSSEData &first,
+                                 const SSEVector &other)
+  {
+    return first * other;
+  }
+
+  inline BaseSSEData operator * (const SSEVector &first,
+                                 const BaseSSEData &other)
+  {
+    return other * first;
+  }
+
+  template <typename T>
+  inline BaseSSEData operator + (const T &first, const T &other)
+  {
+#if USE_SSE == 1
+    return _mm_add_ps(const_cast <T&>(first), const_cast <T&>(other));
+#else
+    return BaseSSEData(first [X] + other [X], first [Y] + other [Y],
+        first [Z] + other [Z]);
+#endif
+  }
+
+  template <typename T>
+  inline BaseSSEData operator - (const T &first, const T &other)
+  {
+#if USE_SSE == 1
+    return _mm_sub_ps(const_cast <T&>(first), const_cast <T&>(other));
+#else
+    return BaseSSEData(first [X] - other [X], first [Y] - other [Y],
+        first [Z] - other [Z]);
+#endif
+  }
 
 } /* namespace Model */

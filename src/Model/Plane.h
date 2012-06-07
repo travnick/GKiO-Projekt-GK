@@ -5,12 +5,14 @@
 #include <Model/VisibleObject.h>
 #include <Model/Vector.h>
 
-namespace Model {
+namespace Model
+{
 
   /*Plane class
    *
    */
-  class Plane: public Model::VisibleObject {
+  class Plane: public Model::VisibleObject
+  {
     public:
 
       /**Creates plane
@@ -22,7 +24,7 @@ namespace Model {
        *
        * @param newAngles
        */
-      Plane (Vector newAngles);
+      Plane (const Vector &newAngles);
 
       /**Creates new plane and copies data from other
        *
@@ -33,7 +35,8 @@ namespace Model {
       /**Destructor of the plane
        *
        */
-      inline virtual ~Plane (){
+      inline virtual ~Plane ()
+      {
       }
 
       /**Set angles of the plane
@@ -41,13 +44,13 @@ namespace Model {
        *
        * @param newAngles angles of the plane
        */
-      void setAngles (Vector newAngles);
+      void setAngles (const Vector &newAngles);
 
       /**Set normal vector of the plane
        *
        * @param newNormal normal of the plane
        */
-      void setNormal (Vector newNormal);
+      void setNormal (const Vector &newNormal);
 
       /**Calculates normal vector at given point
        *

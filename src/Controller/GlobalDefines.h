@@ -40,24 +40,23 @@ const int GIGA = 1000000000;
 //--------------------------------------------------
 
 #define IGNORE_WARNINGS_BEGIN \
-    _Pragma("GCC diagnostic push") \
     _Pragma("GCC diagnostic ignored \"-Wall\"") \
-    _Pragma("GCC diagnostic ignored \"-Wextra\"") \
-    _Pragma("GCC diagnostic ignored \"-Winvalid-pch\"") \
-    _Pragma("GCC diagnostic ignored \"-Winline\"") \
-    _Pragma("GCC diagnostic ignored \"-Wshadow\"") \
+    _Pragma("GCC diagnostic ignored \"-Wattributes\"") \
+    _Pragma("GCC diagnostic ignored \"-Wctor-dtor-privacy\"") \
     _Pragma("GCC diagnostic ignored \"-Weffc++\"") \
+    _Pragma("GCC diagnostic ignored \"-Wextra\"") \
+    _Pragma("GCC diagnostic ignored \"-Wignored-qualifiers\"") \
+    _Pragma("GCC diagnostic ignored \"-Winline\"") \
+    _Pragma("GCC diagnostic ignored \"-Winvalid-pch\"") \
+    _Pragma("GCC diagnostic ignored \"-Wnarrowing\"") \
     _Pragma("GCC diagnostic ignored \"-Wold-style-cast\"") \
     _Pragma("GCC diagnostic ignored \"-Woverloaded-virtual\"") \
-    _Pragma("GCC diagnostic ignored \"-Wctor-dtor-privacy\"") \
-    _Pragma("GCC diagnostic ignored \"-Wignored-qualifiers\"") \
+    _Pragma("GCC diagnostic ignored \"-Wreorder\"") \
+    _Pragma("GCC diagnostic ignored \"-Wshadow\"") \
+    _Pragma("GCC diagnostic ignored \"-Wuninitialized\"") \
     _Pragma("GCC diagnostic ignored \"-Wunused-but-set-parameter\"") \
     _Pragma("GCC diagnostic ignored \"-Wunused-parameter\"") \
-    _Pragma("GCC diagnostic ignored \"-Wreorder\"") \
-    _Pragma("GCC diagnostic ignored \"-Wattributes\"") \
-    _Pragma("GCC diagnostic ignored \"-Wuninitialized\"") \
-    _Pragma("GCC diagnostic ignored \"-Winline\"") \
-    _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
+    _Pragma("GCC diagnostic push")
 
 #define IGNORE_WARNINGS_END \
     _Pragma("GCC diagnostic pop")

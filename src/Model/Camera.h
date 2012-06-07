@@ -2,27 +2,27 @@
 
 #pragma once
 
-#include "Model/Vector.h"
 #include "Model/Object.h"
+#include "Model/Vector.h"
 
 #define MAX_VIEW_ANGLE 180
 
-namespace Model {
-  //Forward declarations -->
-  class Point;
-  // <-- Forward declarations
+namespace Model
+{
 
   /**Camera class
    *
    */
-  class Camera: public Object {
+  class Camera: public Object
+  {
     public:
       typedef double unitType;
 
       /**Available camera types
        *
        */
-      enum Type {
+      enum Type
+      {
         None, Orthogonal, Conic
       };
 
@@ -35,7 +35,8 @@ namespace Model {
        *
        * @return current camera type
        */
-      inline const Camera::Type & getType () const{
+      inline const Camera::Type & getType () const
+      {
         return type;
       }
 
@@ -43,7 +44,8 @@ namespace Model {
        *
        * @return current camera direction
        */
-      inline const Vector &getDirection () const{
+      inline const Vector &getDirection () const
+      {
         return eyeDirection;
       }
 
@@ -53,7 +55,8 @@ namespace Model {
        * @param direction direction from camera origin to given point
        */
       inline void getDirection (const Point &point,
-                                Vector &directionToPoint) const{
+                                Vector &directionToPoint) const
+      {
         Q_ASSERT(screenImageRatio > 0);
 
         point.data.diff(origin.data, directionToPoint.data);
@@ -66,7 +69,8 @@ namespace Model {
        *
        * @return ratio of screen width to image width
        */
-      inline const worldUnit &getScreenImageWidthRatio () const{
+      inline const worldUnit &getScreenImageWidthRatio () const
+      {
         return screenImageRatio;
       }
 
@@ -74,7 +78,8 @@ namespace Model {
        *
        * @return top left corner of camera screen
        */
-      inline const Point &getScreenTopLeft () const{
+      inline const Point &getScreenTopLeft () const
+      {
         return screenTopLeft;
       }
 
@@ -82,7 +87,8 @@ namespace Model {
        *
        * @return camera screen height
        */
-      inline const worldUnit &getScreenHeight () const{
+      inline const worldUnit &getScreenHeight () const
+      {
         return screenHeight;
       }
 
@@ -90,7 +96,8 @@ namespace Model {
        *
        * @return camera screen width
        */
-      inline const worldUnit &getScreenWidth () const{
+      inline const worldUnit &getScreenWidth () const
+      {
         return screenWidth;
       }
 
@@ -98,7 +105,8 @@ namespace Model {
        *
        * @return camera view distance
        */
-      inline const worldUnit &getViewDistance () const{
+      inline const worldUnit &getViewDistance () const
+      {
         return viewDistance;
       }
 
@@ -109,24 +117,24 @@ namespace Model {
        *
        * @param FOV new Field of View
        */
-      inline void setFOV (unitType newFOV){
-        if (newFOV < 0)
-        {
-          newFOV = 0;
-        }
-        //No angle >= MAX_VIEW_ANGLE
+      inline void setFOV (unitType newFOV)
+      {
+        //FOV has to be <= MAX_VIEW_ANGLE
         while (newFOV >= MAX_VIEW_ANGLE)
         {
           newFOV -= MAX_VIEW_ANGLE;
         }
-        FOV = newFOV;
+
+        //FOV has to be > 0
+        FOV = newFOV < 0 ? 0 : newFOV;
       }
 
       /**Returns FOV of camera
        *
        * @return FOV
        */
-      inline unitType getFOV (){
+      inline unitType getFOV ()
+      {
         return FOV;
       }
 
@@ -143,7 +151,8 @@ namespace Model {
        *
        * @param screenWidth new screen width
        */
-      inline void setScreenWidth (worldUnit newScreenWidth){
+      inline void setScreenWidth (worldUnit newScreenWidth)
+      {
         screenWidth = newScreenWidth;
       }
 
@@ -151,7 +160,8 @@ namespace Model {
        *
        * @param imageWidth new image width
        */
-      inline void setImageWidth (imageUnit newImageWidth){
+      inline void setImageWidth (imageUnit newImageWidth)
+      {
         imageWidth = newImageWidth;
       }
 
@@ -159,7 +169,8 @@ namespace Model {
        *
        * @param imageHeight
        */
-      inline void setImageHeight (imageUnit newImageHeight){
+      inline void setImageHeight (imageUnit newImageHeight)
+      {
         imageHeight = newImageHeight;
       }
 
@@ -167,7 +178,8 @@ namespace Model {
        *
        * @param typeName new camera type
        */
-      inline void setType (Type typeName){
+      inline void setType (Type typeName)
+      {
         type = typeName;
       }
 
@@ -195,11 +207,13 @@ namespace Model {
        */
       void updateRotation ();
 
-      const Vector &getAngles () const{
+      const Vector &getAngles () const
+      {
         return angles;
       }
 
-      Vector &getAngles (){
+      Vector &getAngles ()
+      {
         return angles;
       }
 
@@ -207,7 +221,8 @@ namespace Model {
        *
        * @param viewDistance new view distance
        */
-      inline void setViewDistance (const worldUnit &newViewDistance){
+      inline void setViewDistance (const worldUnit &newViewDistance)
+      {
         viewDistance = newViewDistance;
       }
 
@@ -215,23 +230,23 @@ namespace Model {
 
       void rotate (Axis axis, float angle);
 
-      Vector screenWidthDelta;
       Vector screenHeightDelta;
+      Vector screenWidthDelta;
     private:
-      unitType FOV;
-      worldUnit viewDistance;
-      imageUnit imageWidth;
-      imageUnit imageHeight;
-      worldUnit screenWidth;
-      worldUnit screenHeight;
-      worldUnit screenImageRatio;
-      Type type;
-      Vector eyeDirection;
       Vector angles;
+      Vector eyeDirection;
       Point origin;
       Point screenTopLeft;
       Point screenTopRight;
       Point screenBottomLeft;
+      unitType FOV;
+      imageUnit imageHeight;
+      imageUnit imageWidth;
+      worldUnit screenHeight;
+      worldUnit screenWidth;
+      worldUnit screenImageRatio;
+      worldUnit viewDistance;
+      Type type;
   };
 }
 

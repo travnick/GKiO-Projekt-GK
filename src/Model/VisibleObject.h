@@ -4,37 +4,45 @@
 
 #include "Model/Object.h"
 
-namespace Model {
+namespace Model
+{
   //Forward declarations -->
+  class Point;
   class Ray;
   class Vector;
-  class Point;
   // <-- Forward declarations
 
   /**Visible object class
    * Class for object which is visible on rendered image
    *
    */
-  class VisibleObject: public Object {
+  class VisibleObject: public Object
+  {
+    private:
+      MaterialPtr material;
+
     public:
       worldUnit sizeOnImage;
 
-      inline virtual ~VisibleObject (){
+      inline virtual ~VisibleObject ()
+      {
       }
 
       /**Returns id of material that object has
        *
        * @return material id
        */
-      inline const uint &getMaterial () const{
-        return materialId;
+      inline const MaterialPtr &getMaterial () const
+      {
+        return material;
       }
 
       /**Returns approximated size of object
        *
        * @return size of object
        */
-      inline const worldUnit &getSize () const{
+      inline const worldUnit &getSize () const
+      {
         return size;
       }
 
@@ -50,8 +58,9 @@ namespace Model {
        *
        * @param materialId id of material to set
        */
-      inline void setMaterial (uint newMaterialId){
-        materialId = newMaterialId;
+      inline void setMaterial (const MaterialPtr &newMaterialId)
+      {
+        material = newMaterialId;
       }
 
       /**All visible objects have to implement this function
@@ -67,9 +76,6 @@ namespace Model {
 
     protected:
       worldUnit size;
-
-    private:
-      uint materialId;
   };
 
 } /* namespace Model */

@@ -129,9 +129,15 @@ inline void Renderer::shootRay (Ray & ray,
       Vector correction(normalAtIntersection->data * FLOAT_EPSILON);
       intersection->data += correction;
 
+      Material *currentMaterial = ( *currentObject)->getMaterial().data();
+
       //(1.0f / COLOR_COUNT) because few lines bellow we do color * color
-      tmpLightCoef = (1.0f - ( *currentObject)->getMaterial()->getReflection())
-          * coef * (1.0f / COLOR_COUNT);
+      tmpLightCoef = coef * (1.0f / COLOR_COUNT);
+
+      if (renderParams->reflectionDeep > 1)
+      {
+        tmpLightCoef *= (1.0f - currentMaterial->getReflection());
+      }
 
       //Calculate light contribution
       Scene::LighIt endLights = renderParams->scene->getLights().end();
@@ -191,26 +197,23 @@ inline void Renderer::shootRay (Ray & ray,
             lightPower = 1.0;
           }
 
-         if (lightPowerSpecular < 1.0)
-             {
-              lightPowerSpecular = 1.0;
-              }
+          if (lightPowerSpecular < 1.0)
+          {
+            lightPowerSpecular = 1.0;
+          }
 
-
-         //Calculate reflection vector
-         normalAtIntersection->data *= ray.getDir().dotProduct(
+          //Calculate reflection vector
+          normalAtIntersection->data *= ray.getDir().dotProduct(
               normalAtIntersection->data) * 2;
-         ray.getDir().data -= normalAtIntersection->data;
-         ray.getDir().normalize();
-         lightRay->getDir().normalize();
+          ray.getDir().data -= normalAtIntersection->data;
+          ray.getDir().normalize();
+          lightRay->getDir().normalize();
 
-        // odpsucie normalnej
-         ( *currentObject)->getNormal( *intersection, *normalAtIntersection);
+          // odpsucie normalnej
+          ( *currentObject)->getNormal( *intersection, *normalAtIntersection);
 
-          float specular = pow(
-        		  ray.getDir().dotProduct(lightRay->getDir()),
-              ( *currentObject)->getMaterial()->getSpecularPower());
-
+          float specular = pow(ray.getDir().dotProduct(lightRay->getDir()),
+                               currentMaterial->getSpecularPower());
 
           lightPower = ( *light)->power / lightPower;
           lightPowerSpecular = ( *light)->power / lightPowerSpecular;
@@ -219,15 +222,14 @@ inline void Renderer::shootRay (Ray & ray,
           lightPower *= lambert * tmpLightCoef;
           lightPowerSpecular *= specular * tmpLightCoef;
 
-          resultColor += ( * *light)
-              * ( *currentObject)->getMaterial()->getColor() * lightPower;
-          resultColor += ( * *light)
-              * ( *currentObject)->getMaterial()->getSpecularColor()
+          resultColor += ( * *light) * currentMaterial->getColor() * lightPower;
+
+          resultColor += ( * *light) * currentMaterial->getSpecularColor()
               * lightPowerSpecular;
         }
       }
 
-      coef *= ( *currentObject)->getMaterial()->getReflection();
+      coef *= currentMaterial->getReflection();
 
       if (coef < COLOR_MIN_VALUE)
       {

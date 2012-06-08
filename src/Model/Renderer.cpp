@@ -133,6 +133,14 @@ inline void Renderer::shootRay (Ray & ray,
       tmpLightCoef = (1.0f - ( *currentObject)->getMaterial()->getReflection())
           * coef * (1.0f / COLOR_COUNT);
 
+      Vector trololo(ray.getDir());
+               Model::SSEVector trololo2 = normalAtIntersection->data;
+               //Calculate reflection vector
+               trololo2 *= trololo.dotProduct(
+              		 trololo2) * 2;
+               trololo.data -= trololo2;
+               trololo.normalize();
+
       //Calculate light contribution
       Scene::LighIt endLights = renderParams->scene->getLights().end();
       for (Scene::LighIt light = renderParams->scene->getLights().begin();
@@ -175,6 +183,7 @@ inline void Renderer::shootRay (Ray & ray,
 
         if ( !inShadow)
         {
+
           // Lambert lighting model
           float lambert = lightRay->getDir().dotProduct(
               normalAtIntersection->data);
@@ -196,24 +205,13 @@ inline void Renderer::shootRay (Ray & ray,
               lightPowerSpecular = 1.0;
               }
 
-
-         //Calculate reflection vector
-         normalAtIntersection->data *= ray.getDir().dotProduct(
-              normalAtIntersection->data) * 2;
-         ray.getDir().data -= normalAtIntersection->data;
-         ray.getDir().normalize();
-         lightRay->getDir().normalize();
-
-        // odpsucie normalnej
-         ( *currentObject)->getNormal( *intersection, *normalAtIntersection);
-
           float specular = pow(
-        		  ray.getDir().dotProduct(lightRay->getDir()),
+        		  trololo.dotProduct(lightRay->getDir()),
               ( *currentObject)->getMaterial()->getSpecularPower());
 
 
           lightPower = ( *light)->power / lightPower;
-          lightPowerSpecular = ( *light)->power / lightPowerSpecular;
+          //lightPowerSpecular = ( *light)->power / lightPowerSpecular;
           //<--light attenuation
 
           lightPower *= lambert * tmpLightCoef;
@@ -221,10 +219,19 @@ inline void Renderer::shootRay (Ray & ray,
 
           resultColor += ( * *light)
               * ( *currentObject)->getMaterial()->getColor() * lightPower;
+
+          if (normalAtIntersection->dotProduct(trololo) <= 0.25f)
+              {
+                continue;
+              }
+          else
+          	  {
           resultColor += ( * *light)
               * ( *currentObject)->getMaterial()->getSpecularColor()
               * lightPowerSpecular;
+          	  }
         }
+
       }
 
       coef *= ( *currentObject)->getMaterial()->getReflection();

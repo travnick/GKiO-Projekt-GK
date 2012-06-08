@@ -140,12 +140,12 @@ inline void Renderer::shootRay (Ray & ray,
       }
 
       Vector trololo(ray.getDir());
-               Model::SSEVector trololo2 = normalAtIntersection->data;
-               //Calculate reflection vector
-               trololo2 *= trololo.dotProduct(
-              		 trololo2) * 2;
-               trololo.data -= trololo2;
-               trololo.normalize();
+      Model::SSEVector trololo2 = normalAtIntersection->data;
+      //Calculate reflection vector
+      trololo2 *= trololo.dotProduct(trololo2) * 2;
+      trololo.data -= trololo2;
+      //trololo.normalize();
+      //trololo is still normalized;
 
       //Calculate light contribution
       Scene::LighIt endLights = renderParams->scene->getLights().end();
@@ -197,48 +197,45 @@ inline void Renderer::shootRay (Ray & ray,
           float lightPower = (0.01 * pointLightDist->length
               + 0.001 * pointLightDist->length * pointLightDist->length);
 
-          float lightPowerSpecular = ( *light)->power
-              * pow(1.01f, -pointLightDist->length);
+          float lightPowerSpecular = 1;
 
           if (lightPower < 1.0)
           {
             lightPower = 1.0;
           }
 
-         if (lightPowerSpecular < 1.0)
-             {
-              lightPowerSpecular = 1.0;
-              }
+          if (lightPowerSpecular < 1.0)
+          {
+            lightPowerSpecular = 1.0;
+          }
 
-          float specular = pow(
-        		  trololo.dotProduct(lightRay->getDir()),
-              ( *currentObject)->getMaterial()->getSpecularPower());
-
+          float specular = pow(trololo.dotProduct(lightRay->getDir()),
+                               currentMaterial->getSpecularPower());
 
           lightPower = ( *light)->power / lightPower;
-          //lightPowerSpecular = ( *light)->power / lightPowerSpecular;
+//          lightPowerSpecular = ( *light)->power / lightPowerSpecular;
           //<--light attenuation
 
           lightPower *= lambert * tmpLightCoef;
           lightPowerSpecular *= specular * tmpLightCoef;
 
-          resultColor += ( * *light)
-              * ( *currentObject)->getMaterial()->getColor() * lightPower;
+          resultColor += ( * *light) * currentMaterial->getColor() * lightPower;
 
+          //TODO: do something like trololo.dotProduct(lightRay->getDir()) < max angle then contribute
+          // else continue
           if (normalAtIntersection->dotProduct(trololo) <= 0.25f)
-              {
-                continue;
-              }
+          {
+            continue;
+          }
           else
-          	  {
-          resultColor += ( * *light)
-              * ( *currentObject)->getMaterial()->getSpecularColor()
-              * lightPowerSpecular;
-          	  }
+          {
+            resultColor += ( * *light) * currentMaterial->getSpecularColor()
+                * lightPowerSpecular;
+          }
         }
       }
 
-      coef *= ( *currentObject)->getMaterial()->getReflection();
+      coef *= currentMaterial->getReflection();
 
       if (coef < COLOR_MIN_VALUE)
       {
@@ -246,9 +243,10 @@ inline void Renderer::shootRay (Ray & ray,
       }
 
       //Calculate reflection vector
-      normalAtIntersection->data *= ray.getDir().dotProduct(
-          normalAtIntersection->data) * 2;
-      ray.getDir().data -= normalAtIntersection->data;
+//      normalAtIntersection->data *= ray.getDir().dotProduct(
+//          normalAtIntersection->data) * 2;
+//      ray.getDir().data -= normalAtIntersection->data;
+      ray.getDir().data = trololo.data;
       ray.setParams( *intersection);
       //ray is still normalized;
 

@@ -135,9 +135,23 @@ inline void Renderer::shootRay (Ray & ray,
       Vector correction(normalAtIntersection->data * FLOAT_EPSILON);
       intersection->data += correction;
 
+      Material *currentMaterial = ( *currentObject)->getMaterial().data();
+
       //(1.0f / COLOR_COUNT) because few lines bellow we do color * color
-      tmpLightCoef = (1.0f - ( *currentObject)->getMaterial()->getReflection())
-          * coef * (1.0f / COLOR_COUNT);
+      tmpLightCoef = coef * (1.0f / COLOR_COUNT);
+
+      if (renderParams->reflectionDeep > 1)
+      {
+        tmpLightCoef *= (1.0f - currentMaterial->getReflection());
+      }
+
+      Vector trololo(ray.getDir());
+      Model::SSEVector trololo2 = normalAtIntersection->data;
+      //Calculate reflection vector
+      trololo2 *= trololo.dotProduct(trololo2) * 2;
+      trololo.data -= trololo2;
+      //trololo.normalize();
+      //trololo is still normalized;
 
       //Calculate light contribution
       Scene::LighIt endLights = renderParams->scene->getLights().end();
@@ -189,8 +203,7 @@ inline void Renderer::shootRay (Ray & ray,
           float lightPower = (0.01 * pointLightDist->length
               + 0.001 * pointLightDist->length * pointLightDist->length);
 
-          float lightPowerSpecular = ( *light)->power
-              * pow(1.01f, -pointLightDist->length);
+          float lightPowerSpecular = 1;
 
           if (lightPower < 1.0)
           {
@@ -202,22 +215,10 @@ inline void Renderer::shootRay (Ray & ray,
             lightPowerSpecular = 1.0;
           }
 
-          //Calculate reflection vector
-          normalAtIntersection->data *= ray.getDir().dotProduct(
-              normalAtIntersection->data) * 2;
-          ray.getDir().data -= normalAtIntersection->data;
-          ray.getDir().normalize();
-          lightRay->getDir().normalize();
-
-          // odpsucie normalnej
-          ( *currentObject)->getNormal( *intersection, *normalAtIntersection);
-
-          float specular = pow(
-              ray.getDir().dotProduct(lightRay->getDir()),
-              ( *currentObject)->getMaterial()->getSpecularPower());
-
+          float specular = pow(trololo.dotProduct(lightRay->getDir()),
+                               currentMaterial->getSpecularPower());
           lightPower = ( *light)->power / lightPower;
-          lightPowerSpecular = ( *light)->power / lightPowerSpecular;
+//          lightPowerSpecular = ( *light)->power / lightPowerSpecular;
           //<--light attenuation
 
           worldUnit transparency =
@@ -248,18 +249,26 @@ inline void Renderer::shootRay (Ray & ray,
           lightPower *= lambert * tmpLightCoef;
           lightPowerSpecular *= specular * tmpLightCoef;
 
-          resultColor += ( * *light)
-              * ( *currentObject)->getMaterial()->getColor() * lightPower;
-          resultColor += ( * *light)
-              * ( *currentObject)->getMaterial()->getSpecularColor()
-              * lightPowerSpecular;
+          resultColor += ( * *light) * currentMaterial->getColor() * lightPower;
+
+          //TODO: do something like trololo.dotProduct(lightRay->getDir()) < max angle then contribute
+          // else continue
+          if (normalAtIntersection->dotProduct(trololo) <= 0.25f)
+          {
+            continue;
+          }
+          else
+          {
+            resultColor += ( * *light) * currentMaterial->getSpecularColor()
+                * lightPowerSpecular;
 
           resultColor += transpColor * transparency;
 
+          }
         }
       }
 
-      coef *= ( *currentObject)->getMaterial()->getReflection();
+      coef *= currentMaterial->getReflection();
 
       if (coef < COLOR_MIN_VALUE)
       {
@@ -267,9 +276,10 @@ inline void Renderer::shootRay (Ray & ray,
       }
 
       //Calculate reflection vector
-      normalAtIntersection->data *= ray.getDir().dotProduct(
-          normalAtIntersection->data) * 2;
-      ray.getDir().data -= normalAtIntersection->data;
+//      normalAtIntersection->data *= ray.getDir().dotProduct(
+//          normalAtIntersection->data) * 2;
+//      ray.getDir().data -= normalAtIntersection->data;
+      ray.getDir().data = trololo.data;
       ray.setParams( *intersection);
       //ray is still normalized;
 

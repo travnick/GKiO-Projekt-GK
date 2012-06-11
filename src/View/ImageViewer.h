@@ -14,7 +14,7 @@ namespace View
 
   /**Reimplemented QLabel
    * It's customized to better image displaying.
-   * It refresh only part of image visible in QScrollArea.
+   * It refreshes only part of image visible in QScrollArea.
    *
    */
   class ImageViewer: public QLabel

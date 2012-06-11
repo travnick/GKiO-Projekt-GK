@@ -62,6 +62,7 @@ namespace Model
       QScopedPointer <Point> intersection;
       QScopedPointer <Ray> lightRay;
       QScopedPointer <Vector> distanceToIntersection;
+      QScopedPointer <Vector> pointLightDist;
       QScopedPointer <Vector> tmpDistance;
       // <-- Internal temporary
 

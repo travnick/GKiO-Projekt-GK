@@ -16,15 +16,13 @@
 const float E = 2.71828183f;
 
 using namespace Model;
-{
 
 //Because qRound(0.49f * COLOR_MAX_VALUE / COLOR_MAX_VALUE) < 1
 const float COLOR_MIN_VALUE = 0.5f / COLOR_MAX_VALUE;
 
 Renderer::Renderer (const Controller::RenderParams &newRenderParams)
     : tmpDistance(new Vector), pointLightDist(new Vector), distanceToIntersection(
-        new Vector), lightRay(new Ray), normalAtIntersection(new Vector), intersection(
-        new Point)
+        new Vector), lightRay(new Ray), intersection(new Point)
 {
   setRenderParams( &newRenderParams);
 }
@@ -66,10 +64,10 @@ void Renderer::render (const RenderTileData &tile)
 
       ray.setParams(currentOnScreen, direction);
 
-        int refractionDepth = renderParams->refractionDeep;
+      int refractionDepth = renderParams->refractionDeep;
 
       rayResult.setDefaultColor();
-        shootRay(ray, rayResult, viewDistance, refractionDepth);
+      shootRay(ray, rayResult, viewDistance, refractionDepth);
 
       tile.imageData [R] = rayResult.red();
       R += BPP;
@@ -93,9 +91,11 @@ void Renderer::render (const RenderTileData &tile)
 
 inline void Renderer::shootRay (Ray & ray,
                                 Color &resultColor,
-                                  worldUnit mainViewDistance,
-                                  int refractionDepth) const
-  {
+                                worldUnit mainViewDistance,
+                                int refractionDepth) const
+{
+
+  Scene::ObjectIt endObjects = renderParams->scene->getObjects().end();
   Scene::ObjectIt currentObject = endObjects;
   worldUnit coef = 1;
   worldUnit tmpLightCoef = 0;
@@ -119,8 +119,8 @@ inline void Renderer::shootRay (Ray & ray,
     //If there is any intersection?
     if (currentObject != endObjects)
     {
-        QScopedPointer <Vector> normalAtIntersection(new Vector);
-        QScopedPointer <Point> intersection(new Point);
+      QScopedPointer <Vector> normalAtIntersection(new Vector);
+      QScopedPointer <Point> intersection(new Point);
 
       ray.getDir().data.multiply(viewDistance, distanceToIntersection->data);
 
@@ -146,7 +146,7 @@ inline void Renderer::shootRay (Ray & ray,
       {
         ( *light)->getPosition().data.diff(intersection->data,
                                            pointLightDist->data);
-          //if angle between light and normal vector at intersection is higher than 90 degrees
+        //if angle between light and normal vector at intersection is higher than 90 degrees
         if (normalAtIntersection->dotProduct(pointLightDist->data) <= 0.0f)
         {
           continue;
@@ -197,58 +197,53 @@ inline void Renderer::shootRay (Ray & ray,
             lightPower = 1.0;
           }
 
-         if (lightPowerSpecular < 1.0)
-             {
-              lightPowerSpecular = 1.0;
-              }
+          if (lightPowerSpecular < 1.0)
+          {
+            lightPowerSpecular = 1.0;
+          }
 
-
-         //Calculate reflection vector
-         normalAtIntersection->data *= ray.getDir().dotProduct(
+          //Calculate reflection vector
+          normalAtIntersection->data *= ray.getDir().dotProduct(
               normalAtIntersection->data) * 2;
-         ray.getDir().data -= normalAtIntersection->data;
-         ray.getDir().normalize();
-         lightRay->getDir().normalize();
+          ray.getDir().data -= normalAtIntersection->data;
+          ray.getDir().normalize();
+          lightRay->getDir().normalize();
 
-        // odpsucie normalnej
-         ( *currentObject)->getNormal( *intersection, *normalAtIntersection);
+          // odpsucie normalnej
+          ( *currentObject)->getNormal( *intersection, *normalAtIntersection);
 
           float specular = pow(
-        		  ray.getDir().dotProduct(lightRay->getDir()),
+              ray.getDir().dotProduct(lightRay->getDir()),
               ( *currentObject)->getMaterial()->getSpecularPower());
-
 
           lightPower = ( *light)->power / lightPower;
           lightPowerSpecular = ( *light)->power / lightPowerSpecular;
           //<--light attenuation
 
-            worldUnit transparency =
-                renderParams->scene->getMaterials() [ ( *currentObject)->getMaterial()]->getTransparency();
+          worldUnit transparency =
+              ( *currentObject)->getMaterial()->getTransparency();
 
-            Color transpColor(0, 0, 0);
+          Color transpColor(0, 0, 0);
 
-            if ( (transparency > 0.01f) && (refractionDepth > 0))
+          if ( (transparency > 0.01f) && (refractionDepth > 0))
+          {
+            tmpLightCoef *= (1.0f - transparency);
+
+            Ray newRay(ray);
+
+            int refrResult = calculateRefraction(newRay, * *currentObject,
+                                                 normalAtIntersection.data());
+
+            if (refrResult == 0)
             {
-              tmpLightCoef *= (1.0f - transparency);
+              newRay.setParams(
+                  Point(
+                      (SSEData) intersection->data + (- correction.data*2)));
 
-              Ray newRay(ray);
-
-              int refrResult = calculateRefraction(newRay, * *currentObject, normalAtIntersection.data());
-
-              if (refrResult == 0)
-              {
-                newRay.setParams(
-                    Point(
-                        SSEData(
-                            intersection->data
-                                + ray.getDir().data
-                                    * DEFAULT_INTERSECTION_ERROR_VALUE)
-                            + newRay.getDir().data
-                                * DEFAULT_INTERSECTION_ERROR_VALUE));
-                shootRay(newRay, transpColor, mainViewDistance,
-                         refractionDepth - 1);
-              }
+              shootRay(newRay, transpColor, mainViewDistance,
+                       refractionDepth - 1);
             }
+          }
 
           lightPower *= lambert * tmpLightCoef;
           lightPowerSpecular *= specular * tmpLightCoef;
@@ -259,7 +254,7 @@ inline void Renderer::shootRay (Ray & ray,
               * ( *currentObject)->getMaterial()->getSpecularColor()
               * lightPowerSpecular;
 
-            resultColor += transpColor * transparency;
+          resultColor += transpColor * transparency;
 
         }
       }
@@ -285,105 +280,104 @@ inline void Renderer::shootRay (Ray & ray,
       return;
     }
   }
-  }
+}
 
-  inline int Renderer::calculateRefraction (Ray &ray,
-                                            VisibleObject &currentObject, Vector *normalAtIntersection) const
-  {
+inline int Renderer::calculateRefraction (Ray &ray,
+                                          VisibleObject &currentObject,
+                                          Vector *normalAtIntersection) const
+{
 
-    float ior =
-        renderParams->scene->getMaterials() [currentObject.getMaterial()]->getIOR();
+  float ior = currentObject.getMaterial()->getIOR();
 
 //    Vector abackRayDir(ray.getDir());
 //    abackRayDir.data.negate();
 
-    float cos_alpha = -ray.getDir().dotProduct( *normalAtIntersection);
-    //float cos_alpha = -abackRayDir.dotProduct( *normalAtIntersection);
+  float cos_alpha = -ray.getDir().dotProduct( *normalAtIntersection);
+  //float cos_alpha = -abackRayDir.dotProduct( *normalAtIntersection);
 
-    //it is ior_in/ior_out
-    float ir;
+  //it is ior_in/ior_out
+  float ir;
 
+  //we are going into the sphere
+  if (cos_alpha > 0.0f)
+  {
+    ir = 1.0f / ior;
+  }
+  else
+  {
+    ir = ior;
+  }
 
-    //we are going into the sphere
-    if (cos_alpha > 0.0f)
-    {
-      ir = 1.0f / ior;
-    }
-    else
-    {
-      ir = ior;
-    }
+  float sin_betha2 = ir * ir * (1.0f - cos_alpha * cos_alpha);
 
-    float sin_betha2 = ir * ir * (1.0f - cos_alpha * cos_alpha);
-
-    //
+  //
 //    float cosA = 1;
 //    float tmp;
 
-    //float cos_betha = 1.0f - ir*ir *(1.0f -(cos_alpha * cos_alpha));
-    //ray.getDir().data = SSEData(ray.getDir().data * ir) + SSEData(normalAtIntersection->data * (ir * cos_alpha - sqrt(abs(cos_betha))));
+//float cos_betha = 1.0f - ir*ir *(1.0f -(cos_alpha * cos_alpha));
+//ray.getDir().data = SSEData(ray.getDir().data * ir) + SSEData(normalAtIntersection->data * (ir * cos_alpha - sqrt(abs(cos_betha))));
 
-    if (sin_betha2 < 1.0f)
-    {
-      /*
-       //we are in sphere
-       if (cos_alpha < 0.0f)
-       {
-       ir = ior;
-       tmp = 1.0f - ir * ir * (1.0f - cos_alpha * cos_alpha);
-       cosA = -1.0f;
+  if (sin_betha2 < 1.0f)
+  {
+    /*
+     //we are in sphere
+     if (cos_alpha < 0.0f)
+     {
+     ir = ior;
+     tmp = 1.0f - ir * ir * (1.0f - cos_alpha * cos_alpha);
+     cosA = -1.0f;
 
-       cos_alpha = -cos_alpha;
+     cos_alpha = -cos_alpha;
 
-       ray.getDir().data = SSEData(abackRayDir.data * ir)
-       - SSEData(
-       normalAtIntersection->data
-       * (cosA * (ir * cos_alpha - (sqrt(tmp)))));
-       ray.getDir().normalize();
-       */
+     ray.getDir().data = SSEData(abackRayDir.data * ir)
+     - SSEData(
+     normalAtIntersection->data
+     * (cosA * (ir * cos_alpha - (sqrt(tmp)))));
+     ray.getDir().normalize();
+     */
 
-      //ray.getDir().data = SSEData(ray.getDir().data * ir)
-      //    - SSEData(
-      //       normalAtIntersection->data
-      //            * (ir * (cos_alpha) + sqrt(1.0f - sin_betha2)));
-      ray.getDir().data = SSEData(ray.getDir().data * ir)
-          - SSEData(
-              normalAtIntersection->data
-                  * (ir * (cos_alpha) + sqrt(1.0f - sin_betha2)));
-      ray.getDir().normalize();
-      //}
-      /*
-       else
-       {
-       ir = 1.0f / ior;
-       tmp = 1.0f - ir * ir * (1.0f - cos_alpha * cos_alpha);
-       ray.getDir().data = SSEData(ray.getDir().data * ir)
-       - SSEData(
-       normalAtIntersection->data
-       * (cosA * (ir * cos_alpha - (sqrt(tmp)))));
-       ray.getDir().normalize();
-       }
+    //ray.getDir().data = SSEData(ray.getDir().data * ir)
+    //    - SSEData(
+    //       normalAtIntersection->data
+    //            * (ir * (cos_alpha) + sqrt(1.0f - sin_betha2)));
+    ray.getDir().data = SSEData(ray.getDir().data * ir)
+        - SSEData(
+            normalAtIntersection->data
+                * (ir * (cos_alpha) + sqrt(1.0f - sin_betha2)));
+    ray.getDir().normalize();
+    //}
+    /*
+     else
+     {
+     ir = 1.0f / ior;
+     tmp = 1.0f - ir * ir * (1.0f - cos_alpha * cos_alpha);
+     ray.getDir().data = SSEData(ray.getDir().data * ir)
+     - SSEData(
+     normalAtIntersection->data
+     * (cosA * (ir * cos_alpha - (sqrt(tmp)))));
+     ray.getDir().normalize();
+     }
 
-       //if (tmp > 0.0f)
-       {
-       */
-      /*
-       ray.getDir().data = SSEData(
-       normalAtIntersection->data * (cosA * (ir * cos_alpha - sqrt(tmp))))
-       - SSEData(abackRayDir.data * ir);
+     //if (tmp > 0.0f)
+     {
+     */
+    /*
+     ray.getDir().data = SSEData(
+     normalAtIntersection->data * (cosA * (ir * cos_alpha - sqrt(tmp))))
+     - SSEData(abackRayDir.data * ir);
 
-       */
-      /*
-       ray.getDir().data = SSEData(abackRayDir.data * ir)
-       - SSEData(
-       normalAtIntersection->data
-       * (cosA * (ir * cos_alpha - (sqrt(tmp)))));
-       ray.getDir().normalize();
-       */
-      //}
-      return 0;
-    }
+     */
+    /*
+     ray.getDir().data = SSEData(abackRayDir.data * ir)
+     - SSEData(
+     normalAtIntersection->data
+     * (cosA * (ir * cos_alpha - (sqrt(tmp)))));
+     ray.getDir().normalize();
+     */
+    //}
+    return 0;
+  }
 
-    return -1;
+  return -1;
 
 }

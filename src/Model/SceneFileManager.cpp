@@ -28,7 +28,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
   d.setContent(&io);
   root = d.documentElement();
 
-  // Wczytywanie materiałów
+  // Loading maerials
   tmpname = Materials::MATERIALS_NAME;
   node = root.elementsByTagName(tmpname).item(0).firstChild();
 
@@ -76,7 +76,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
   if (scene.getMaterials().empty())
     throw std::logic_error("Brak zdefiniowanych materiałów");
 
-  // Wczytywanie świateł
+  // Loading lights
   tmpname = Lights::LIGHTS_NAME;
   node = root.elementsByTagName(tmpname).item(0).firstChild();
 
@@ -105,7 +105,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
     scene.addLight(object);
   }
 
-  // Wczytywanie obiektów
+  // Loading objects
   tmpname = Objects::OBJECTS_NAME;
   node = root.elementsByTagName(tmpname).item(0).firstChild();
 

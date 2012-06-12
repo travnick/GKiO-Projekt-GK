@@ -48,8 +48,25 @@ namespace Model
        */
       static void getVPCommon (const QDomElement &value, Point &object);
 
+      /** Loads integer data from an xml element to the name variable
+       *
+       * @param elem an xml element
+       * @param name a name of the xml property to load data from
+       */
       static int getInt (const QDomElement &elem, const QString &name);
+
+      /** Loads floating point data from an xml element to the name variable
+       *
+       * @param elem an xml element
+       * @param name a name of the xml property to load data from
+       */
       static float getFloat (const QDomElement &elem, const QString &name);
+
+      /** Loads double precision floating point data from an xml element to the name variable
+       *
+       * @param elem an xml element
+       * @param name a name of the xml property to load data from
+       */
       static double getDouble (const QDomElement &elem, const QString &name);
   };
 } /* namespace Model */

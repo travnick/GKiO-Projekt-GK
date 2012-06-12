@@ -22,7 +22,7 @@ const float COLOR_MIN_VALUE = 0.5f / COLOR_MAX_VALUE;
 
 Renderer::Renderer (const Controller::RenderParams &newRenderParams)
     : tmpDistance(new Vector), pointLightDist(new Vector), distanceToIntersection(
-        new Vector), lightRay(new Ray), intersection(new Point)
+        new Vector), lightRay(new Ray)
 {
   setRenderParams( &newRenderParams);
 }
@@ -94,7 +94,6 @@ inline void Renderer::shootRay (Ray & ray,
                                 worldUnit mainViewDistance,
                                 int refractionDepth) const
 {
-
   Scene::ObjectIt endObjects = renderParams->scene->getObjects().end();
   Scene::ObjectIt currentObject = endObjects;
   worldUnit coef = 1;
@@ -152,6 +151,16 @@ inline void Renderer::shootRay (Ray & ray,
       trololo.data -= trololo2;
       //trololo.normalize();
       //trololo is still normalized;
+
+      float transparency = ( *currentObject)->getMaterial()->getTransparency();
+
+      Color transpColor = shootRefractedRay(ray, transparency, refractionDepth,
+                                            mainViewDistance, viewDistance,
+                                            tmpLightCoef, correction,
+                                            *normalAtIntersection,
+                                            *intersection, * *currentObject);
+
+      resultColor += transpColor;
 
       //Calculate light contribution
       Scene::LighIt endLights = renderParams->scene->getLights().end();
@@ -221,31 +230,6 @@ inline void Renderer::shootRay (Ray & ray,
 //          lightPowerSpecular = ( *light)->power / lightPowerSpecular;
           //<--light attenuation
 
-          worldUnit transparency =
-              ( *currentObject)->getMaterial()->getTransparency();
-
-          Color transpColor(0, 0, 0);
-
-          if ( (transparency > 0.01f) && (refractionDepth > 0))
-          {
-            tmpLightCoef *= (1.0f - transparency);
-
-            Ray newRay(ray);
-
-            int refrResult = calculateRefraction(newRay, * *currentObject,
-                                                 normalAtIntersection.data());
-
-            if (refrResult == 0)
-            {
-              newRay.setParams(
-                  Point(
-                      (SSEData) intersection->data + (- correction.data*2)));
-
-              shootRay(newRay, transpColor, mainViewDistance,
-                       refractionDepth - 1);
-            }
-          }
-
           lightPower *= lambert * tmpLightCoef;
           lightPowerSpecular *= specular * tmpLightCoef;
 
@@ -261,9 +245,6 @@ inline void Renderer::shootRay (Ray & ray,
           {
             resultColor += ( * *light) * currentMaterial->getSpecularColor()
                 * lightPowerSpecular;
-
-          resultColor += transpColor * transparency;
-
           }
         }
       }
@@ -307,15 +288,18 @@ inline int Renderer::calculateRefraction (Ray &ray,
 
   //it is ior_in/ior_out
   float ir;
+  float a = 1;
 
   //we are going into the sphere
-  if (cos_alpha > 0.0f)
+  if (cos_alpha >= 0.0f)
   {
     ir = 1.0f / ior;
   }
   else
   {
     ir = ior;
+    a = -a;
+    cos_alpha = -cos_alpha;
   }
 
   float sin_betha2 = ir * ir * (1.0f - cos_alpha * cos_alpha);
@@ -350,10 +334,9 @@ inline int Renderer::calculateRefraction (Ray &ray,
     //    - SSEData(
     //       normalAtIntersection->data
     //            * (ir * (cos_alpha) + sqrt(1.0f - sin_betha2)));
-    ray.getDir().data = SSEData(ray.getDir().data * ir)
-        - SSEData(
-            normalAtIntersection->data
-                * (ir * (cos_alpha) + sqrt(1.0f - sin_betha2)));
+    ray.getDir().data = ray.getDir().data * ir
+        - normalAtIntersection->data
+            * (a * (ir * cos_alpha + sqrt(1.0f - sin_betha2)));
     ray.getDir().normalize();
     //}
     /*
@@ -390,4 +373,47 @@ inline int Renderer::calculateRefraction (Ray &ray,
 
   return -1;
 
+}
+
+inline Color Renderer::shootRefractedRay (const Ray &ray,
+                                          float transparency,
+                                          int refractionDepth,
+                                          worldUnit mainViewDistance,
+                                          worldUnit viewDistance,
+                                          worldUnit &tmpLightCoef,
+                                          Vector &correction,
+                                          Vector &normalAtIntersection,
+                                          Point &intersection,
+                                          VisibleObject &currentObject) const
+{
+  Color transpColor(0, 0, 0);
+
+  if ( (transparency > 0.01f) && (refractionDepth > 0))
+  {
+    tmpLightCoef *= (1.0f - transparency);
+
+    Ray newRay(ray);
+
+    int refrResult = calculateRefraction(newRay, currentObject,
+                                         &normalAtIntersection);
+
+    if (refrResult == 0)
+    {
+      newRay.setParams(intersection);
+
+      newRay.getStart().data -= correction.data;
+      newRay.getStart().data += newRay.getDir().data * 5 * FLOAT_EPSILON;
+
+      shootRay(newRay, transpColor, mainViewDistance, refractionDepth - 1);
+
+      Color absorbance = currentObject.getMaterial()->getColor() * 0.15f
+          * ( viewDistance);
+      Color transparencyColor(expf(absorbance.red()), expf(absorbance.green()),
+                              expf(absorbance.blue()));
+
+      //transpColor *= transparencyColor * (1.0f / COLOR_MAX_VALUE);
+    }
+  }
+
+  return transpColor;
 }

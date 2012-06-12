@@ -52,6 +52,15 @@ namespace Model
        *
        * @return start point of vector
        */
+      inline Point &getStart ()
+      {
+        return start;
+      }
+
+      /**Returns start point of vector
+       *
+       * @return start point of vector
+       */
       inline const Point &getStart () const
       {
         return start;

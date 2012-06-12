@@ -59,7 +59,7 @@ namespace Model
 
     private:
       //Internal temporary -->
-      QScopedPointer <Point> intersection;
+      //QScopedPointer <Point> intersection;
       QScopedPointer <Ray> lightRay;
       QScopedPointer <Vector> distanceToIntersection;
       QScopedPointer <Vector> pointLightDist;
@@ -85,8 +85,23 @@ namespace Model
       /**
        *
        */
+      Color shootRefractedRay (const Ray &ray,
+                               float transparency,
+                               int refractionDepth,
+                               worldUnit mainViewDistance,
+                               worldUnit viewDistance,
+                               worldUnit &tmpLightCoef,
+                               Vector &correction,
+                               Vector &normalAtIntersection,
+                               Point &intersection,
+                               VisibleObject &currentObject) const;
+
+      /**
+       *
+       */
       int calculateRefraction (Ray &ray,
-                                VisibleObject &currentObject, Vector *normalAtIntersection) const;
+                               VisibleObject &currentObject,
+                               Vector *normalAtIntersection) const;
 
       Q_DISABLE_COPY (Renderer)
   };

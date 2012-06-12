@@ -8,7 +8,7 @@ namespace Controller
 {
 
   RendererThread::RendererThread (const QSharedPointer <RenderParams> &newRenderParams)
-      : renderer(new Model::Renderer( *newRenderParams))
+      : renderer(new Model::Renderer(*newRenderParams))
   {
   }
 
@@ -22,7 +22,7 @@ namespace Controller
 
   void RendererThread::run ()
   {
-    renderer->render( *tile);
+    renderer->render(*tile);
   }
 
 } /* namespace Controller */

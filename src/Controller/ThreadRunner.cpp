@@ -41,8 +41,8 @@ namespace Controller
     QMutexLocker locker(mutex.data());
     threadPool->setMaxThreadCount(renderParams->maxThreadCount);
 
-    int tilesSize = tiles.size();
-    for (int i = 0; i < tilesSize; ++i)
+    int tileCount = tiles.size();
+    for (int i = 0; i < tileCount; ++i)
     {
       renderers [i]->setTile(tiles [i]);
 
@@ -61,7 +61,7 @@ namespace Controller
   {
     //Copy common data that are needed to render
     QSharedPointer <Model::RenderTileData> tile(
-        new Model::RenderTileData( *image));
+        new Model::RenderTileData(*image));
 
     tile->deleteImageData = false;
 
@@ -150,7 +150,7 @@ namespace Controller
   {
     qsrand(time(NULL));
 
-    while ( !tiles.empty())
+    while (!tiles.empty())
     {
       int rand = qrand() % tiles.size();
       tilesRandomized.append(tiles [rand]);

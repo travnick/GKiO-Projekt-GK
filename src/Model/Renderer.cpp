@@ -21,10 +21,10 @@ using namespace Model;
 const float COLOR_MIN_VALUE = 0.5f / COLOR_MAX_VALUE;
 
 Renderer::Renderer (const Controller::RenderParams &newRenderParams)
-    : tmpDistance(new Vector), pointLightDist(new Vector), distanceToIntersection(
+    : tmpDistance(new Vector), pointLightDist(new Vector), rayStartIntersect(
         new Vector), lightRay(new Ray)
 {
-  setRenderParams( &newRenderParams);
+  setRenderParams(&newRenderParams);
 }
 
 Renderer::~Renderer ()
@@ -96,20 +96,20 @@ inline void Renderer::shootRay (Ray & ray,
 {
   Scene::ObjectIt endObjects = renderParams->scene->getObjects().end();
   Scene::ObjectIt currentObject = endObjects;
-  worldUnit coef = 1;
-  worldUnit tmpLightCoef = 0;
-  worldUnit viewDistance = mainViewDistance;
+  float coef = 1;
+  float tmpLightCoef = 0;
+  worldUnit rayStartIntersectDist = mainViewDistance;
   int reflecionDeep = renderParams->reflectionDeep;
   bool inShadow;
 
   while (reflecionDeep-- > 0)
   {
-    viewDistance = mainViewDistance;
+    rayStartIntersectDist = mainViewDistance;
     //Find intersection
     for (Scene::ObjectIt object = renderParams->scene->getObjects().begin();
         object < endObjects; object++)
     {
-      if ( ( *object)->checkRay(ray, viewDistance, *tmpDistance) == true)
+      if ( (*object)->checkRay(ray, rayStartIntersectDist, *tmpDistance))
       {
         currentObject = object;
       }
@@ -121,20 +121,20 @@ inline void Renderer::shootRay (Ray & ray,
       QScopedPointer <Vector> normalAtIntersection(new Vector);
       QScopedPointer <Point> intersection(new Point);
 
-      ray.getDir().data.multiply(viewDistance, distanceToIntersection->data);
+      ray.getDir().data.multiply(rayStartIntersectDist,
+                                 rayStartIntersect->data);
 
       //Calculate intersection point
-      ray.getStart().data.move(distanceToIntersection->data,
-                               intersection->data);
+      ray.getStart().data.move(rayStartIntersect->data, intersection->data);
 
       //Get normal vector at intersection point
-      ( *currentObject)->getNormal( *intersection, *normalAtIntersection);
+      (*currentObject)->getNormal(*intersection, *normalAtIntersection);
 
       //move intersection point by epsilon, needed for error correction
       Vector correction(normalAtIntersection->data * FLOAT_EPSILON);
       intersection->data += correction;
 
-      Material *currentMaterial = ( *currentObject)->getMaterial().data();
+      Material *currentMaterial = (*currentObject)->getMaterial().data();
 
       //(1.0f / COLOR_COUNT) because few lines bellow we do color * color
       tmpLightCoef = coef * (1.0f / COLOR_COUNT);
@@ -152,13 +152,13 @@ inline void Renderer::shootRay (Ray & ray,
       //trololo.normalize();
       //trololo is still normalized;
 
-      float transparency = ( *currentObject)->getMaterial()->getTransparency();
+      float transparency = (*currentObject)->getMaterial()->getTransparency();
 
       Color transpColor = shootRefractedRay(ray, transparency, refractionDepth,
-                                            mainViewDistance, viewDistance,
-                                            tmpLightCoef, correction,
-                                            *normalAtIntersection,
-                                            *intersection, * *currentObject);
+                                            mainViewDistance,
+                                            rayStartIntersectDist, tmpLightCoef,
+                                            correction, *normalAtIntersection,
+                                            *intersection, **currentObject);
 
       resultColor += transpColor;
 
@@ -167,8 +167,8 @@ inline void Renderer::shootRay (Ray & ray,
       for (Scene::LighIt light = renderParams->scene->getLights().begin();
           light < endLights; light++)
       {
-        ( *light)->getPosition().data.diff(intersection->data,
-                                           pointLightDist->data);
+        (*light)->getPosition().data.diff(intersection->data,
+                                          pointLightDist->data);
         //if angle between light and normal vector at intersection is higher than 90 degrees
         if (normalAtIntersection->dotProduct(pointLightDist->data) <= 0.0f)
         {
@@ -182,7 +182,7 @@ inline void Renderer::shootRay (Ray & ray,
           continue;
         }
 
-        lightRay->setParams( *intersection, *pointLightDist);
+        lightRay->setParams(*intersection, *pointLightDist);
         // Computation of the shadows
         inShadow = false;
 
@@ -193,8 +193,8 @@ inline void Renderer::shootRay (Ray & ray,
               renderParams->scene->getObjects().begin(); object < endObjects;
               object++)
           {
-            if ( ( *object)->checkRay( *lightRay, pointLightDist->length,
-                                      *tmpDistance) == true)
+            if ( (*object)->checkRay(*lightRay, pointLightDist->length,
+                                     *tmpDistance))
             {
               inShadow = true;
               break;
@@ -202,7 +202,7 @@ inline void Renderer::shootRay (Ray & ray,
           }
         }
 
-        if ( !inShadow)
+        if (!inShadow)
         {
           // Lambert lighting model
           float lambert = lightRay->getDir().dotProduct(
@@ -226,14 +226,15 @@ inline void Renderer::shootRay (Ray & ray,
 
           float specular = pow(trololo.dotProduct(lightRay->getDir()),
                                currentMaterial->getSpecularPower());
-          lightPower = ( *light)->power / lightPower;
+          lightPower = (*light)->power / lightPower;
 //          lightPowerSpecular = ( *light)->power / lightPowerSpecular;
           //<--light attenuation
 
           lightPower *= lambert * tmpLightCoef;
           lightPowerSpecular *= specular * tmpLightCoef;
 
-          resultColor += ( * *light) * currentMaterial->getColor() * lightPower;
+          //Add diffuse component
+          resultColor += (**light) * currentMaterial->getColor() * lightPower;
 
           //TODO: do something like trololo.dotProduct(lightRay->getDir()) < max angle then contribute
           // else continue
@@ -243,7 +244,7 @@ inline void Renderer::shootRay (Ray & ray,
           }
           else
           {
-            resultColor += ( * *light) * currentMaterial->getSpecularColor()
+            resultColor += (**light) * currentMaterial->getSpecularColor()
                 * lightPowerSpecular;
           }
         }
@@ -261,7 +262,7 @@ inline void Renderer::shootRay (Ray & ray,
 //          normalAtIntersection->data) * 2;
 //      ray.getDir().data -= normalAtIntersection->data;
       ray.getDir().data = trololo.data;
-      ray.setParams( *intersection);
+      ray.setParams(*intersection);
       //ray is still normalized;
 
       currentObject = endObjects;
@@ -280,11 +281,7 @@ inline int Renderer::calculateRefraction (Ray &ray,
 
   float ior = currentObject.getMaterial()->getIOR();
 
-//    Vector abackRayDir(ray.getDir());
-//    abackRayDir.data.negate();
-
-  float cos_alpha = -ray.getDir().dotProduct( *normalAtIntersection);
-  //float cos_alpha = -abackRayDir.dotProduct( *normalAtIntersection);
+  float cos_alpha = -ray.getDir().dotProduct(*normalAtIntersection);
 
   //it is ior_in/ior_out
   float ir;
@@ -304,75 +301,17 @@ inline int Renderer::calculateRefraction (Ray &ray,
 
   float sin_betha2 = ir * ir * (1.0f - cos_alpha * cos_alpha);
 
-  //
-//    float cosA = 1;
-//    float tmp;
-
-//float cos_betha = 1.0f - ir*ir *(1.0f -(cos_alpha * cos_alpha));
-//ray.getDir().data = SSEData(ray.getDir().data * ir) + SSEData(normalAtIntersection->data * (ir * cos_alpha - sqrt(abs(cos_betha))));
-
   if (sin_betha2 < 1.0f)
   {
-    /*
-     //we are in sphere
-     if (cos_alpha < 0.0f)
-     {
-     ir = ior;
-     tmp = 1.0f - ir * ir * (1.0f - cos_alpha * cos_alpha);
-     cosA = -1.0f;
-
-     cos_alpha = -cos_alpha;
-
-     ray.getDir().data = SSEData(abackRayDir.data * ir)
-     - SSEData(
-     normalAtIntersection->data
-     * (cosA * (ir * cos_alpha - (sqrt(tmp)))));
-     ray.getDir().normalize();
-     */
-
-    //ray.getDir().data = SSEData(ray.getDir().data * ir)
-    //    - SSEData(
-    //       normalAtIntersection->data
-    //            * (ir * (cos_alpha) + sqrt(1.0f - sin_betha2)));
     ray.getDir().data = ray.getDir().data * ir
         - normalAtIntersection->data
             * (a * (ir * cos_alpha + sqrt(1.0f - sin_betha2)));
+
     ray.getDir().normalize();
-    //}
-    /*
-     else
-     {
-     ir = 1.0f / ior;
-     tmp = 1.0f - ir * ir * (1.0f - cos_alpha * cos_alpha);
-     ray.getDir().data = SSEData(ray.getDir().data * ir)
-     - SSEData(
-     normalAtIntersection->data
-     * (cosA * (ir * cos_alpha - (sqrt(tmp)))));
-     ray.getDir().normalize();
-     }
 
-     //if (tmp > 0.0f)
-     {
-     */
-    /*
-     ray.getDir().data = SSEData(
-     normalAtIntersection->data * (cosA * (ir * cos_alpha - sqrt(tmp))))
-     - SSEData(abackRayDir.data * ir);
-
-     */
-    /*
-     ray.getDir().data = SSEData(abackRayDir.data * ir)
-     - SSEData(
-     normalAtIntersection->data
-     * (cosA * (ir * cos_alpha - (sqrt(tmp)))));
-     ray.getDir().normalize();
-     */
-    //}
     return 0;
   }
-
   return -1;
-
 }
 
 inline Color Renderer::shootRefractedRay (const Ray &ray,
@@ -402,12 +341,12 @@ inline Color Renderer::shootRefractedRay (const Ray &ray,
       newRay.setParams(intersection);
 
       newRay.getStart().data -= correction.data;
-      newRay.getStart().data += newRay.getDir().data * 5 * FLOAT_EPSILON;
+      newRay.getStart().data += newRay.getDir().data * FLOAT_EPSILON;
 
       shootRay(newRay, transpColor, mainViewDistance, refractionDepth - 1);
 
       Color absorbance = currentObject.getMaterial()->getColor() * 0.15f
-          * ( viewDistance);
+          * (viewDistance);
       Color transparencyColor(expf(absorbance.red()), expf(absorbance.green()),
                               expf(absorbance.blue()));
 

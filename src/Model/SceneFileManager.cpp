@@ -25,7 +25,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
   QDomElement root;
   QDomDocument d;
 
-  d.setContent( &io);
+  d.setContent(&io);
   root = d.documentElement();
 
   // Wczytywanie materiałów
@@ -34,7 +34,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
 
   for (; !node.isNull(); node = node.nextSibling())
   {
-    if ( !node.isElement())
+    if (!node.isElement())
       continue;
 
     QSharedPointer <Material> material(new Material());
@@ -82,7 +82,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
 
   for (; !node.isNull(); node = node.nextSibling())
   {
-    if ( !node.isElement())
+    if (!node.isElement())
       continue;
 
     QSharedPointer <Light> object(new Light());
@@ -100,7 +100,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
 
     object->power = power;
     object->setPosition(point);
-    ( *object) = (color);
+    (*object) = (color);
 
     scene.addLight(object);
   }
@@ -111,7 +111,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
 
   for (; !node.isNull(); node = node.nextSibling())
   {
-    if ( !node.isElement())
+    if (!node.isElement())
       continue;
 
     QDomElement elem = node.toElement();
@@ -131,7 +131,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
         getVPCommon(node.firstChildElement("position").toElement(), point);
         radius = getFloat(elem, "r");
 
-        if ( ! (radius > 0))
+        if (! (radius > 0))
         {
           throw std::logic_error("Promień musi być dodatni.");
         }
@@ -184,7 +184,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
           {
             for (int k = 0; k < multiplyZ; ++k)
             {
-              QSharedPointer <VisibleObject> object(new Sphere( *mainbject));
+              QSharedPointer <VisibleObject> object(new Sphere(*mainbject));
               point = object->getPosition();
 
               point [X] += offset * i * multiplyXSign;
@@ -220,7 +220,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
 
       case Objects::Camera:
       {
-        if ( ! (scene.getCamera().isNull()))
+        if (! (scene.getCamera().isNull()))
         {
           throw std::logic_error("Może być zdefiniowana tylko jedna kamera.");
         }
@@ -238,15 +238,15 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
 
         screenWidth = static_cast <Point::dataType>(getFloat(elem,
                                                              "screenWidth"));
-        if ( ! (screenWidth > 0))
+        if (! (screenWidth > 0))
           throw std::logic_error("Parametr screenWidth musi być większy od 0.");
 
         FOV = static_cast <Camera::unitType>(getDouble(elem, "fov"));
-        if ( ! (FOV > 0 && FOV < 180))
+        if (! (FOV > 0 && FOV < 180))
           throw std::logic_error("Parametr FOV musi być z zakresu (0;180).");
 
         viewDistance = static_cast <worldUnit>(getFloat(elem, "viewDistance"));
-        if ( ! (viewDistance > 0))
+        if (! (viewDistance > 0))
           throw std::logic_error(
               "Parametr viewDistance musi być większy od 0.");
 
@@ -289,8 +289,8 @@ int SceneFileManager::getInt (const QDomElement &elem, const QString &name)
 {
   bool ok;
   int val;
-  val = elem.attribute(name).toInt( &ok, 10);
-  if ( !ok)
+  val = elem.attribute(name).toInt(&ok, 10);
+  if (!ok)
     throw std::logic_error(
         "Błąd podczas wczytywania elementu " + name.toStdString());
   return val;
@@ -300,8 +300,8 @@ float SceneFileManager::getFloat (const QDomElement &elem, const QString &name)
 {
   bool ok;
   float val;
-  val = elem.attribute(name).toFloat( &ok);
-  if ( !ok)
+  val = elem.attribute(name).toFloat(&ok);
+  if (!ok)
     throw std::logic_error(
         "Błąd podczas wczytywania elementu " + name.toStdString());
   return val;
@@ -312,8 +312,8 @@ double SceneFileManager::getDouble (const QDomElement &elem,
 {
   bool ok;
   double val;
-  val = elem.attribute(name).toDouble( &ok);
-  if ( !ok)
+  val = elem.attribute(name).toDouble(&ok);
+  if (!ok)
     throw std::logic_error(
         "Błąd podczas wczytywania elementu " + name.toStdString());
   return val;

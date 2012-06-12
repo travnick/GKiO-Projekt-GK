@@ -65,7 +65,7 @@ namespace Model
         setColor(DEFAULT_COLOR_VALUE, DEFAULT_COLOR_VALUE, DEFAULT_COLOR_VALUE);
       }
 
-      /**
+      /**All color components are multiplied by mulValue
        *
        * @param mulValue
        * @return
@@ -75,7 +75,7 @@ namespace Model
         return data * mulValue;
       }
 
-      /**
+      /**All color components are multiplied by mulValue
        *
        * @param mulValue
        * @return
@@ -86,7 +86,10 @@ namespace Model
         return *this;
       }
 
-      /**
+      /**There occurs:
+       * this[R] * other[R]
+       * this[G] * other[G]
+       * this[B] * other[B]
        *
        * @param other
        * @return
@@ -96,7 +99,10 @@ namespace Model
         return data * other.data;
       }
 
-      /**
+      /**There occurs:
+       * this[R] *= other[R]
+       * this[G] *= other[G]
+       * this[B] *= other[B]
        *
        * @param other
        * @return
@@ -107,7 +113,7 @@ namespace Model
         return *this;
       }
 
-      /**
+      /**Adds two colors
        *
        * @param other
        * @return
@@ -120,17 +126,17 @@ namespace Model
 
       inline colorType red () const
       {
-        return retCol(data [R]);
+        return retColor(data [R]);
       }
 
       inline colorType green () const
       {
-        return retCol(data [G]);
+        return retColor(data [G]);
       }
 
       inline colorType blue () const
       {
-        return retCol(data [B]);
+        return retColor(data [B]);
       }
 
     private:
@@ -141,7 +147,7 @@ namespace Model
        * @param color float representation of color
        * @return color value
        */
-      inline colorType retCol (float color) const
+      inline colorType retColor (float color) const
       {
         saturate(color);
 

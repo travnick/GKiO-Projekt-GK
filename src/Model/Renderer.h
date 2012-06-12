@@ -48,9 +48,9 @@ namespace Model
        */
       void render (const RenderTileData &tile);
 
-      /**Sets 3D scene to render
+      /**
        *
-       * @param scene 3d scene to render
+       * @param newRenderParams
        */
       inline void setRenderParams (const Controller::RenderParams * newRenderParams)
       {
@@ -59,10 +59,18 @@ namespace Model
 
     private:
       //Internal temporary -->
-      //QScopedPointer <Point> intersection;
       QScopedPointer <Ray> lightRay;
-      QScopedPointer <Vector> distanceToIntersection;
+      /**Vector from ray start point do intersection point
+       *
+       */
+      QScopedPointer <Vector> rayStartIntersect;
+      /**Vector from intersection point to light position
+       *
+       */
       QScopedPointer <Vector> pointLightDist;
+      /**It is used for temporary calculations
+       *
+       */
       QScopedPointer <Vector> tmpDistance;
       // <-- Internal temporary
 

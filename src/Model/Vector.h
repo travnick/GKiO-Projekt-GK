@@ -61,7 +61,7 @@ namespace Model
        */
       inline Vector toNormal () const
       {
-        Vector other( *this);
+        Vector other(*this);
         other.normalize();
         return other;
       }

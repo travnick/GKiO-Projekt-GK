@@ -6,6 +6,7 @@
 #include <QSharedPointer>
 #include <QString>
 
+// Functions -->
 /**
  *
  * @param string
@@ -15,6 +16,7 @@ inline QString toLowerCase (const char* string)
 {
   return QString::fromStdString(string).toLower();
 }
+// <-- Functions
 
 //Constants -->
 const float PI = 3.14159265;
@@ -61,12 +63,6 @@ inline float SQRT (float value)
   return sqrtf(value);
 }
 // <--Templates
-
-// Functions -->
-
-QString toLowerCase (const char* string);
-
-// <-- Functions
 
 namespace Model
 {

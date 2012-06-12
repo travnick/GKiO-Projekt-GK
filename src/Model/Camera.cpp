@@ -38,9 +38,9 @@ namespace Model
     unitType halfHeight = screenHeight / 2;
     unitType halfWidth = screenWidth / 2;
 
-    screenTopLeft.set( -halfWidth, halfHeight, 0);
+    screenTopLeft.set(-halfWidth, halfHeight, 0);
     screenTopRight.set(halfWidth, halfHeight, 0);
-    screenBottomLeft.set( -halfWidth, -halfHeight, 0);
+    screenBottomLeft.set(-halfWidth, -halfHeight, 0);
 
     screenTopLeft.rotate(angles);
     screenTopRight.rotate(angles);
@@ -50,6 +50,7 @@ namespace Model
     screenTopRight.data += position;
     screenBottomLeft.data += position;
 
+    //Vectors used for moving on the projection plane
     screenWidthDelta.data = screenTopRight.data - screenTopLeft.data;
     screenHeightDelta.data = screenBottomLeft.data - screenTopLeft.data;
 

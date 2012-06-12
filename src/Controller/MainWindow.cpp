@@ -86,7 +86,7 @@ namespace Controller
 
     updateCamera();
 
-    if ( !ui->liveCamera->isChecked())
+    if (!ui->liveCamera->isChecked())
     {
       ui->imageViewer->getImage()->fill(Qt::darkGray);
     }
@@ -173,7 +173,7 @@ namespace Controller
 
       imageWriter.setFormat(IMAGE_SAVE_FORMAT);
       imageWriter.setCompression(9);
-      imageWriter.write( *imageToSave);
+      imageWriter.write(*imageToSave);
     }
   }
 
@@ -410,7 +410,7 @@ namespace Controller
   {
     ui->loadScene->setDisabled(withSceneLoading);
     ui->render->setDisabled(true);
-    ui->terminateRender->setDisabled(false | ( !withLibSelect));
+    ui->terminateRender->setDisabled(false | (!withLibSelect));
 
     ui->imageGroup->setDisabled(true);
     ui->cameraGroup->setDisabled(true);
@@ -443,7 +443,7 @@ namespace Controller
     bool result = false;
     QString fileName(DEFAULT_SCENE_FILE_NAME);
 
-    if ( !QFile::exists(fileName))
+    if (!QFile::exists(fileName))
     {
       fileName = QFileDialog::getOpenFileName(this,
                                               QSTRING("Otwórz plik sceny"),
@@ -474,7 +474,7 @@ namespace Controller
               + QSTRING(ex.what()));
     }
 
-    if ( !result)
+    if (!result)
     {
       //Important because possibility of changing scene file content and trying to reload it
       deactivateButtons(false, false);
@@ -501,7 +501,7 @@ namespace Controller
   {
     ui->lastTime->setValue(time / static_cast <float>(KILO));
 
-    if ( !ui->liveCamera->isChecked())
+    if (!ui->liveCamera->isChecked())
     {
       //Add new row to result list
       if (addResult)
@@ -509,7 +509,7 @@ namespace Controller
         addTimeToResultList(ui->lastTime->value());
       }
     }
-    else if ( !ui->refreshTimeGroup->isChecked())
+    else if (!ui->refreshTimeGroup->isChecked())
     {
       ui->refreshTime->setValue(time);
     }
@@ -576,7 +576,7 @@ namespace Controller
 
     getCameraParameters();
 
-    if ( !renderingInProgress && ui->liveCamera->isChecked())
+    if (!renderingInProgress && ui->liveCamera->isChecked())
     {
       runRenderer();
     }
@@ -615,7 +615,7 @@ namespace Controller
 
     getCameraParameters();
 
-    if ( !renderingInProgress && ui->liveCamera->isChecked())
+    if (!renderingInProgress && ui->liveCamera->isChecked())
     {
       runRenderer();
     }

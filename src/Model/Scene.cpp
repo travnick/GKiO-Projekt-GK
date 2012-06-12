@@ -51,9 +51,4 @@ namespace Model
   {
     camera->calibrate();
   }
-
-  void Scene::calculateObjectSizeOnImage (const ObjectPtr &)
-  {
-    //TODO: implement
-  }
 }

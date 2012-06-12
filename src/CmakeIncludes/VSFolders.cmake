@@ -23,7 +23,6 @@ SOURCE_GROUP("Header Files" FILES
 )
 SOURCE_GROUP("Source Files" FILES
   ${SOURCE_DIR}/Model/Camera.cpp
-  ${SOURCE_DIR}/Model/Material.cpp
   ${SOURCE_DIR}/Model/Object.cpp
   ${SOURCE_DIR}/Model/Plane.cpp
   ${SOURCE_DIR}/Model/Renderer.cpp

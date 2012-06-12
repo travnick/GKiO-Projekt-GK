@@ -22,7 +22,6 @@ namespace Model
       MaterialPtr material;
 
     public:
-      worldUnit sizeOnImage;
 
       inline virtual ~VisibleObject ()
       {

@@ -50,6 +50,7 @@ namespace Model
       }
 
       /**Returns direction from camera origin to given point
+       * on the projection plane
        *
        * @param point point in 3D space
        * @param direction direction from camera origin to given point
@@ -230,9 +231,13 @@ namespace Model
 
       void rotate (Axis axis, float angle);
 
+      //Vectors used for moving on the projection plane
       Vector screenHeightDelta;
       Vector screenWidthDelta;
     private:
+      /**Rotation angles
+       *
+       */
       Vector angles;
       Vector eyeDirection;
       Point origin;

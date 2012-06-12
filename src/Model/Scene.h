@@ -162,8 +162,6 @@ namespace Model
       inline void addVisibleObject (const ObjectPtr &object)
       {
         objects.push_back(object);
-
-        calculateObjectSizeOnImage(object);
       }
 
       /**Updates camera
@@ -188,7 +186,5 @@ namespace Model
       MaterialContainer materials;
       ObjectContainer objects;
       bool loaded;
-
-      void calculateObjectSizeOnImage (const ObjectPtr &object);
   };
 }

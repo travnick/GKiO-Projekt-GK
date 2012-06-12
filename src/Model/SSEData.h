@@ -140,9 +140,9 @@ namespace Model
       {
         setDefaults();
 
-        ( *this) [X] = x;
-        ( *this) [Y] = y;
-        ( *this) [Z] = z;
+        (*this) [X] = x;
+        (*this) [Y] = y;
+        (*this) [Z] = z;
       }
 
 #if USE_SSE == 1
@@ -161,7 +161,7 @@ namespace Model
         ( *this) [Y] = other [Y];
         ( *this) [Z] = other [Z];
 #endif
-        return ( *this);
+        return (*this);
       }
 
       inline void setDefaults ()
@@ -169,7 +169,7 @@ namespace Model
 #if USE_SSE == 1
         // It's important, without determining W value there is performance loss
         // because of operating on NaNs etc.
-        ( *this) [W] = 0;
+        (*this) [W] = 0;
 #endif
       }
 
@@ -278,17 +278,17 @@ namespace Model
       inline SSEVector & operator = (const BaseSSEData &other)
       {
         *internalData = other;
-        return ( *this);
+        return (*this);
       }
 
       inline float & operator[] (int idx)
       {
-        return ( *internalData) [idx];
+        return (*internalData) [idx];
       }
 
       inline float operator[] (int idx) const
       {
-        return ( *internalData) [idx];
+        return (*internalData) [idx];
       }
 
 // operations on data -->
@@ -378,7 +378,7 @@ namespace Model
        */
       inline SSEVector &operator -= (const SSEVector &other)
       {
-        *internalData = ( *this) - other;
+        *internalData = (*this) - other;
         return *this;
       }
 
@@ -443,9 +443,9 @@ namespace Model
       {
         SSEVector crossProd;
 
-        crossProd [X] = ( *this) [Y] * other [Z] - ( *this) [Z] * other [Y];
-        crossProd [Y] = ( *this) [Z] * other [X] - ( *this) [X] * other [Z];
-        crossProd [Z] = ( *this) [X] * other [Y] - ( *this) [Y] * other [X];
+        crossProd [X] = (*this) [Y] * other [Z] - (*this) [Z] * other [Y];
+        crossProd [Y] = (*this) [Z] * other [X] - (*this) [X] * other [Z];
+        crossProd [Z] = (*this) [X] * other [Y] - (*this) [Y] * other [X];
 
         return crossProd;
       }
@@ -460,19 +460,19 @@ namespace Model
        */
       inline float dotProduct () const
       {
-        return dotProduct( *this);
+        return dotProduct(*this);
       }
 
       inline BaseSSEData operator - () const
       {
-        return BaseSSEData( - ( *this) [X], - ( *this) [Y], - ( *this) [Z]);
+        return BaseSSEData(- (*this) [X], - (*this) [Y], - (*this) [Z]);
       }
 
       inline void negate ()
       {
-        ( *this) [X] = - ( *this) [X];
-        ( *this) [Y] = - ( *this) [Y];
-        ( *this) [Z] = - ( *this) [Z];
+        (*this) [X] = - (*this) [X];
+        (*this) [Y] = - (*this) [Y];
+        (*this) [Z] = - (*this) [Z];
       }
 // <-- operations on data
 

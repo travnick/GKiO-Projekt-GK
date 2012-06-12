@@ -16,6 +16,9 @@ namespace Model
   class RenderTileData
   {
     public:
+      /**Amount of the memory consumed by an image
+       *
+       */
       quint64 imageDataSize;
       Point2D topLeft;
       Point2D bottomRight;
@@ -23,6 +26,11 @@ namespace Model
       imageUnit width;
       imageUnit imageHeight;
       imageUnit imageWidth;
+
+      /**Pointer to memory allocated for image
+       * Don't delete it until program close
+       *
+       */
       colorType *imageData;
       bool deleteImageData;
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene>
   <materials>
-    <mat id="0" reflection="0.1" transparency="0.9" ior="1.502" specularPower="10">
+    <mat id="0" reflection="0.1" transparency="0.9" ior="1.402" specularPower="10">
       <diffuseColor r="63" g="230" b="27" />
       <specularColor r="204" g="204" b="204" />
     </mat>
@@ -25,7 +25,7 @@
       <diffuseColor r="135" g="208" b="230" />
       <specularColor r="204" g="204" b="204" />
     </mat>
-    <mat id="6" reflection="0.05" transparency="0.0" ior="1.0" specularPower="500">
+    <mat id="6" reflection="0.1" transparency="0.5" ior="10.3" specularPower="500">
       <diffuseColor r="66" g="131" b="153" />
       <specularColor r="204" g="204" b="204" />
     </mat>
@@ -76,36 +76,36 @@
       <position x="41.87" y="51.66" z="80.83" />
     </camera>
     
-    <!-- TOP -->
+    <!-- TOP
     <sphere r="1.0" material="5" offset="15">
       <position x="-45" y="60" z="50" />
       <multiply x="7" y="1" z="7" />
-    </sphere>
+    </sphere> -->
     
-    <!-- BACK -->
+    <!-- BACK
     <sphere r="2.0" material="3" offset="12">
       <position x="-43" y="3" z="140" />
       <multiply x="8" y="5" z="1" />
-    </sphere>
+    </sphere> -->
     
-    <!-- LEFT -->
+    <!-- LEFT
     <sphere r="2.0" material="3" offset="8">
       <position x="-47" y="3" z="140" />
       <multiply x="1" y="8" z="-11" />
-    </sphere>
+    </sphere> -->
     
-    <!-- RIGHT -->
+    <!-- RIGHT
     <sphere r="2.0" material="3" offset="8">
       <position x="47" y="3" z="140" />
       <multiply x="1" y="8" z="-11" />
-    </sphere>
+    </sphere> -->
     
-    <!-- BOTTOM -->
+    <!-- BOTTOM
     <sphere r="2.0" material="6" offset="7">
       <position x="-45" y="-1.5" z="50" />
       <multiply x="14" y="1" z="14" />
-    </sphere>
-    <plane angleX="0" angleY="0" angleZ="0" d="-10" material="6" />
+    </sphere> -->
+    <plane angleX="-20" angleY="0" angleZ="0" d="0" material="6" />
     
     <!-- CUBE-->
     <sphere r="1.0" material="2" offset="3">
@@ -146,7 +146,7 @@
     </sphere>
     
     <!-- the biggest one-->
-    <sphere r="10.0" material="0">
+    <sphere r="15.0" material="0">
       <position x="15" y="30" z="100" />
     </sphere>
   </objects>

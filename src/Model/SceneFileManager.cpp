@@ -50,6 +50,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
     getColor(node.firstChildElement("diffuseColor").toElement(), color);
     getColor(node.firstChildElement("specularColor").toElement(),
              specularColor);
+    QString texture = elem.attribute("texture");
 
     if (reflection < 0.0f || reflection > 1.0f)
       throw std::logic_error("Wartość odbicia jest spoza zakresu.");
@@ -69,6 +70,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
     material->setReflection(reflection);
     material->setTransparency(transparency);
     material->setIOR(ior);
+    material->setTexture(texture);
 
     scene.addMaterial(material);
   }

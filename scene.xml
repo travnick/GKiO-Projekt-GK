@@ -25,7 +25,7 @@
       <diffuseColor r="135" g="208" b="230" />
       <specularColor r="204" g="204" b="204" />
     </mat>
-    <mat id="6" reflection="0.5" transparency="0.5" ior="10.3" specularPower="500">
+    <mat id="6" reflection="0.05" transparency="0" ior="10.3" specularPower="500">
       <diffuseColor r="66" g="131" b="153" />
       <specularColor r="204" g="204" b="204" />
     </mat>
@@ -33,7 +33,7 @@
   
   <lights>
     <!-- TOP -->
-    <light id="1" power="200.0">
+    <light id="1" power="1000.0">
       <position x="0" y="1000" z="80" />
       <color r="204" g="204" b="204" />
     </light>
@@ -105,7 +105,7 @@
       <position x="-45" y="-1.5" z="50" />
       <multiply x="14" y="1" z="14" />
     </sphere> 
-    <plane angleX="0" angleY="0" angleZ="0" d="0" material="6" />
+    <plane angleX="0" angleY="0" angleZ="0" d="-10" material="6" />
     
     <!-- CUBE-->
     <sphere r="1.0" material="2" offset="3">

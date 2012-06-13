@@ -84,11 +84,13 @@ namespace Model
        * @param resultColor color at the intersection point
        * @param viewDistance maximum range to check intersections
        * @param refractionDepth maximum depth of refraction
+       * @param objectWeAreIn object in which current ray starts
        */
       void shootRay (Ray & ray,
                      Color &resultColor,
                      worldUnit viewDistance,
-                     int refractionDepth) const;
+                     int refractionDepth,
+                     const VisibleObject *objectWeAreIn) const;
 
       /**
        *
@@ -102,13 +104,15 @@ namespace Model
                                Vector &correction,
                                Vector &normalAtIntersection,
                                Point &intersection,
-                               VisibleObject &currentObject) const;
+                               VisibleObject &currentObject,
+                               const VisibleObject *objectWeAreIn) const;
 
       /**
        *
        */
       int calculateRefraction (Ray &ray,
                                VisibleObject &currentObject,
+                               const VisibleObject *objectWeAreIn,
                                Vector *normalAtIntersection) const;
 
       Q_DISABLE_COPY (Renderer)

@@ -28,11 +28,21 @@ namespace Model
       {
       }
 
+      /**Constructs Color from r, g, b components
+       *
+       * @param r red
+       * @param g green
+       * @param b blue
+       *
+       */
       inline Color (dataType r, dataType g, dataType b)
           : data(r, g, b)
       {
       }
 
+      /**Constructs Color from BaseSSEData
+       *
+       */
       inline Color (const BaseSSEData &newData)
           : data(newData)
       {
@@ -124,16 +134,28 @@ namespace Model
         return *this;
       }
 
+      /** Returns a red component of the color
+       *
+       *  @return red component
+       */
       inline colorType red () const
       {
         return retColor(data [R]);
       }
 
+      /** Returns a green component of the color
+       *
+       *  @return green component
+       */
       inline colorType green () const
       {
         return retColor(data [G]);
       }
 
+      /** Returns a blue component of the color
+       *
+       *  @return blue component
+       */
       inline colorType blue () const
       {
         return retColor(data [B]);

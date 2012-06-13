@@ -208,11 +208,20 @@ namespace Model
        */
       void updateRotation ();
 
+
+      /** Return angles of camera
+       *
+       * @return angles of camera
+       */
       const Vector &getAngles () const
       {
         return angles;
       }
 
+      /** Return angles of camera
+       *
+       * @return angles of camera
+       */
       Vector &getAngles ()
       {
         return angles;

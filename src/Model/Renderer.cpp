@@ -40,6 +40,7 @@ void Renderer::render (const RenderTileData &tile)
   Point currentOnScreen;
   Ray ray;
   Color rayResult;
+  const VisibleObject *objectWeAreIn = &renderParams->scene->getWorldObject();
 
   imageUnit diffToNewLine = BPP * (tile.imageWidth - tile.width);
   imageUnit R = BPP * (tile.topLeft.x + tile.topLeft.y * tile.imageWidth);
@@ -67,7 +68,7 @@ void Renderer::render (const RenderTileData &tile)
       int refractionDepth = renderParams->refractionDeep;
 
       rayResult.setDefaultColor();
-      shootRay(ray, rayResult, viewDistance, refractionDepth);
+      shootRay(ray, rayResult, viewDistance, refractionDepth, objectWeAreIn);
 
       tile.imageData [R] = rayResult.red();
       R += BPP;
@@ -92,7 +93,8 @@ void Renderer::render (const RenderTileData &tile)
 inline void Renderer::shootRay (Ray & ray,
                                 Color &resultColor,
                                 worldUnit mainViewDistance,
-                                int refractionDepth) const
+                                int refractionDepth,
+                                const VisibleObject *objectWeAreIn) const
 {
   Scene::ObjectIt endObjects = renderParams->scene->getObjects().end();
   Scene::ObjectIt currentObject = endObjects;
@@ -144,13 +146,12 @@ inline void Renderer::shootRay (Ray & ray,
         tmpLightCoef *= (1.0f - currentMaterial->getReflection());
       }
 
-      Vector rayCopy(ray.getDir());
+      Vector reflectedRay(ray.getDir());
       Model::SSEVector normalCopy = normalAtIntersection->data;
       //Calculate reflection vector
-      normalCopy *= rayCopy.dotProduct(normalCopy) * 2;
-      rayCopy.data -= normalCopy;
-      //rayCopy.normalize();
-      //rayCopy is still normalized;
+      normalCopy *= reflectedRay.dotProduct(normalCopy) * 2;
+      reflectedRay.data -= normalCopy;
+      //reflectedRay is still normalized;
 
       float transparency = (*currentObject)->getMaterial()->getTransparency();
 
@@ -159,7 +160,8 @@ inline void Renderer::shootRay (Ray & ray,
                                             mainViewDistance,
                                             rayStartIntersectDist, tmpLightCoef,
                                             correction, *normalAtIntersection,
-                                            *intersection, **currentObject);
+                                            *intersection, **currentObject,
+                                            objectWeAreIn);
 
       resultColor += transpColor;
 
@@ -210,7 +212,7 @@ inline void Renderer::shootRay (Ray & ray,
           float lambert = lightRay->getDir().dotProduct(
               normalAtIntersection->data);
 
-          //light attenuation -->
+          //light attenuation
           float lightPower = (0.01 * pointLightDist->length
               + 0.001 * pointLightDist->length * pointLightDist->length);
 
@@ -226,11 +228,12 @@ inline void Renderer::shootRay (Ray & ray,
             lightPowerSpecular = 1.0;
           }
 
-          float specular = pow(rayCopy.dotProduct(lightRay->getDir()),
+          float rayLigthRayAngleCos = reflectedRay.dotProduct(
+              lightRay->getDir());
+
+          float specular = pow(rayLigthRayAngleCos,
                                currentMaterial->getSpecularPower());
           lightPower = (*light)->power / lightPower;
-//          lightPowerSpecular = ( *light)->power / lightPowerSpecular;
-          //<--light attenuation
 
           lightPower *= lambert * tmpLightCoef;
           lightPowerSpecular *= specular * tmpLightCoef;
@@ -238,13 +241,9 @@ inline void Renderer::shootRay (Ray & ray,
           //Add diffuse component
           resultColor += (**light) * currentMaterial->getColor() * lightPower;
 
-          //TODO: do something like rayCopy.dotProduct(lightRay->getDir()) < max angle then contribute
+          //TODO: do something like reflectedRay.dotProduct(lightRay->getDir()) < max angle then contribute
           // else continue
-          if (rayCopy.dotProduct(lightRay->getDir()) <= 0.0f)
-          {
-            continue;
-          }
-          else
+          if (rayLigthRayAngleCos > 0.0f)
           {
             resultColor += (**light) * currentMaterial->getSpecularColor()
                 * lightPowerSpecular;
@@ -255,16 +254,12 @@ inline void Renderer::shootRay (Ray & ray,
       //multiply by current reflection contribution
       coef *= currentMaterial->getReflection();
 
-      if (coef < COLOR_MIN_VALUE)
+      if ( (coef < COLOR_MIN_VALUE) || (objectWeAreIn == currentObject->data()))
       {
         break;
       }
 
-      //Calculate reflection vector
-//      normalAtIntersection->data *= ray.getDir().dotProduct(
-//          normalAtIntersection->data) * 2;
-//      ray.getDir().data -= normalAtIntersection->data;
-      ray.getDir().data = rayCopy.data;
+      ray.getDir().data = reflectedRay.data;
       ray.setParams(*intersection);
       //ray is still normalized;
 
@@ -279,13 +274,14 @@ inline void Renderer::shootRay (Ray & ray,
 
 inline int Renderer::calculateRefraction (Ray &ray,
                                           VisibleObject &currentObject,
+                                          const VisibleObject *objectWeAreIn,
                                           Vector *normalAtIntersection) const
 {
 
   float ior = currentObject.getMaterial()->getIOR();
 
   //TODO: not sure if it is proper comment - needs verification
-  //get cosinus between normal and ray going into the sphere
+  //get cosine between normal and ray going into the sphere
   float cos_alpha = -ray.getDir().dotProduct(*normalAtIntersection);
 
   //it is ior_in/ior_out
@@ -295,7 +291,7 @@ inline int Renderer::calculateRefraction (Ray &ray,
   //we are going into the sphere
   if (cos_alpha >= 0.0f)
   {
-    ir = 1.0f / ior;
+    ir = objectWeAreIn->getMaterial()->getIOR() / ior;
   }
   else
   //going outside of the sphere
@@ -330,7 +326,8 @@ inline Color Renderer::shootRefractedRay (const Ray &ray,
                                           Vector &correction,
                                           Vector &normalAtIntersection,
                                           Point &intersection,
-                                          VisibleObject &currentObject) const
+                                          VisibleObject &currentObject,
+                                          const VisibleObject *objectWeAreIn) const
 {
   //default color is black
   Color transpColor(0, 0, 0);
@@ -342,7 +339,7 @@ inline Color Renderer::shootRefractedRay (const Ray &ray,
 
     Ray newRay(ray);
 
-    int refrResult = calculateRefraction(newRay, currentObject,
+    int refrResult = calculateRefraction(newRay, currentObject, objectWeAreIn,
                                          &normalAtIntersection);
 
     //there was refraction
@@ -354,7 +351,12 @@ inline Color Renderer::shootRefractedRay (const Ray &ray,
       newRay.getStart().data -= correction.data;
       newRay.getStart().data += newRay.getDir().data * FLOAT_EPSILON;
 
-      shootRay(newRay, transpColor, mainViewDistance, refractionDepth - 1);
+      //changing object to the sphere we are going into
+      objectWeAreIn = &currentObject;
+
+      shootRay(newRay, transpColor, mainViewDistance, refractionDepth - 1,
+               objectWeAreIn);
+
       transpColor *= transparency;
     }
   }

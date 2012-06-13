@@ -9,6 +9,7 @@
 #include "Model/Scene.h"
 #include "Model/SceneFileManager.h"
 #include "Model/Sphere.h"
+#include "Model/Material.h"
 
 using namespace std;
 
@@ -16,8 +17,13 @@ namespace Model
 {
 
   Scene::Scene ()
+      : world(1)
   {
     loaded = false;
+
+    MaterialPtr worldMaterial(new Material);
+    worldMaterial->setIOR(1.0f);
+    world.setMaterial(worldMaterial);
   }
 
   bool Scene::init (const QString &filename, bool reload) throw (std::exception)
@@ -41,6 +47,7 @@ namespace Model
       fileManager.loadScene(infile, *this);
       infile.close();
       result = true;
+
     }
     loaded = result;
 

@@ -10,6 +10,7 @@
 #include "Controller/GlobalDefines.h"
 #include "Model/Camera.h"
 #include "Model/ModelDefines.h"
+#include "Model/Sphere.h"
 
 //Forward declarations -->
 namespace std
@@ -108,6 +109,15 @@ namespace Model
         return objects.size();
       }
 
+      /**Returns world object
+       *
+       *@return world object
+       */
+      inline const Sphere &getWorldObject () const
+      {
+        return world;
+      }
+
       /**Sets image width
        * It sets image width in camera, not in scene
        *
@@ -181,6 +191,7 @@ namespace Model
       }
 
     private:
+      Sphere world;
       CameraPtr camera;
       LighContainer lights;
       MaterialContainer materials;

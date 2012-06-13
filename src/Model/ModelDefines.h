@@ -29,21 +29,21 @@ const float FLOAT_EPSILON = 0.01f;
 //Macros -->
 /**Converts degree to radian
  *
- * @param value angle in degree
+ * @param x angle in degree
  * @return angle in radian
  */
 #define RAD(x) (x*(PI/180))
 
 /**Converts a macro argument into a string constant
  *
- * @param value argument to stringify
+ * @param x argument to stringify
  * @return string constant
  */
 #define STRINGIFY(x) #x
 
 /**Converts a macro argument into a lower case QString
  *
- * @param value argument to stringify
+ * @param x argument to stringify
  * @return lower case string
  */
 #define LCSTRING(x) toLowerCase(STRINGIFY(x))

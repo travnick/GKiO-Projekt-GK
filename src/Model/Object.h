@@ -34,7 +34,7 @@ namespace Model
 
       /**Copies position from other point in 3D space
        *
-       * @param position other point in 3D space
+       * @param newPosition other point in 3D space
        */
       inline void setPosition (const Point &newPosition)
       {
@@ -64,7 +64,7 @@ namespace Model
        * @param object type
        * @return string representation of type
        */
-      static const QString &getObjectTypeName (Objects::ObjectType);
+      static const QString &getObjectTypeName (Objects::ObjectType object);
 
     protected:
       Point position;

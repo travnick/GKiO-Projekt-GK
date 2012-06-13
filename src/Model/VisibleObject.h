@@ -55,7 +55,7 @@ namespace Model
 
       /**Sets material of the object
        *
-       * @param materialId id of material to set
+       * @param newMaterialId id of material to set
        */
       inline void setMaterial (const MaterialPtr &newMaterialId)
       {

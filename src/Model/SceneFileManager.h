@@ -27,7 +27,7 @@ namespace Model
 
       /**Loads scene from stream
        *
-       * @param is stream to load data from
+       * @param io stream to load data from
        * @param scene scene to load data in
        */
       void loadScene (QIODevice & io, Scene &scene);

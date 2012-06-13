@@ -130,7 +130,7 @@ namespace Model
 
       /**Sets camera object in scene
        *
-       * @param camera camera to set in scene
+       * @param newCamera camera to set in scene
        */
       inline void setCamera (const CameraPtr &newCamera)
       {

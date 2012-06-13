@@ -20,8 +20,8 @@ namespace Model
 
       /**Creates ray with given start point and direction
        *
-       * @param start start point of vector
-       * @param direction direction of vector
+       * @param newStart start point of vector
+       * @param newDirection direction of vector
        */
       inline Ray (const Point &newStart, const Vector &newDirection)
           : start(newStart), direction(newDirection)
@@ -30,8 +30,8 @@ namespace Model
 
       /**Sets ray start point and direction
        *
-       * @param start start point of vector
-       * @param direction direction of vector
+       * @param newStart start point of vector
+       * @param newDirection direction of vector
        */
       inline void setParams (const Point &newStart, const Vector &newDirection)
       {
@@ -41,7 +41,7 @@ namespace Model
 
       /**Sets ray start point
        *
-       * @param start start point of vector
+       * @param newStart start point of vector
        */
       inline void setParams (const Point &newStart)
       {

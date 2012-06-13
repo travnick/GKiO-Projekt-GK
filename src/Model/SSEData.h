@@ -385,7 +385,7 @@ namespace Model
       /**Multiplies self by a constant
        *
        * @param constant worldUnit
-       * @param result this SSEVector
+       * @return this SSEVector
        */
       inline SSEVector &operator *= (worldUnit constant)
       {

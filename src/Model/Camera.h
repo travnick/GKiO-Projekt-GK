@@ -53,7 +53,7 @@ namespace Model
        * on the projection plane
        *
        * @param point point in 3D space
-       * @param direction direction from camera origin to given point
+       * @param directionToPoint direction from camera origin to given point
        */
       inline void getDirection (const Point &point,
                                 Vector &directionToPoint) const
@@ -116,7 +116,7 @@ namespace Model
        * FOV is decremented by 180 until FOV < 180
        * If FOV < 0 then FOV = 0
        *
-       * @param FOV new Field of View
+       * @param newFOV new Field of View
        */
       inline void setFOV (unitType newFOV)
       {
@@ -150,7 +150,7 @@ namespace Model
 
       /**Sets screen width
        *
-       * @param screenWidth new screen width
+       * @param newScreenWidth new screen width
        */
       inline void setScreenWidth (worldUnit newScreenWidth)
       {
@@ -159,7 +159,7 @@ namespace Model
 
       /**Sets image width
        *
-       * @param imageWidth new image width
+       * @param newImageWidth new image width
        */
       inline void setImageWidth (imageUnit newImageWidth)
       {
@@ -168,7 +168,7 @@ namespace Model
 
       /**Sets image height
        *
-       * @param imageHeight
+       * @param newImageHeight
        */
       inline void setImageHeight (imageUnit newImageHeight)
       {
@@ -220,15 +220,27 @@ namespace Model
 
       /**Sets camera view distance
        *
-       * @param viewDistance new view distance
+       * @param newViewDistance new view distance
        */
       inline void setViewDistance (const worldUnit &newViewDistance)
       {
         viewDistance = newViewDistance;
       }
 
+      /**
+       *  Moves camera along specified axis by "speed" distance
+       *
+       *  @param direction direction of movement
+       *  @param speed distance that camera will travel
+       */
       void move (Axis direction, float speed);
 
+      /**
+       * Rotates camera along specified axis by angle
+       *
+       * @param axis axis of rotation
+       * @param angle angle of rotation
+       */
       void rotate (Axis axis, float angle);
 
       //Vectors used for moving on the projection plane

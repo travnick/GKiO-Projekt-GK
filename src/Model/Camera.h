@@ -35,7 +35,7 @@ namespace Model
        *
        * @return current camera type
        */
-      inline const Camera::Type & getType () const
+      inline Camera::Type getType () const
       {
         return type;
       }
@@ -70,7 +70,7 @@ namespace Model
        *
        * @return ratio of screen width to image width
        */
-      inline const worldUnit &getScreenImageWidthRatio () const
+      inline worldUnit getScreenImageWidthRatio () const
       {
         return screenImageRatio;
       }
@@ -88,7 +88,7 @@ namespace Model
        *
        * @return camera screen height
        */
-      inline const worldUnit &getScreenHeight () const
+      inline worldUnit getScreenHeight () const
       {
         return screenHeight;
       }
@@ -97,7 +97,7 @@ namespace Model
        *
        * @return camera screen width
        */
-      inline const worldUnit &getScreenWidth () const
+      inline worldUnit getScreenWidth () const
       {
         return screenWidth;
       }
@@ -106,7 +106,7 @@ namespace Model
        *
        * @return camera view distance
        */
-      inline const worldUnit &getViewDistance () const
+      inline worldUnit getViewDistance () const
       {
         return viewDistance;
       }
@@ -208,7 +208,6 @@ namespace Model
        */
       void updateRotation ();
 
-
       /** Return angles of camera
        *
        * @return angles of camera
@@ -231,21 +230,21 @@ namespace Model
        *
        * @param newViewDistance new view distance
        */
-      inline void setViewDistance (const worldUnit &newViewDistance)
+      inline void setViewDistance (worldUnit newViewDistance)
       {
         viewDistance = newViewDistance;
       }
 
-      /**
-       *  Moves camera along specified axis by "speed" distance
+      /**Moves camera along specified axis by "speed" distance
+       * "speed" can be negative or positive
        *
-       *  @param direction direction of movement
-       *  @param speed distance that camera will travel
+       * @param direction direction of movement
+       * @param speed distance that camera will travel
        */
       void move (Axis direction, float speed);
 
-      /**
-       * Rotates camera along specified axis by angle
+      /**Rotates camera along specified axis by angle
+       * "angle" can be negative or positive
        *
        * @param axis axis of rotation
        * @param angle angle of rotation

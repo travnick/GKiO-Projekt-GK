@@ -19,7 +19,7 @@ inline QString toLowerCase (const char* string)
 // <-- Functions
 
 //Constants -->
-const float PI = 3.14159265;
+const float PI = M_PI;
 
 #define FLOAT_PRECISION 6
 

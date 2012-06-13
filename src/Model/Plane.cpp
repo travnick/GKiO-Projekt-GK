@@ -25,12 +25,12 @@ Plane::Plane (const Plane& other)
 bool Plane::checkRay (const Ray& ray, worldUnit& range, Vector&) const
 {
 
-  worldUnit rayNormalDot = ray.getDir().dotProduct(normal.data);
+  float rayNormalDot = ray.getDir().dotProduct(normal.data);
 
   if (rayNormalDot > ANGLE_ERROR_VALUE || rayNormalDot < -ANGLE_ERROR_VALUE)
   //We are in front/back of plane
   {
-    worldUnit raystartNormalDot = ray.getStart().data.dotProduct(normal.data);
+    float raystartNormalDot = ray.getStart().data.dotProduct(normal.data);
     worldUnit t = (normal.length - raystartNormalDot) / rayNormalDot;
 
     if ( (t > 0.0f) && (t < range))

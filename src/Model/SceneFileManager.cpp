@@ -88,10 +88,10 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
     QSharedPointer <Light> object(new Light());
     Point point;
     Color color;
-    worldUnit power;
+    float power;
     QDomElement elem = node.toElement();
 
-    power = static_cast <worldUnit>(getFloat(elem, "power"));
+    power = static_cast <float>(getFloat(elem, "power"));
     if (power < 0.0f)
       throw std::logic_error("Moc światła nie może być ujemna.");
 

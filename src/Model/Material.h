@@ -43,7 +43,6 @@ namespace Model
         return specularColor;
       }
 
-
       /** Sets specular color of the material
        *
        * @param color specular color
@@ -61,7 +60,6 @@ namespace Model
       {
         return specularPower;
       }
-
 
       /** Sets power of specular color of the material
        *
@@ -118,9 +116,9 @@ namespace Model
       }
 
       /** Sets a reflection factor of material
-         *
-         * @param val transparency of material
-         */
+       *
+       * @param val transparency of material
+       */
       inline void setReflection (float val)
       {
         reflection = val > 1 ? 1 : val;

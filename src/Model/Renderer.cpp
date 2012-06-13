@@ -13,7 +13,7 @@
 #include "Model/Vector.h"
 #include "Model/VisibleObject.h"
 
-const float E = 2.71828183f;
+const float E = M_E;
 
 using namespace Model;
 
@@ -24,7 +24,7 @@ Renderer::Renderer (const Controller::RenderParams &newRenderParams)
     : tmpDistance(new Vector), pointLightDist(new Vector), rayStartIntersect(
         new Vector), lightRay(new Ray)
 {
-  setRenderParams( &newRenderParams);
+  setRenderParams(&newRenderParams);
 }
 
 Renderer::~Renderer ()
@@ -109,7 +109,7 @@ inline void Renderer::shootRay (Ray & ray,
     for (Scene::ObjectIt object = renderParams->scene->getObjects().begin();
         object < endObjects; object++)
     {
-      if ( ( *object)->checkRay(ray, rayStartIntersectDist, *tmpDistance))
+      if ( (*object)->checkRay(ray, rayStartIntersectDist, *tmpDistance))
       {
         currentObject = object;
       }
@@ -128,13 +128,13 @@ inline void Renderer::shootRay (Ray & ray,
       ray.getStart().data.move(rayStartIntersect->data, intersection->data);
 
       //Get normal vector at intersection point
-      ( *currentObject)->getNormal( *intersection, *normalAtIntersection);
+      (*currentObject)->getNormal(*intersection, *normalAtIntersection);
 
       //move intersection point by epsilon, needed for error correction
       Vector correction(normalAtIntersection->data * FLOAT_EPSILON);
       intersection->data += correction;
 
-      Material *currentMaterial = ( *currentObject)->getMaterial().data();
+      Material *currentMaterial = (*currentObject)->getMaterial().data();
 
       //(1.0f / COLOR_COUNT) because few lines bellow we do color * color
       tmpLightCoef = coef * (1.0f / COLOR_COUNT);
@@ -152,14 +152,14 @@ inline void Renderer::shootRay (Ray & ray,
       //rayCopy.normalize();
       //rayCopy is still normalized;
 
-      float transparency = ( *currentObject)->getMaterial()->getTransparency();
+      float transparency = (*currentObject)->getMaterial()->getTransparency();
 
       //calculate refracted ray and transparent sphere color
       Color transpColor = shootRefractedRay(ray, transparency, refractionDepth,
                                             mainViewDistance,
                                             rayStartIntersectDist, tmpLightCoef,
                                             correction, *normalAtIntersection,
-                                            *intersection, * *currentObject);
+                                            *intersection, **currentObject);
 
       resultColor += transpColor;
 
@@ -169,8 +169,8 @@ inline void Renderer::shootRay (Ray & ray,
       for (Scene::LighIt light = renderParams->scene->getLights().begin();
           light < endLights; light++)
       {
-        ( *light)->getPosition().data.diff(intersection->data,
-                                           pointLightDist->data);
+        (*light)->getPosition().data.diff(intersection->data,
+                                          pointLightDist->data);
         //if angle between light and normal vector at intersection is higher than 90 degrees
         if (normalAtIntersection->dotProduct(pointLightDist->data) <= 0.0f)
         {
@@ -184,7 +184,7 @@ inline void Renderer::shootRay (Ray & ray,
           continue;
         }
 
-        lightRay->setParams( *intersection, *pointLightDist);
+        lightRay->setParams(*intersection, *pointLightDist);
         // Computation of the shadows
         inShadow = false;
 
@@ -195,8 +195,8 @@ inline void Renderer::shootRay (Ray & ray,
               renderParams->scene->getObjects().begin(); object < endObjects;
               object++)
           {
-            if ( ( *object)->checkRay( *lightRay, pointLightDist->length,
-                                      *tmpDistance))
+            if ( (*object)->checkRay(*lightRay, pointLightDist->length,
+                                     *tmpDistance))
             {
               inShadow = true;
               break;
@@ -204,7 +204,7 @@ inline void Renderer::shootRay (Ray & ray,
           }
         }
 
-        if ( !inShadow)
+        if (!inShadow)
         {
           // Lambert lighting model
           float lambert = lightRay->getDir().dotProduct(
@@ -228,7 +228,7 @@ inline void Renderer::shootRay (Ray & ray,
 
           float specular = pow(rayCopy.dotProduct(lightRay->getDir()),
                                currentMaterial->getSpecularPower());
-          lightPower = ( *light)->power / lightPower;
+          lightPower = (*light)->power / lightPower;
 //          lightPowerSpecular = ( *light)->power / lightPowerSpecular;
           //<--light attenuation
 
@@ -236,7 +236,7 @@ inline void Renderer::shootRay (Ray & ray,
           lightPowerSpecular *= specular * tmpLightCoef;
 
           //Add diffuse component
-          resultColor += ( * *light) * currentMaterial->getColor() * lightPower;
+          resultColor += (**light) * currentMaterial->getColor() * lightPower;
 
           //TODO: do something like rayCopy.dotProduct(lightRay->getDir()) < max angle then contribute
           // else continue
@@ -246,7 +246,7 @@ inline void Renderer::shootRay (Ray & ray,
           }
           else
           {
-            resultColor += ( * *light) * currentMaterial->getSpecularColor()
+            resultColor += (**light) * currentMaterial->getSpecularColor()
                 * lightPowerSpecular;
           }
         }
@@ -265,7 +265,7 @@ inline void Renderer::shootRay (Ray & ray,
 //          normalAtIntersection->data) * 2;
 //      ray.getDir().data -= normalAtIntersection->data;
       ray.getDir().data = rayCopy.data;
-      ray.setParams( *intersection);
+      ray.setParams(*intersection);
       //ray is still normalized;
 
       currentObject = endObjects;
@@ -286,7 +286,7 @@ inline int Renderer::calculateRefraction (Ray &ray,
 
   //TODO: not sure if it is proper comment - needs verification
   //get cosinus between normal and ray going into the sphere
-  float cos_alpha = -ray.getDir().dotProduct( *normalAtIntersection);
+  float cos_alpha = -ray.getDir().dotProduct(*normalAtIntersection);
 
   //it is ior_in/ior_out
   float ir;
@@ -326,7 +326,7 @@ inline Color Renderer::shootRefractedRay (const Ray &ray,
                                           int refractionDepth,
                                           worldUnit mainViewDistance,
                                           worldUnit viewDistance,
-                                          worldUnit &tmpLightCoef,
+                                          float &tmpLightCoef,
                                           Vector &correction,
                                           Vector &normalAtIntersection,
                                           Point &intersection,

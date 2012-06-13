@@ -98,7 +98,7 @@ namespace Model
                                int refractionDepth,
                                worldUnit mainViewDistance,
                                worldUnit viewDistance,
-                               worldUnit &tmpLightCoef,
+                               float &tmpLightCoef,
                                Vector &correction,
                                Vector &normalAtIntersection,
                                Point &intersection,

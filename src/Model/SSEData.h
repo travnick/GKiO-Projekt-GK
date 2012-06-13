@@ -58,7 +58,7 @@ namespace Model
    * @return BaseSSEData
    */
   template <typename T>
-  inline BaseSSEData operator * (const T &first, worldUnit constant);
+  inline BaseSSEData operator * (const T &first, float constant);
 
   /**Multiplies vector by a constant
    *
@@ -67,7 +67,7 @@ namespace Model
    * @return BaseSSEData
    */
   template <typename T>
-  inline BaseSSEData operator * (worldUnit constant, const T &other);
+  inline BaseSSEData operator * (float constant, const T &other);
 
   /**Multiplies two vectors
    *
@@ -353,7 +353,7 @@ namespace Model
        * @param constant worldUnit
        * @param result SSEVector
        */
-      inline void multiply (const worldUnit &constant, SSEVector &result) const
+      inline void multiply (float constant, SSEVector &result) const
       {
         result = *this * constant;
       }
@@ -387,7 +387,7 @@ namespace Model
        * @param constant worldUnit
        * @return this SSEVector
        */
-      inline SSEVector &operator *= (worldUnit constant)
+      inline SSEVector &operator *= (float constant)
       {
         *internalData = *this * constant;
         return *this;
@@ -529,14 +529,14 @@ namespace Model
   }
 
   template <typename T>
-  inline BaseSSEData operator * (const T &first, worldUnit constant)
+  inline BaseSSEData operator * (const T &first, float constant)
   {
     T tmpData(constant, constant, constant);
     return tmpData * first;
   }
 
   template <typename T>
-  inline BaseSSEData operator * (worldUnit constant, const T &other)
+  inline BaseSSEData operator * (float constant, const T &other)
   {
     return other * constant;
   }

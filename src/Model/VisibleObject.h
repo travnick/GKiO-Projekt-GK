@@ -40,7 +40,7 @@ namespace Model
        *
        * @return size of object
        */
-      inline const worldUnit &getSize () const
+      inline worldUnit getSize () const
       {
         return size;
       }

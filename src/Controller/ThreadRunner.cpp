@@ -20,6 +20,7 @@ namespace Controller
           new QMutex)
   {
     threadPool->setExpiryTimeout(THREAD_EXPIRE_TIMEOUT);
+    tilesRandomized = false;
   }
 
   ThreadRunner::~ThreadRunner ()
@@ -44,8 +45,6 @@ namespace Controller
     int tileCount = tiles.size();
     for (int i = 0; i < tileCount; ++i)
     {
-      renderers [i]->setTile(tiles [i]);
-
       threadPool->start(renderers [i].data());
     }
 
@@ -92,7 +91,6 @@ namespace Controller
     tilesNumber += tilesY.rem > 0 ? 1 : 0;
 
     tiles.reserve(tilesNumber);
-    tilesRandomized.reserve(tilesNumber);
 
     //Slice image into whole tiles
     for (imageUnit y = 0; y < tileYLimit; y += tileSize)
@@ -127,15 +125,15 @@ namespace Controller
       createTile(tileXLimit, tileYLimit, tilesX.rem, tilesY.rem);
     }
 
-    if (renderParams->randomRender)
-    {
-      randomizeTiles();
-    }
+    renderers.reserve(tiles.size());
+    renderersRandomized.reserve(tiles.size());
 
-    //Create threads if there is more tiles. Don't delete threads if there is less tiles
-    if (tiles.size() > renderers.size())
+    int i = renderers.size() - tiles.size();
+
+    //Create threads if there is more tiles.
+    if (i < 0)
     {
-      for (int i = renderers.size(), j = tiles.size(); i < j; ++i)
+      do
       {
         QSharedPointer <RendererThread> renderer(
             (new RendererThread(renderParams)));
@@ -143,22 +141,48 @@ namespace Controller
 
         renderers.append(renderer);
       }
+      while ( ++i < 0);
     }
+    else
+    {
+      while (i-- > 0)
+      {
+        renderers.removeLast();
+      }
+    }
+    //force assigning tiles to threads
+    tilesRandomized = true;
+    resetTilesOrder();
   }
 
   void ThreadRunner::randomizeTiles ()
   {
     qsrand(time(NULL));
-
-    while (!tiles.empty())
+    int rand;
+    while (!renderers.empty())
     {
-      int rand = qrand() % tiles.size();
-      tilesRandomized.append(tiles [rand]);
-      tiles.removeAt(rand);
+      rand = qrand() % renderers.size();
+      renderersRandomized.append(renderers [rand]);
+      renderers.removeAt(rand);
+    }
+    //Do fast swap of vectors
+    renderers.swap(renderersRandomized);
+    tilesRandomized = true;
+  }
+
+  void ThreadRunner::resetTilesOrder ()
+  {
+    if (!tilesRandomized)
+    {
+      return;
     }
 
-    //Do fast swap of vectors
-    tiles.swap(tilesRandomized);
+    int tileCount = tiles.size();
+    for (int i = 0; i < tileCount; ++i)
+    {
+      renderers [i]->setTile(tiles [i]);
+    }
+    tilesRandomized = false;
   }
 
   void ThreadRunner::terminate ()

@@ -129,12 +129,6 @@ namespace Controller
        */
       void rotateCamera ();
 
-      /**Sets random rendering
-       *
-       * @param value random rendering value
-       */
-      void setRandomRender (bool value);
-
     private:
       /**Image data structure
        * It handles image data and image properties
@@ -174,7 +168,7 @@ namespace Controller
       /**Stores timer for image updating events
        *
        */
-      QScopedPointer <QTimer> timer;
+      QScopedPointer <QTimer> refreshTimer;
 
       /**Stores GUI object
        *
@@ -208,16 +202,13 @@ namespace Controller
        * It enables:
        *  - render terminating
        * It disables:
-       *  - library changing // if withLibSelect == true
        *  - rendering starting
        *  - scene loading // if withSceneLoading == true
        *  - size changing
        *
-       * @param withLibSelect disable library changing ?
        * @param withSceneLoading disable scene loading ?
        */
-      void deactivateButtons (bool withLibSelect = true, bool withSceneLoading =
-                                  true);
+      void deactivateButtons (bool withSceneLoading = true);
 
       /**Calculates memory requirement for image size width x height
        *
@@ -251,8 +242,9 @@ namespace Controller
 
       /**Updates camera parameters if needed
        *
+       * @return succeed or not
        */
-      void updateCamera ();
+      bool updateCamera ();
 
       /**Gets camera parameters and show them in the window
        *

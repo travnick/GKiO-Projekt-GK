@@ -65,6 +65,13 @@ namespace Controller
        */
       void createTiles ();
 
+      /**Randomizes tiles
+       *
+       */
+      void randomizeTiles ();
+
+      void resetTilesOrder ();
+
     signals:
       /**Sends signal when all threads done their job
        *
@@ -72,6 +79,7 @@ namespace Controller
       void renderFinished ();
 
     private:
+      bool tilesRandomized;
 
       /**Stores rendering parameters
        *
@@ -89,9 +97,9 @@ namespace Controller
        *
        */
       QList <QSharedPointer <Model::RenderTileData> > tiles;
-      QList <QSharedPointer <Model::RenderTileData> > tilesRandomized;
 
-      QVector <QSharedPointer <RendererThread> > renderers;
+      QList <QSharedPointer <RendererThread> > renderers;
+      QList <QSharedPointer <RendererThread> > renderersRandomized;
 
       QSharedPointer <Model::RenderTileData> image;
 
@@ -104,11 +112,6 @@ namespace Controller
        * @param tileSizeY tile height
        */
       void createTile (int x, int y, int tileSizeX, int tileSizeY);
-
-      /**Randomizes tiles
-       *
-       */
-      void randomizeTiles ();
 
       /**Disables copying of object
        *

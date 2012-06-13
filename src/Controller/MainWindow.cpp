@@ -21,8 +21,7 @@
 #include "Model/Scene.h"
 #include "View/ui_MainWindow.h"
 
-#define TIME_BEFORE_REMOVE_THREADS 60000 //[ms]
-#define TIME_BEFORE_REMOVE_THREADS_ON_EXIT 1000 //[ms]
+#define TIME_BEFORE_REMOVE_THREADS 1000 //[ms]
 #define DEFAULT_REFRESH_TIME 1000 //[ms]
 #define WINDOW_MARGIN 0 //
 #define IMAGE_SAVE_FORMAT "png"
@@ -46,11 +45,11 @@ namespace Controller
 
   MainWindow::MainWindow (QMainWindow *myParent)
       : QMainWindow(myParent), image(new Model::RenderTileData), scene(
-          new Model::Scene), renderParams(new RenderParams), threadRunner(
-          new ThreadRunner)
+          new Model::Scene), timeCounter(new QElapsedTimer), renderParams(
+          new RenderParams), threadRunner(new ThreadRunner)
   {
     ui.reset(new Ui::MainWindow);
-    timer.reset(new QTimer);
+    refreshTimer.reset(new QTimer);
 
     QThreadPool::globalInstance()->setExpiryTimeout(TIME_BEFORE_REMOVE_THREADS);
     image->imageData = 0;
@@ -74,8 +73,7 @@ namespace Controller
     //Send terminate signal to thread runner and wait for end
     ui->terminateRender->click();
 
-    QThreadPool::globalInstance()->waitForDone(
-        TIME_BEFORE_REMOVE_THREADS_ON_EXIT);
+    QThreadPool::globalInstance()->waitForDone(TIME_BEFORE_REMOVE_THREADS);
   }
 
   void MainWindow::runRenderer ()
@@ -84,7 +82,10 @@ namespace Controller
 
     deactivateButtons();
 
-    updateCamera();
+    if (!updateCamera())
+    {
+      return;
+    }
 
     if (!ui->liveCamera->isChecked())
     {
@@ -96,25 +97,35 @@ namespace Controller
     renderParams->reflectionDeep = ui->maxReflectionDeep->value() + 1; // +1 is important !!
     renderParams->refractionDeep = ui->maxRefractionDeep->value();
     renderParams->shadows = ui->shadows->isChecked();
+    renderParams->randomRender = ui->randomRender->isChecked();
 
-    timeCounter.reset(new QElapsedTimer);
+    if (renderParams->randomRender)
+    {
+      threadRunner->randomizeTiles();
+    }
+    else
+    {
+      threadRunner->resetTilesOrder();
+    }
 
-    timer->start();
+    refreshTimer->start();
     timeCounter->start();
 
     QThreadPool::globalInstance()->start(threadRunner.data());
   }
 
-  void MainWindow::updateCamera ()
+  bool MainWindow::updateCamera ()
   {
+    bool tileChanged = image->width != ui->tileSize->value();
+
     image->width = ui->tileSize->value();
     image->height = image->width;
 
     if (sizeChanged)
     {
-      if (allocateMemoryForImage() == false)
+      if (!allocateMemoryForImage())
       {
-        return;
+        return false;
       }
 
       scene->setImageWidth(image->imageWidth);
@@ -124,7 +135,10 @@ namespace Controller
           new QImage(image->imageData, image->imageWidth, image->imageHeight,
                      imageBytesPerLine, QImage::Format_RGB888),
           true);
+    }
 
+    if (sizeChanged || tileChanged)
+    {
       threadRunner->createTiles();
     }
 
@@ -136,10 +150,11 @@ namespace Controller
                                         ui->zAngle->value());
 
     scene->getCamera()->updateRotation();
-
     scene->getCamera()->setFOV(ui->fov->value());
 
     scene->updateCamera();
+
+    return true;
   }
 
   void MainWindow::terminateRender ()
@@ -152,7 +167,7 @@ namespace Controller
 
   void MainWindow::setRefreshTime (int refreshTime)
   {
-    timer->setInterval(refreshTime);
+    refreshTimer->setInterval(refreshTime);
   }
 
   void MainWindow::saveImage ()
@@ -202,7 +217,7 @@ namespace Controller
     imageUnit matchImageHeight = image->imageHeight;
 
     while (matchImageHeight >= 1
-        && refreshMemoryRequest(newWidth, matchImageHeight) == false)
+        && !refreshMemoryRequest(newWidth, matchImageHeight))
     {
       --matchImageHeight;
     }
@@ -216,7 +231,7 @@ namespace Controller
     imageUnit matchImageWidth = image->imageWidth;
 
     while (matchImageWidth >= 1
-        && refreshMemoryRequest(matchImageWidth, newHeight) == false)
+        && !refreshMemoryRequest(matchImageWidth, newHeight))
     {
       --matchImageWidth;
     }
@@ -341,11 +356,10 @@ namespace Controller
     //Rendering signals
     connect(threadRunner.data(), SIGNAL(renderFinished()), this,
             SLOT(renderFinished()));
-    connect(timer.data(), SIGNAL(timeout()), ui->imageViewer, SLOT(update()));
+    connect(refreshTimer.data(), SIGNAL(timeout()), ui->imageViewer,
+            SLOT(update()));
     connect(ui->tileSize, SIGNAL(editingFinished()), threadRunner.data(),
             SLOT(createTiles()));
-    connect(ui->randomRender, SIGNAL(toggled(bool)), this,
-            SLOT(setRandomRender(bool)));
   }
 
   void MainWindow::calibrate ()
@@ -406,11 +420,11 @@ namespace Controller
     ui->actionSave->setDisabled(false);
   }
 
-  void MainWindow::deactivateButtons (bool withLibSelect, bool withSceneLoading)
+  void MainWindow::deactivateButtons (bool withSceneLoading)
   {
     ui->loadScene->setDisabled(withSceneLoading);
     ui->render->setDisabled(true);
-    ui->terminateRender->setDisabled(false | (!withLibSelect));
+    ui->terminateRender->setDisabled(false);
 
     ui->imageGroup->setDisabled(true);
     ui->cameraGroup->setDisabled(true);
@@ -427,8 +441,7 @@ namespace Controller
   void MainWindow::renderFinished ()
   {
     qint64 elapsedTime = timeCounter->elapsed();
-    timeCounter.reset();
-    timer->stop();
+    refreshTimer->stop();
 
     updateImage();
 
@@ -469,15 +482,15 @@ namespace Controller
     catch (std::exception &ex)
     {
       showWarning(
-          QSTRING("Błąd parsowania pliku sceny<br>"
-              "Sprawdź poprawność pliku: ") + fileName + QSTRING("<br><br>")
-              + QSTRING(ex.what()));
+          QSTRING("Błąd parsowania pliku sceny: ") + fileName
+              + QSTRING("<br><br>") + QSTRING(ex.what()));
     }
 
     if (!result)
     {
-      //Important because possibility of changing scene file content and trying to reload it
-      deactivateButtons(false, false);
+      //Important because possibility of changing scene file content
+      //and trying to reload it
+      deactivateButtons(false);
     }
     else
     {
@@ -633,11 +646,5 @@ namespace Controller
     ui->zAngle->setValue(scene->getCamera()->getAngles() [Model::Z]);
 
     ui->fov->setValue(scene->getCamera()->getFOV());
-  }
-
-  void MainWindow::setRandomRender (bool value)
-  {
-    renderParams->randomRender = value;
-    threadRunner->createTiles();
   }
 }

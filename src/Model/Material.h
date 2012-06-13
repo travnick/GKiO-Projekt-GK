@@ -124,7 +124,25 @@ namespace Model
         reflection = val > 1 ? 1 : val;
       }
 
+      /**Returns texture name
+       *
+       * @return texture name
+       */
+      QString getTexture () const
+      {
+        return texture;
+      }
+
+      /**Sets texture name
+       *
+       */
+      void setTexture (QString texture)
+      {
+        this->texture = texture;
+      }
+
     private:
+      QString texture;
       Color diffuse;
       Color specularColor;
       float ior;

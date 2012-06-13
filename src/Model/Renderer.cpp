@@ -102,7 +102,7 @@ inline void Renderer::shootRay (Ray & ray,
   int reflecionDeep = renderParams->reflectionDeep;
   bool inShadow;
 
-  while (reflecionDeep-- > 0)
+  while (reflecionDeep-- >= 0)
   {
     rayStartIntersectDist = mainViewDistance;
     //Find intersection

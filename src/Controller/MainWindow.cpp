@@ -94,7 +94,7 @@ namespace Controller
 
     renderParams->allowRunning = true;
     renderParams->maxThreadCount = ui->threadCounter->value();
-    renderParams->reflectionDeep = ui->maxReflectionDeep->value() + 1; // +1 is important !!
+    renderParams->reflectionDeep = ui->maxReflectionDeep->value();
     renderParams->refractionDeep = ui->maxRefractionDeep->value();
     renderParams->shadows = ui->shadows->isChecked();
     renderParams->randomRender = ui->randomRender->isChecked();
@@ -141,6 +141,7 @@ namespace Controller
     {
       threadRunner->createTiles();
     }
+    sizeChanged = false;
 
     scene->getCamera()->setPosition(ui->xPos->value(), ui->yPos->value(),
                                     ui->zPos->value());
@@ -207,7 +208,6 @@ namespace Controller
     else
     {
       image->imageData = static_cast <colorType*>(mem);
-      sizeChanged = false;
     }
     return true;
   }
@@ -358,8 +358,6 @@ namespace Controller
             SLOT(renderFinished()));
     connect(refreshTimer.data(), SIGNAL(timeout()), ui->imageViewer,
             SLOT(update()));
-    connect(ui->tileSize, SIGNAL(editingFinished()), threadRunner.data(),
-            SLOT(createTiles()));
   }
 
   void MainWindow::calibrate ()

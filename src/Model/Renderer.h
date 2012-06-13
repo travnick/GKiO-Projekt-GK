@@ -94,6 +94,18 @@ namespace Model
 
       /**
        *
+       * @param ray
+       * @param transparency
+       * @param refractionDepth
+       * @param mainViewDistance
+       * @param viewDistance
+       * @param tmpLightCoef
+       * @param correction
+       * @param normalAtIntersection
+       * @param intersection
+       * @param currentObject
+       * @param objectWeAreIn
+       * @return
        */
       Color shootRefractedRay (const Ray &ray,
                                float transparency,
@@ -109,6 +121,11 @@ namespace Model
 
       /**
        *
+       * @param ray
+       * @param currentObject
+       * @param objectWeAreIn
+       * @param normalAtIntersection
+       * @return
        */
       int calculateRefraction (Ray &ray,
                                VisibleObject &currentObject,

@@ -16,10 +16,6 @@ namespace Controller
   {
   }
 
-  void RendererThread::setRenderParams (const RenderParams &)
-  {
-  }
-
   void RendererThread::run ()
   {
     renderer->render(*tile);

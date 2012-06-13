@@ -32,8 +32,9 @@ namespace Model
   {
     public:
 
-      /**Initializes temporary fields
+      /**Constructs renderer with given rendering parameters
        *
+       * @param renderParams
        */
       Renderer (const Controller::RenderParams &renderParams);
 
@@ -48,7 +49,7 @@ namespace Model
        */
       void render (const RenderTileData &tile);
 
-      /**
+      /**Sets rendering parameters
        *
        * @param newRenderParams
        */

@@ -26,8 +26,12 @@ namespace Model
       {
       }
 
-      Vector (const SSEVector &newData)
-          : Point(newData), length(0), squareLength(0)
+      /**Constructs Vector from SSEVector
+       *
+       * @param other object do copy data from
+       */
+      Vector (const SSEVector &other)
+          : Point(other), length(0), squareLength(0)
       {
       }
 
@@ -77,9 +81,6 @@ namespace Model
       /**Calculates dot product of vector with self
        * Result is also stored in squareLength
        *
-       * It uses SSE4.1 if avaliable or SSE3 instead.
-       * No SSE2 support now.
-       *
        * @return dotProduct
        */
       inline worldUnit dotProduct ()
@@ -113,11 +114,21 @@ namespace Model
         squareLength = -1;
       }
 
+      /**Multiplies vector by other and returns result
+       *
+       * @param other object to multiply with
+       * @return result of multiplying
+       */
       inline Vector operator * (const Vector &other) const
       {
         return data.crossProduct(other.data);
       }
 
+      /**Multiplies vector by other
+       *
+       * @param other object to multiply with
+       * @return this
+       */
       inline Vector &operator *= (const Vector &other)
       {
         data = data.crossProduct(other.data);

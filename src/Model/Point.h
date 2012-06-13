@@ -26,6 +26,10 @@ namespace Model
       {
       }
 
+      /**Constructs point from SSEVector
+       *
+       * @param newData new coordinates
+       */
       inline Point (const SSEVector &newData)
           : data(newData)
       {
@@ -66,11 +70,21 @@ namespace Model
         data [Y] = y;
       }
 
+      /**Returns position at given index
+       *
+       * @param idx index of coordinate to get
+       * @return coordinate at given index
+       */
       inline float &operator [] (int idx)
       {
         return data [idx];
       }
 
+      /**Returns position at given index
+       *
+       * @param idx index of coordinate to get
+       * @return coordinate at given index
+       */
       inline float operator [] (int idx) const
       {
         return data [idx];
@@ -95,11 +109,19 @@ namespace Model
         data [Z] = result.z();
       }
 
+      /**SSEVector typecast operator
+       * It provides typecasting Point into SSEVector
+       *
+       */
       inline &operator SSEVector ()
       {
         return data;
       }
 
+      /**SSEVector typecast operator
+       * It provides typecasting Point into SSEVector
+       *
+       */
       inline &operator const SSEVector () const
       {
         return data;

@@ -48,8 +48,7 @@ namespace Controller
       void setParams (const QSharedPointer <Model::RenderTileData> &image,
                       const QSharedPointer <RenderParams> &newRenderParams);
 
-      /**Creates tiles and render threads, each tread renders one tile.
-       * There are created as much threads as tiles.
+      /**Runs rendering with threads.
        * Threads above maxThreadCount are added to queue.
        */
       void run ();
@@ -60,7 +59,8 @@ namespace Controller
        */
       void terminate ();
 
-      /**Creates image tiles
+      /**Creates tiles and render threads, each tread renders one tile.
+       * There are created as much threads as tiles.
        *
        */
       void createTiles ();
@@ -70,6 +70,9 @@ namespace Controller
        */
       void randomizeTiles ();
 
+      /**Sets tile order to default
+       *
+       */
       void resetTilesOrder ();
 
     signals:

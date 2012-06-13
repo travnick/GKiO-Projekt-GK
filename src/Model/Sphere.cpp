@@ -43,13 +43,11 @@ namespace Model
     worldUnit t = SQRT(D);
 
     if (dist.squareLength >= squareRadius)
-    //We are outside sphere
-    {
+    { //We are outside sphere
       a -= t;
     }
     else
-    //We are inside sphere
-    {
+    { //We are inside sphere
       a += t;
     }
 

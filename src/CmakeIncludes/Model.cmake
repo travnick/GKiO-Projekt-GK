@@ -1,5 +1,4 @@
 set(HDRS_Model
-  ${SOURCE_DIR}/Model/AlignedClass.h
   ${SOURCE_DIR}/Model/Camera.h
   ${SOURCE_DIR}/Model/Color.h
   ${SOURCE_DIR}/Model/Light.h

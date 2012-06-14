@@ -111,7 +111,7 @@ namespace Model
        */
       void setIOR (float val)
       {
-        this->ior = val;
+        ior = val;
       }
 
       /** Returns the transparency factor of the material

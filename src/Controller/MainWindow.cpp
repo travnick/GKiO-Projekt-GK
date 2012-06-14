@@ -27,7 +27,7 @@
 #define IMAGE_SAVE_FORMAT "png"
 
 #define DEFAULT_IMAGE_WIDTH 800
-#define DEFAULT_IMAGE_HEIGHT 560
+#define DEFAULT_IMAGE_HEIGHT 600
 #define DEFAULT_TILE_SIZE 100
 
 namespace Controller

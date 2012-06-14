@@ -14,6 +14,7 @@
 #include "Model/VisibleObject.h"
 
 const float E = M_E;
+//const float PI = M_PI;
 
 using namespace Model;
 
@@ -149,8 +150,8 @@ inline void Renderer::shootRay (Ray & ray,
       Vector reflectedRay(ray.getDir());
       Model::SSEVector normalCopy = normalAtIntersection->data;
       //Calculate reflection vector
-      normalCopy *= reflectedRay.dotProduct(normalCopy) * 2;
-      reflectedRay.data -= normalCopy;
+      //normalCopy *= reflectedRay.dotProduct(normalCopy) * 2;
+      //reflectedRay.data -= normalCopy;
       //reflectedRay is still normalized;
 
       float transparency = (*currentObject)->getMaterial()->getTransparency();
@@ -164,6 +165,14 @@ inline void Renderer::shootRay (Ray & ray,
                                             objectWeAreIn);
 
       resultColor += transpColor;
+
+      QString textureName = currentMaterial->getTexture();
+
+      Color textureColor = texture(textureName, normalCopy);
+      resultColor += textureColor;
+
+      normalCopy *= reflectedRay.dotProduct(normalCopy) * 2;
+      reflectedRay.data -= normalCopy;
 
       //Calculate light contribution
       Scene::LighIt endLights = renderParams->scene->getLights().end();
@@ -362,4 +371,35 @@ inline Color Renderer::shootRefractedRay (const Ray &ray,
   }
 
   return transpColor;
+}
+
+inline Color Renderer::texture(QString textureName,
+							   Model::SSEVector normalCopy) const
+{
+		Color textureColor;
+	// wczytac bitmape do tablicy
+	  QImage myImage;
+	  myImage.load(textureName);
+
+	  float y = normalCopy[Y];
+	  float x = normalCopy[X];
+
+	  float v = (acos(y)) / PI;
+	  float u = (acos((x) / (sin(PI * v)) ))/ 2 * PI;
+
+	  int width = myImage.width();
+	  int height = myImage.height();
+
+	  float px = width * u;
+	  float py = height * v;
+
+	  QRgb QColor = myImage.pixel(px, py);
+
+	  int red = qRed(QColor);
+	  int green = qGreen(QColor);
+	  int blue =  qBlue(QColor);
+
+	  textureColor.setColor(red, green, blue);
+
+	  return textureColor;
 }

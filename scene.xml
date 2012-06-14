@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene>
   <materials>
-    <mat id="0" reflection="0.1" transparency="0.9" ior="1.402" specularPower="10">
+    <mat id="0" reflection="0.1" transparency="0.0" texture="tiles.bmp" ior="1.402" specularPower="10">
       <diffuseColor r="63" g="230" b="27" />
       <specularColor r="204" g="204" b="204" />
     </mat>
-    <mat id="1" reflection="1" transparency="0.0" ior="1.0" specularPower="50">
+    <mat id="1" reflection="1.0" transparency="0.0" ior="1.0" specularPower="50">
       <diffuseColor r="72" g="208" b="203" />
       <specularColor r="204" g="204" b="204" />
     </mat>

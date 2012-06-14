@@ -3,9 +3,12 @@
 #pragma once
 
 #include <QScopedPointer>
-
+#include <QImage>
 #include "Controller/GlobalDefines.h"
 #include "Model/ModelDefines.h"
+#include "Model/Vector.h"
+
+class QString;
 
 namespace Controller
 {
@@ -131,6 +134,9 @@ namespace Model
                                VisibleObject &currentObject,
                                const VisibleObject *objectWeAreIn,
                                Vector *normalAtIntersection) const;
+
+      Color texture(QString textureName,
+    		        Model::SSEVector normalCopy) const;
 
       Q_DISABLE_COPY (Renderer)
   };

@@ -241,8 +241,6 @@ inline void Renderer::shootRay (Ray & ray,
           //Add diffuse component
           resultColor += (**light) * currentMaterial->getColor() * lightPower;
 
-          //TODO: do something like reflectedRay.dotProduct(lightRay->getDir()) < max angle then contribute
-          // else continue
           if (rayLigthRayAngleCos > 0.0f)
           {
             resultColor += (**light) * currentMaterial->getSpecularColor()

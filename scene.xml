@@ -17,7 +17,7 @@
       <diffuseColor r="230" g="105" b="0" />
       <specularColor r="204" g="204" b="204" />
     </mat>
-    <mat id="4" reflection="0.4" transparency="0.0" ior="1.0" specularPower="50">
+    <mat id="4" reflection="0.4" transparency="0.0" ior="1.0" specularPower="50" texture="tiles2.bmp">
       <diffuseColor r="230" g="230" b="0" />
       <specularColor r="204" g="204" b="204" />
     </mat>

@@ -167,8 +167,8 @@ inline void Renderer::shootRay (Ray & ray,
 
       resultColor += transpColor;
 
-      Color textureColor = currentMaterial->getTextureColor(*normalAtIntersection.data());
-      resultColor += textureColor;
+      Color textureColor = currentMaterial->getTextureColor(
+          *normalAtIntersection.data());
 
       normalCopy *= reflectedRay.dotProduct(normalCopy) * 2;
       reflectedRay.data -= normalCopy;
@@ -247,7 +247,8 @@ inline void Renderer::shootRay (Ray & ray,
           lightPowerSpecular *= specular * lightContrCoef;
 
           //Add diffuse component
-          resultColor += (**light) * currentMaterial->getColor() * lightPower;
+          resultColor += (**light) * currentMaterial->getColor()
+              * (textureColor * (1.0 / COLOR_MAX_VALUE)) * lightPower;
 
           if (rayLigthRayAngleCos > 0.0f)
           {

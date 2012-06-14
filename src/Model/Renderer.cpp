@@ -159,16 +159,15 @@ inline void Renderer::shootRay (Ray & ray,
       //calculate refracted ray and transparent sphere color
       Color transpColor = shootRefractedRay(ray, transparency, refractionDepth,
                                             mainViewDistance,
-                                            rayStartIntersectDist, lightContrCoef,
-                                            correction, *normalAtIntersection,
+                                            rayStartIntersectDist,
+                                            lightContrCoef, correction,
+                                            *normalAtIntersection,
                                             *intersection, **currentObject,
                                             objectWeAreIn);
 
       resultColor += transpColor;
 
-      QString textureName = currentMaterial->getTexture();
-
-      Color textureColor = texture(textureName, normalCopy);
+      Color textureColor = currentMaterial->getTextureColor(*normalAtIntersection.data());
       resultColor += textureColor;
 
       normalCopy *= reflectedRay.dotProduct(normalCopy) * 2;
@@ -261,7 +260,8 @@ inline void Renderer::shootRay (Ray & ray,
       //multiply by current reflection contribution
       reflectionCoef *= currentMaterial->getReflection();
 
-      if ( (reflectionCoef < COLOR_MIN_VALUE) || (objectWeAreIn == currentObject->data()))
+      if ( (reflectionCoef < COLOR_MIN_VALUE)
+          || (objectWeAreIn == currentObject->data()))
       {
         break;
       }
@@ -368,35 +368,4 @@ inline Color Renderer::shootRefractedRay (const Ray &ray,
   }
 
   return transpColor;
-}
-
-inline Color Renderer::texture(QString textureName,
-							   Model::SSEVector normalCopy) const
-{
-		Color textureColor;
-	// wczytac bitmape do tablicy
-	  QImage myImage;
-	  myImage.load(textureName);
-
-	  float y = normalCopy[Y];
-	  float x = normalCopy[X];
-
-	  float v = (acos(y)) / PI;
-	  float u = (acos((x) / (sin(PI * v)) ))/ 2 * PI;
-
-	  int width = myImage.width();
-	  int height = myImage.height();
-
-	  float px = width * u;
-	  float py = height * v;
-
-	  QRgb QColor = myImage.pixel(px, py);
-
-	  int red = qRed(QColor);
-	  int green = qGreen(QColor);
-	  int blue =  qBlue(QColor);
-
-	  textureColor.setColor(red, green, blue);
-
-	  return textureColor;
 }

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QColor>
+
 #include "Controller/GlobalDefines.h"
 #include "Model/ModelDefines.h"
 #include "Model/SSEData.h"
@@ -25,6 +27,15 @@ namespace Model
       typedef float dataType;
 
       inline Color ()
+      {
+      }
+
+      /**Constructs color from QRgb
+       *
+       * @param color
+       */
+      inline Color (QRgb color)
+          : data(qRed(color), qGreen(color), qBlue(color))
       {
       }
 

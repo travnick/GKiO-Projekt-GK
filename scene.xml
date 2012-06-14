@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene>
   <materials>
-    <mat id="0" reflection="0.1" transparency="0.0" texture="tiles.bmp" ior="1.402" specularPower="10">
+    <mat id="0" reflection="0.1" transparency="0.5" texture="tiles.bmp" ior="1.402" specularPower="10">
       <diffuseColor r="63" g="230" b="27" />
       <specularColor r="204" g="204" b="204" />
     </mat>

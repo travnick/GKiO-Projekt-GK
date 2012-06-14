@@ -136,9 +136,6 @@ namespace Model
                                const VisibleObject *objectWeAreIn,
                                Vector *normalAtIntersection) const;
 
-      Color texture(QString textureName,
-    		        Model::SSEVector normalCopy) const;
-
       Q_DISABLE_COPY (Renderer)
   };
 }

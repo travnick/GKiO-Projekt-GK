@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QImage>
+
 #include "Model/Color.h"
 
 namespace Model
@@ -23,6 +25,30 @@ namespace Model
       inline const Color &getColor () const
       {
         return diffuse;
+      }
+
+      inline Color getTextureColor (const Point &normalAtIntersection) const
+      {
+        if (!texture.isNull())
+        {
+          float y = normalAtIntersection [Y];
+          float x = normalAtIntersection [X];
+
+          float v = acos(y) / PI;
+          float u = acos(x / sin(PI * v)) / (2 * PI);
+
+          int width = texture.width();
+          int height = texture.height();
+
+          float px = width * u;
+          float py = height * v;
+
+          if ( (px > 0 && px < width) && (py > 0 && py < height))
+          {
+            return texture.pixel(px, py);
+          }
+        }
+        return Color(0, 0, 0);
       }
 
       /** Sets diffuse color of the material
@@ -136,13 +162,15 @@ namespace Model
       /**Sets texture file name
        *
        */
-      void setTexture (const QString &texture)
+      void setTexture (const QString &newTextureFileName)
       {
-        textureFileName = texture;
+        textureFileName = newTextureFileName;
+        texture.load(textureFileName);
       }
 
     private:
       QString textureFileName;
+      QImage texture;
       Color diffuse;
       Color specularColor;
       float ior;

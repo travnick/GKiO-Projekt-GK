@@ -99,8 +99,8 @@ inline void Renderer::shootRay (Ray & ray,
 {
   Scene::ObjectIt endObjects = renderParams->scene->getObjects().end();
   Scene::ObjectIt currentObject = endObjects;
-  float coef = 1;
-  float tmpLightCoef = 0;
+  float reflectionCoef = 1;
+  float lightContrCoef = 0;
   worldUnit rayStartIntersectDist = mainViewDistance;
   int reflecionDeep = renderParams->reflectionDeep;
   bool inShadow;
@@ -140,11 +140,11 @@ inline void Renderer::shootRay (Ray & ray,
       Material *currentMaterial = (*currentObject)->getMaterial().data();
 
       //(1.0f / COLOR_COUNT) because few lines bellow we do color * color
-      tmpLightCoef = coef * (1.0f / COLOR_COUNT);
+      lightContrCoef = reflectionCoef * (1.0f / COLOR_COUNT);
 
       if (renderParams->reflectionDeep > 1)
       {
-        tmpLightCoef *= (1.0f - currentMaterial->getReflection());
+        lightContrCoef *= (1.0f - currentMaterial->getReflection());
       }
 
       Vector reflectedRay(ray.getDir());
@@ -159,7 +159,7 @@ inline void Renderer::shootRay (Ray & ray,
       //calculate refracted ray and transparent sphere color
       Color transpColor = shootRefractedRay(ray, transparency, refractionDepth,
                                             mainViewDistance,
-                                            rayStartIntersectDist, tmpLightCoef,
+                                            rayStartIntersectDist, lightContrCoef,
                                             correction, *normalAtIntersection,
                                             *intersection, **currentObject,
                                             objectWeAreIn);
@@ -244,8 +244,8 @@ inline void Renderer::shootRay (Ray & ray,
                                currentMaterial->getSpecularPower());
           lightPower = (*light)->power / lightPower;
 
-          lightPower *= lambert * tmpLightCoef;
-          lightPowerSpecular *= specular * tmpLightCoef;
+          lightPower *= lambert * lightContrCoef;
+          lightPowerSpecular *= specular * lightContrCoef;
 
           //Add diffuse component
           resultColor += (**light) * currentMaterial->getColor() * lightPower;
@@ -261,9 +261,9 @@ inline void Renderer::shootRay (Ray & ray,
       }
 
       //multiply by current reflection contribution
-      coef *= currentMaterial->getReflection();
+      reflectionCoef *= currentMaterial->getReflection();
 
-      if ( (coef < COLOR_MIN_VALUE) || (objectWeAreIn == currentObject->data()))
+      if ( (reflectionCoef < COLOR_MIN_VALUE) || (objectWeAreIn == currentObject->data()))
       {
         break;
       }
@@ -289,7 +289,6 @@ inline int Renderer::calculateRefraction (Ray &ray,
 
   float ior = currentObject.getMaterial()->getIOR();
 
-  //TODO: not sure if it is proper comment - needs verification
   //get cosine between normal and ray going into the sphere
   float cos_alpha = -ray.getDir().dotProduct(*normalAtIntersection);
 
@@ -330,8 +329,8 @@ inline Color Renderer::shootRefractedRay (const Ray &ray,
                                           float transparency,
                                           int refractionDepth,
                                           worldUnit mainViewDistance,
-                                          worldUnit viewDistance,
-                                          float &tmpLightCoef,
+                                          worldUnit rayStartIntersectDist,
+                                          float &lightContrCoef,
                                           Vector &correction,
                                           Vector &normalAtIntersection,
                                           Point &intersection,
@@ -344,7 +343,7 @@ inline Color Renderer::shootRefractedRay (const Ray &ray,
   //checking if there is any transparency or if we still need to calculate transparency
   if ( (transparency > 0.01f) && (refractionDepth > 0))
   {
-    tmpLightCoef *= (1.0f - transparency);
+    lightContrCoef *= (1.0f - transparency);
 
     Ray newRay(ray);
 

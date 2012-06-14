@@ -24,9 +24,11 @@ namespace Model
     Vector tmpVector;
     QMatrix4x4 transformMatrix;
 
+    //Calculate focal length of camera
     worldUnit angle = (180 - FOV) / 2.0f;
     worldUnit focalLength = tan(RAD(angle)) * screenWidth / 2;
 
+    //Calculate origin of camera
     eyeDirection.normalize();
     origin = position;
     eyeDirection.data.multiply(focalLength, tmpVector.data);

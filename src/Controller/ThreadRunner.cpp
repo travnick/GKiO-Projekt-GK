@@ -130,9 +130,8 @@ namespace Controller
 
     int i = renderers.size() - tiles.size();
 
-    //Create threads if there is more tiles.
     if (i < 0)
-    {
+    { //Create threads if there are more tiles
       do
       {
         QSharedPointer <RendererThread> renderer(
@@ -144,7 +143,7 @@ namespace Controller
       while ( ++i < 0);
     }
     else
-    {
+    { //Delete threads, if there are more than tiles
       while (i-- > 0)
       {
         renderers.removeLast();

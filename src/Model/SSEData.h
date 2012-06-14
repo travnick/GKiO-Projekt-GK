@@ -21,9 +21,9 @@
 
 #endif
 
+//Include for SIMD operations
 #include <x86intrin.h>
 
-#include "Model/AlignedClass.h"
 #include "Model/ModelDefines.h"
 
 // Calculate dot product from xmm[3/2/1] and store result to xmm[0]
@@ -31,7 +31,6 @@
 
 namespace Model
 {
-
   union SSEData;
   typedef SSEData BaseSSEData;
 
@@ -54,7 +53,7 @@ namespace Model
   /**Multiplies vector by a constant
    *
    * @param first T
-   * @param constant worldUnit
+   * @param constant float
    * @return BaseSSEData
    */
   template <typename T>
@@ -62,7 +61,7 @@ namespace Model
 
   /**Multiplies vector by a constant
    *
-   * @param constant worldUnit
+   * @param constant float
    * @param other T
    * @return BaseSSEData
    */
@@ -125,6 +124,10 @@ namespace Model
         setDefaults();
       }
 
+      /**Constructs SSEData from other
+       *
+       * @param other object to copy data from
+       */
       inline SSEData (const SSEData &other)
       {
 #if USE_SSE == 1
@@ -136,6 +139,12 @@ namespace Model
 #endif
       }
 
+      /**Constructs SSEData with given parameters
+       *
+       * @param x
+       * @param y
+       * @param z
+       */
       inline SSEData (float x, float y, float z)
       {
         setDefaults();
@@ -146,12 +155,21 @@ namespace Model
       }
 
 #if USE_SSE == 1
+      /**Constructs SSEData from __m128 data
+       *
+       * @param other object to copy data from
+       */
       inline SSEData (const __m128 &other)
       {
         data = other;
       }
 #endif
 
+      /**Copies parameters from other
+       *
+       * @param other object to copy data from
+       * @return this
+       */
       inline SSEData & operator = (const SSEData &other)
       {
 #if USE_SSE == 1
@@ -164,20 +182,33 @@ namespace Model
         return (*this);
       }
 
+      /**Sets default values
+       * Zeroing is important when using SSE.
+       * Without determining W value there is performance loss
+       * because of operating on NaNs etc.
+       */
       inline void setDefaults ()
       {
 #if USE_SSE == 1
-        // It's important, without determining W value there is performance loss
-        // because of operating on NaNs etc.
         (*this) [W] = 0;
 #endif
       }
 
+      /**Returns value at given index
+       *
+       * @param idx index of value to get
+       * @return value at given index
+       */
       inline float & operator[] (int idx)
       {
         return dataArray [idx];
       }
 
+      /**Returns value at given index
+       *
+       * @param idx index of value to get
+       * @return value at given index
+       */
       inline float operator[] (int idx) const
       {
         return dataArray [idx];
@@ -203,7 +234,12 @@ namespace Model
       {
         return *this;
       }
+      //End of hacks
 
+      /**__m128 typecast operator
+       * It provides typecasting SSEData into __m128
+       *
+       */
       inline & operator __m128 ()
       {
         return data;
@@ -263,11 +299,21 @@ namespace Model
       {
       }
 
+      /**Constructs SSEVector from BaseSSEData
+       *
+       * @param newData object to copy data from
+       */
       inline SSEVector (const BaseSSEData &newData)
           : internalData(newData)
       {
       }
 
+      /**Constructs SSEVector with given data
+       *
+       * @param newX
+       * @param newY
+       * @param newZ
+       */
       inline SSEVector (float newX, float newY, float newZ)
           : internalData(newX, newY, newZ)
       {
@@ -275,17 +321,32 @@ namespace Model
 
 #endif
 
+      /**Copies data from other
+       *
+       * @param newData object to copy data from
+       * @return this
+       */
       inline SSEVector & operator = (const BaseSSEData &other)
       {
         *internalData = other;
         return (*this);
       }
 
+      /**Returns value at given index
+       *
+       * @param idx index of value to get
+       * @return value at given index
+       */
       inline float & operator[] (int idx)
       {
         return (*internalData) [idx];
       }
 
+      /**Returns value at given index
+       *
+       * @param idx index of value to get
+       * @return value at given index
+       */
       inline float operator[] (int idx) const
       {
         return (*internalData) [idx];
@@ -350,7 +411,7 @@ namespace Model
 
       /**Multiplies self by a constant
        *
-       * @param constant worldUnit
+       * @param constant float
        * @param result SSEVector
        */
       inline void multiply (float constant, SSEVector &result) const
@@ -405,6 +466,17 @@ namespace Model
         return *this;
       }
 
+      /**Calculates dot product of vector with self
+       * Result is also stored in squareLength
+       *
+       * @return dotProduct
+       */
+      inline float dotProduct () const
+      {
+        return dotProduct(*this);
+      }
+
+      IGNORE_WARNINGS_BEGIN
       /**Calculates dot product with other vector
        * You should give here Point::date
        *
@@ -414,7 +486,6 @@ namespace Model
       inline float dotProduct (const BaseSSEData &other) const
       {
         float dotProd;
-        IGNORE_WARNINGS_BEGIN
 
 #if __SSE4_1__ == 1 &&  USE_SSE == 1
         _mm_store_ss(
@@ -429,9 +500,9 @@ namespace Model
         dotProd = ( *this) [X] * other [X] + ( *this) [Y] * other [Y]
         + ( *this) [Z] * other [Z];
 #endif
-        IGNORE_WARNINGS_END
         return dotProd;
       }
+      IGNORE_WARNINGS_END
 
       /**Calculates cross product with other vector
        * You should give here Point::data
@@ -450,24 +521,14 @@ namespace Model
         return crossProd;
       }
 
-      /**Calculates dot product of vector with self
-       * Result is also stored in squareLength
-       *
-       * It uses SSE4.1 if avaliable or SSE3 instead.
-       * No SSE2 support now.
-       *
-       * @return dotProduct
-       */
-      inline float dotProduct () const
-      {
-        return dotProduct(*this);
-      }
-
       inline BaseSSEData operator - () const
       {
         return BaseSSEData(- (*this) [X], - (*this) [Y], - (*this) [Z]);
       }
 
+      /**Negates vector
+       *
+       */
       inline void negate ()
       {
         (*this) [X] = - (*this) [X];
@@ -476,16 +537,28 @@ namespace Model
       }
 // <-- operations on data
 
+      /**SSEData typecast operator
+       * It provides typecasting SSEVector into SSEData
+       *
+       */
       inline & operator SSEData ()
       {
         return *internalData;
       }
 
+      /**SSEData typecast operator
+       * It provides typecasting SSEVector into SSEData
+       *
+       */
       inline & operator const SSEData () const
       {
         return *internalData;
       }
 
+      /**__m128 typecast operator
+       * It provides typecasting SSEVector into __m128
+       *
+       */
       inline & operator __m128 ()
       {
         return internalData->data;
@@ -513,6 +586,7 @@ namespace Model
       {
         return *this;
       }
+      //End of hacks
   };
 
   //---------------------------------------------------------------------------------

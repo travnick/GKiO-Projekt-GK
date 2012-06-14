@@ -40,6 +40,9 @@ namespace Model
         deleteImageData = true;
       }
 
+      /**Frees image memory only once
+       *
+       */
       inline ~RenderTileData ()
       {
         if (deleteImageData)

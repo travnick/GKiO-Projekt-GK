@@ -35,8 +35,9 @@ namespace Model
   {
     public:
 
-      /**Initializes temporary fields
+      /**Constructs renderer with given rendering parameters
        *
+       * @param renderParams
        */
       Renderer (const Controller::RenderParams &renderParams);
 
@@ -51,7 +52,7 @@ namespace Model
        */
       void render (const RenderTileData &tile);
 
-      /**
+      /**Sets rendering parameters
        *
        * @param newRenderParams
        */
@@ -95,40 +96,40 @@ namespace Model
                      int refractionDepth,
                      const VisibleObject *objectWeAreIn) const;
 
-      /**
+      /**Used to calculate color of transparent object; shoots refracted rays
        *
-       * @param ray
-       * @param transparency
-       * @param refractionDepth
-       * @param mainViewDistance
-       * @param viewDistance
-       * @param tmpLightCoef
-       * @param correction
-       * @param normalAtIntersection
-       * @param intersection
-       * @param currentObject
-       * @param objectWeAreIn
-       * @return
+       * @param ray ray going into the object
+       * @param transparency transparency coefficient
+       * @param refractionDepth how many times ray can pass through transparent surface
+       * @param mainViewDistance whole distance on the scene
+       * @param rayStartIntersectDist distance between start of the ray and nearest intersection
+       * @param lightContrCoef coefficient which determines light contribution
+       * @param correction needed to correct new ray's starting point
+       * @param normalAtIntersection normal at intersection point
+       * @param intersection point of intersection
+       * @param currentObject object which ray has collision with
+       * @param objectWeAreIn ray goes from that object to another one (the one ray has collision with)
+       * @return color of transparency
        */
       Color shootRefractedRay (const Ray &ray,
                                float transparency,
                                int refractionDepth,
                                worldUnit mainViewDistance,
-                               worldUnit viewDistance,
-                               float &tmpLightCoef,
+                               worldUnit rayStartIntersectDist,
+                               float &lightContrCoef,
                                Vector &correction,
                                Vector &normalAtIntersection,
                                Point &intersection,
                                VisibleObject &currentObject,
                                const VisibleObject *objectWeAreIn) const;
 
-      /**
+      /**Calculates refracted ray direction
        *
-       * @param ray
-       * @param currentObject
-       * @param objectWeAreIn
-       * @param normalAtIntersection
-       * @return
+       * @param ray ray which goes into the object
+       * @param currentObject object which ray has collision with
+       * @param objectWeAreIn ray goes from that object to another one (the one ray has collision with)
+       * @param normalAtIntersection normal at intersection point
+       * @return returns 0 when refraction had place; -1 in other case
        */
       int calculateRefraction (Ray &ray,
                                VisibleObject &currentObject,

@@ -44,12 +44,6 @@ namespace Controller
        */
       ~RendererThread ();
 
-      /**Sets rendering parameters
-       *
-       * @param renderParams rendering parameters
-       */
-      void setRenderParams (const RenderParams &renderParams);
-
       /**Sets tile to render
        *
        * @param newTile description of image part to render

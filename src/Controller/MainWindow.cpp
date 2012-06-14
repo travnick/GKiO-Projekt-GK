@@ -92,6 +92,7 @@ namespace Controller
       ui->imageViewer->getImage()->fill(Qt::darkGray);
     }
 
+    //Set render parameters
     renderParams->allowRunning = true;
     renderParams->maxThreadCount = ui->threadCounter->value();
     renderParams->reflectionDeep = ui->maxReflectionDeep->value();
@@ -111,6 +112,7 @@ namespace Controller
     refreshTimer->start();
     timeCounter->start();
 
+    //Start rendering
     QThreadPool::globalInstance()->start(threadRunner.data());
   }
 
@@ -131,6 +133,7 @@ namespace Controller
       scene->setImageWidth(image->imageWidth);
       scene->setImageHeight(image->imageHeight);
 
+      //Create image for image viewer
       ui->imageViewer->setImage(
           new QImage(image->imageData, image->imageWidth, image->imageHeight,
                      imageBytesPerLine, QImage::Format_RGB888),
@@ -264,26 +267,20 @@ namespace Controller
       memoryForImage = image->imageDataSize;
       sufix = QSTRING(BYTE_NAME);
     }
+    else if (image->imageDataSize < MiB)
+    {
+      memoryForImage = image->imageDataSize / KiB;
+      sufix = QSTRING(KILOBYTE_NAME);
+    }
+    else if (image->imageDataSize < GiB)
+    {
+      memoryForImage = image->imageDataSize / MiB;
+      sufix = QSTRING(MEGABYTE_NAME);
+    }
     else
     {
-      if (image->imageDataSize < MiB)
-      {
-        memoryForImage = image->imageDataSize / KiB;
-        sufix = QSTRING(KILOBYTE_NAME);
-      }
-      else
-      {
-        if (image->imageDataSize < GiB)
-        {
-          memoryForImage = image->imageDataSize / MiB;
-          sufix = QSTRING(MEGABYTE_NAME);
-        }
-        else
-        {
-          memoryForImage = image->imageDataSize / GiB;
-          sufix = QSTRING(GIGABYTE_NAME);
-        }
-      }
+      memoryForImage = image->imageDataSize / GiB;
+      sufix = QSTRING(GIGABYTE_NAME);
     }
 
     ui->memoryRequest->setText(QString::number(memoryForImage, 'f', 3) + sufix);
@@ -325,6 +322,7 @@ namespace Controller
 
   void MainWindow::connectSignals ()
   {
+    //Connect render panel controls
     connect(ui->render, SIGNAL(pressed()), this, SLOT(runRenderer()));
     connect(ui->imageWidth, SIGNAL(valueChanged(int)), this,
             SLOT(changeWidth(int)));
@@ -489,22 +487,21 @@ namespace Controller
       //Important because possibility of changing scene file content
       //and trying to reload it
       deactivateButtons(false);
+      return;
+    }
+
+    scene->updateCamera();
+    activateButtons();
+
+    //Preserve camera settings
+    if (ui->keepCameraSettings->isChecked())
+    {
+      updateCamera();
     }
     else
     {
-      scene->updateCamera();
-      activateButtons();
-
-      //Preserve camera settings
-      if (ui->keepCameraSettings->isChecked())
-      {
-        updateCamera();
-      }
-      else
-      {
-        getCameraParameters();
-        ui->keepCameraSettings->setChecked(true);
-      }
+      getCameraParameters();
+      ui->keepCameraSettings->setChecked(true);
     }
   }
 

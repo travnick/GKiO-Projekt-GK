@@ -103,7 +103,7 @@ namespace Controller
        * It sets new refresh time immediately.
        * Refresh timer is responsible for image updating during rendering
        *
-       * @param refreshTime new refrest time value
+       * @param refreshTime new refresh time value
        */
       void setRefreshTime (int refreshTime);
 
@@ -188,7 +188,6 @@ namespace Controller
       /**Activates buttons in GUI.
        * Sets state to rendering ready.
        * It enables:
-       *  - library changing
        *  - rendering starting
        *  - scene loading
        *  - size changing

@@ -25,7 +25,7 @@
       <diffuseColor r="135" g="208" b="204" />
       <specularColor r="204" g="204" b="204" />
     </mat>
-    <mat id="6" reflection="0.05" transparency="0" ior="1.0" specularPower="500">
+    <mat id="6" reflection="0.05" transparency="0.5" texture="tiles2.bmp" ior="1.3" specularPower="500">
       <diffuseColor r="66" g="131" b="153" />
 <!--       <specularColor r="204" g="204" b="204" /> -->
       <specularColor r="0" g="0" b="0" />
@@ -83,29 +83,29 @@
       <multiply x="7" y="1" z="7" />
     </sphere> -->
     
-    <!-- BACK -->
+    <!-- BACK  -->
     <sphere r="2.0" material="3" offset="12">
       <position x="-43" y="3" z="140" />
       <multiply x="8" y="5" z="1" />
-    </sphere> 
+    </sphere>
     
-    <!-- LEFT -->
+    <!-- LEFT  -->
     <sphere r="2.0" material="3" offset="8">
       <position x="-47" y="3" z="140" />
       <multiply x="1" y="8" z="-11" />
-    </sphere> 
+    </sphere>
     
-    <!-- RIGHT -->
+    <!-- RIGHT  -->
     <sphere r="2.0" material="3" offset="8">
       <position x="47" y="3" z="140" />
       <multiply x="1" y="8" z="-11" />
-    </sphere> 
+    </sphere>
     
-    <!-- BOTTOM -->
+    <!-- BOTTOM  -->
     <sphere r="2.0" material="6" offset="7">
       <position x="-45" y="-1.5" z="50" />
       <multiply x="14" y="1" z="14" />
-    </sphere> 
+    </sphere>
     <plane angleX="0" angleY="0" angleZ="0" d="0" material="6" />
     
     <!-- CUBE-->

@@ -27,6 +27,12 @@ namespace Model
         return diffuse;
       }
 
+      /**Gets color from texture.
+       * Normal vector is used to calculate point on the texture
+       *
+       * @param normalAtIntersection
+       * @return color from texture
+       */
       inline Color getTextureColor (const Point &normalAtIntersection) const
       {
         if (!texture.isNull())

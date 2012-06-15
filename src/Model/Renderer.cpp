@@ -147,13 +147,6 @@ inline void Renderer::shootRay (Ray & ray,
         lightContrCoef *= (1.0f - currentMaterial->getReflection());
       }
 
-      Vector reflectedRay(ray.getDir());
-      Model::SSEVector normalCopy = normalAtIntersection->data;
-      //Calculate reflection vector
-      //normalCopy *= reflectedRay.dotProduct(normalCopy) * 2;
-      //reflectedRay.data -= normalCopy;
-      //reflectedRay is still normalized;
-
       float transparency = (*currentObject)->getMaterial()->getTransparency();
 
       //calculate refracted ray and transparent sphere color
@@ -170,8 +163,12 @@ inline void Renderer::shootRay (Ray & ray,
       Color textureColor = currentMaterial->getTextureColor(
           *normalAtIntersection.data());
 
+      //Calculate reflection vector
+      Vector reflectedRay(ray.getDir());
+      Model::SSEVector normalCopy = normalAtIntersection->data;
       normalCopy *= reflectedRay.dotProduct(normalCopy) * 2;
       reflectedRay.data -= normalCopy;
+      //reflectedRay is still normalized;
 
       //Calculate light contribution
       Scene::LighIt endLights = renderParams->scene->getLights().end();

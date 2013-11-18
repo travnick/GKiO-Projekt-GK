@@ -18,6 +18,11 @@ namespace Model
       {
       }
 
+      Object (const Point &newPosition)
+          : position(newPosition)
+      {
+      }
+
       /**Sets position of object in 3D space
        * Position is center of the object
        *

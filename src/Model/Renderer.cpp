@@ -13,7 +13,7 @@
 #include "Model/Vector.h"
 #include "Model/VisibleObject.h"
 
-const float E = M_E;
+const float E = 2.7182818284590452354L;
 //const float PI = M_PI;
 
 using namespace Model;
@@ -34,22 +34,22 @@ Renderer::~Renderer ()
 
 void Renderer::render (const RenderTileData &tile)
 {
-  const Camera *camera = renderParams->scene->getCamera().data();
-  worldUnit viewDistance = renderParams->scene->getCamera()->getViewDistance();
+  const Camera &camera = renderParams->scene->getCamera();
+  worldUnit viewDistance = camera.getViewDistance();
   Vector direction;
-  Point startOnScreen(camera->getScreenTopLeft());
+  Point startOnScreen(camera.getScreenTopLeft());
   Point currentOnScreen;
   Ray ray;
   Color rayResult;
   const VisibleObject *objectWeAreIn = &renderParams->scene->getWorldObject();
 
-  imageUnit diffToNewLine = BPP * (tile.imageWidth - tile.width);
+  const imageUnit diffToNewLine = BPP * (tile.imageWidth - tile.width);
   imageUnit R = BPP * (tile.topLeft.x + tile.topLeft.y * tile.imageWidth);
   imageUnit G = R + 1;
   imageUnit B = G + 1;
 
-  startOnScreen.data += camera->screenWidthDelta.data * tile.topLeft.x;
-  startOnScreen.data += camera->screenHeightDelta.data * tile.topLeft.y;
+  startOnScreen.data += camera.screenWidthDelta.data * tile.topLeft.x;
+  startOnScreen.data += camera.screenHeightDelta.data * tile.topLeft.y;
 
   for (imageUnit iLine = tile.topLeft.y; iLine < tile.bottomRight.y; ++iLine)
   {
@@ -59,9 +59,9 @@ void Renderer::render (const RenderTileData &tile)
         renderParams->allowRunning && iCol < tile.bottomRight.x; ++iCol)
     //Checking if thread is allowed to run: renderParams->allowRunning
     {
-      if (camera->getType() == Camera::Conic)
+      if (camera.getType() == Camera::Conic)
       {
-        camera->getDirection(currentOnScreen, direction);
+        camera.getDirection(currentOnScreen, direction);
       }
 
       ray.setParams(currentOnScreen, direction);
@@ -80,10 +80,10 @@ void Renderer::render (const RenderTileData &tile)
       tile.imageData [B] = rayResult.blue();
       B += BPP;
 
-      currentOnScreen.data += camera->screenWidthDelta.data;
+      currentOnScreen.data += camera.screenWidthDelta.data;
     }
 
-    startOnScreen.data += camera->screenHeightDelta.data;
+    startOnScreen.data += camera.screenHeightDelta.data;
 
     R += diffToNewLine;
     G += diffToNewLine;
@@ -98,7 +98,7 @@ inline void Renderer::shootRay (Ray & ray,
                                 const VisibleObject *objectWeAreIn) const
 {
   Scene::ObjectIt endObjects = renderParams->scene->getObjects().end();
-  Scene::ObjectIt currentObject = endObjects;
+  ObjectPtr currentObject;
   float reflectionCoef = 1;
   float lightContrCoef = 0;
   worldUnit rayStartIntersectDist = mainViewDistance;
@@ -109,17 +109,16 @@ inline void Renderer::shootRay (Ray & ray,
   {
     rayStartIntersectDist = mainViewDistance;
     //Find intersection
-    for (Scene::ObjectIt object = renderParams->scene->getObjects().begin();
-        object < endObjects; object++)
+    for (const ObjectPtr &object : renderParams->scene->getObjects())
     {
-      if ( (*object)->checkRay(ray, rayStartIntersectDist, *tmpDistance))
+      if (object->checkRay(ray, rayStartIntersectDist, *tmpDistance))
       {
         currentObject = object;
       }
     }
 
     //If there is any intersection?
-    if (currentObject != endObjects)
+    if (currentObject != nullptr)
     {
       QScopedPointer <Vector> normalAtIntersection(new Vector);
       QScopedPointer <Point> intersection(new Point);
@@ -131,23 +130,23 @@ inline void Renderer::shootRay (Ray & ray,
       ray.getStart().data.move(rayStartIntersect->data, intersection->data);
 
       //Get normal vector at intersection point
-      (*currentObject)->getNormal(*intersection, *normalAtIntersection);
+      currentObject->getNormal(*intersection, *normalAtIntersection);
 
       //move intersection point by epsilon, needed for error correction
       Vector correction(normalAtIntersection->data * FLOAT_EPSILON);
       intersection->data += correction;
 
-      Material *currentMaterial = (*currentObject)->getMaterial().data();
+      const Material &currentMaterial = currentObject->getMaterial();
 
       //(1.0f / COLOR_COUNT) because few lines bellow we do color * color
       lightContrCoef = reflectionCoef * (1.0f / COLOR_COUNT);
 
       if (renderParams->reflectionDeep > 1)
       {
-        lightContrCoef *= (1.0f - currentMaterial->getReflection());
+        lightContrCoef *= (1.0f - currentMaterial.getReflection());
       }
 
-      float transparency = (*currentObject)->getMaterial()->getTransparency();
+      float transparency = currentObject->getMaterial().getTransparency();
 
       //calculate refracted ray and transparent sphere color
       Color transpColor = shootRefractedRay(ray, transparency, refractionDepth,
@@ -155,12 +154,12 @@ inline void Renderer::shootRay (Ray & ray,
                                             rayStartIntersectDist,
                                             lightContrCoef, correction,
                                             *normalAtIntersection,
-                                            *intersection, **currentObject,
+                                            *intersection, *currentObject,
                                             objectWeAreIn);
 
       resultColor += transpColor;
 
-      Color textureColor = currentMaterial->getTextureColor(
+      Color textureColor = currentMaterial.getTextureColor(
           *normalAtIntersection.data());
 
       //Calculate reflection vector
@@ -171,13 +170,9 @@ inline void Renderer::shootRay (Ray & ray,
       //reflectedRay is still normalized;
 
       //Calculate light contribution
-      Scene::LighIt endLights = renderParams->scene->getLights().end();
-
-      for (Scene::LighIt light = renderParams->scene->getLights().begin();
-          light < endLights; light++)
+      for (const Light &light : renderParams->scene->getLights())
       {
-        (*light)->getPosition().data.diff(intersection->data,
-                                          pointLightDist->data);
+        light.getPosition().data.diff(intersection->data, pointLightDist->data);
         //if angle between light and normal vector at intersection is higher than 90 degrees
         if (normalAtIntersection->dotProduct(pointLightDist->data) <= 0.0f)
         {
@@ -237,29 +232,29 @@ inline void Renderer::shootRay (Ray & ray,
               lightRay->getDir());
 
           float specular = pow(rayLigthRayAngleCos,
-                               currentMaterial->getSpecularPower());
-          lightPower = (*light)->power / lightPower;
+                               currentMaterial.getSpecularPower());
+          lightPower = light.power / lightPower;
 
           lightPower *= lambert * lightContrCoef;
           lightPowerSpecular *= specular * lightContrCoef;
 
           //Add diffuse component
-          resultColor += (**light) * currentMaterial->getColor()
+          resultColor += light * currentMaterial.getColor()
               * (textureColor * (1.0 / COLOR_MAX_VALUE)) * lightPower;
 
           if (rayLigthRayAngleCos > 0.0f)
           {
-            resultColor += (**light) * currentMaterial->getSpecularColor()
+            resultColor += light * currentMaterial.getSpecularColor()
                 * lightPowerSpecular;
           }
         }
       }
 
       //multiply by current reflection contribution
-      reflectionCoef *= currentMaterial->getReflection();
+      reflectionCoef *= currentMaterial.getReflection();
 
       if ( (reflectionCoef < COLOR_MIN_VALUE)
-          || (objectWeAreIn == currentObject->data()))
+          || (objectWeAreIn == currentObject.get()))
       {
         break;
       }
@@ -268,7 +263,7 @@ inline void Renderer::shootRay (Ray & ray,
       ray.setParams(*intersection);
       //ray is still normalized;
 
-      currentObject = endObjects;
+      currentObject = nullptr;
     }
     else
     {
@@ -283,7 +278,7 @@ inline int Renderer::calculateRefraction (Ray &ray,
                                           Vector *normalAtIntersection) const
 {
 
-  float ior = currentObject.getMaterial()->getIOR();
+  float ior = currentObject.getMaterial().getIOR();
 
   //get cosine between normal and ray going into the sphere
   float cos_alpha = -ray.getDir().dotProduct(*normalAtIntersection);
@@ -295,7 +290,7 @@ inline int Renderer::calculateRefraction (Ray &ray,
   //we are going into the sphere
   if (cos_alpha >= 0.0f)
   {
-    ir = objectWeAreIn->getMaterial()->getIOR() / ior;
+    ir = objectWeAreIn->getMaterial().getIOR() / ior;
   }
   else
   //going outside of the sphere

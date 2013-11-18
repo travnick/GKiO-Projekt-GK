@@ -21,9 +21,9 @@ namespace Model
   {
     loaded = false;
 
-    MaterialPtr worldMaterial(new Material);
+    worldMaterial.reset(new Material);
     worldMaterial->setIOR(1.0f);
-    world.setMaterial(worldMaterial);
+    world.setMaterial(worldMaterial.get());
   }
 
   bool Scene::init (const QString &filename, bool reload) throw (std::exception)
@@ -38,7 +38,6 @@ namespace Model
 
     if (infile.exists())
     {
-      camera.clear();
       lights.clear();
       materials.clear();
       objects.clear();
@@ -56,6 +55,6 @@ namespace Model
 
   void Scene::updateCamera ()
   {
-    camera->calibrate();
+    camera.calibrate();
   }
 }

@@ -23,7 +23,7 @@
 
 #define TIME_BEFORE_REMOVE_THREADS 1000 //[ms]
 #define DEFAULT_REFRESH_TIME 1000 //[ms]
-#define WINDOW_MARGIN 0 //
+#define WINDOW_MARGIN 0
 #define IMAGE_SAVE_FORMAT "png"
 
 #define DEFAULT_IMAGE_WIDTH 800
@@ -32,6 +32,43 @@
 
 namespace Controller
 {
+
+  class MainWindow::MainWindowState
+  {
+    public:
+      virtual ~MainWindowState ()
+      {
+      }
+
+      virtual void Activate (MainWindow &window) = 0;
+  };
+
+  class MainWindow::RenderingInProgressState: public MainWindow::MainWindowState
+  {
+    public:
+      virtual void Activate (MainWindow &window)
+      {
+        window.deactivateButtons(true);
+      }
+  };
+
+  class MainWindow::ReadyForRenderingState: public MainWindow::MainWindowState
+  {
+    public:
+      virtual void Activate (MainWindow &window)
+      {
+        window.activateButtons();
+      }
+  };
+
+  class MainWindow::WaitingForSceneFileState: public MainWindow::MainWindowState
+  {
+    public:
+      virtual void Activate (MainWindow &window)
+      {
+        window.deactivateButtons(false);
+      }
+  };
 
   void MainWindow::showWarning (QString message)
   {
@@ -64,7 +101,15 @@ namespace Controller
     addResult = true;
     renderingInProgress = false;
 
+    states.resize(StatesCount);
+    states [RenderingInProgress].reset(new RenderingInProgressState);
+    states [ReadyForRendering].reset(new ReadyForRenderingState);
+    states [WaitingForSceneFile].reset(new WaitingForSceneFileState);
+
     setUpGUI();
+
+    setState(WaitingForSceneFile);
+
     loadScene();
   }
 
@@ -80,7 +125,7 @@ namespace Controller
   {
     renderingInProgress = true;
 
-    deactivateButtons();
+    setState(RenderingInProgress);
 
     if (!updateCamera())
     {
@@ -146,15 +191,15 @@ namespace Controller
     }
     sizeChanged = false;
 
-    scene->getCamera()->setPosition(ui->xPos->value(), ui->yPos->value(),
+    scene->getCamera().setPosition(ui->xPos->value(), ui->yPos->value(),
                                     ui->zPos->value());
 
-    scene->getCamera()->getAngles().set(ui->xAngle->value(),
+    scene->getCamera().getAngles().set(ui->xAngle->value(),
                                         ui->yAngle->value(),
                                         ui->zAngle->value());
 
-    scene->getCamera()->updateRotation();
-    scene->getCamera()->setFOV(ui->fov->value());
+    scene->getCamera().updateRotation();
+    scene->getCamera().setFOV(ui->fov->value());
 
     scene->updateCamera();
 
@@ -204,7 +249,7 @@ namespace Controller
     if (mem == 0)
     {
       showWarning(QSTRING("Nie można przydzielić wymaganej ilości pamięci.<br>"
-          "Proszę zmniejszyć obrazek"));
+                          "Proszę zmniejszyć obrazek"));
 
       return false;
     }
@@ -441,7 +486,7 @@ namespace Controller
 
     updateImage();
 
-    activateButtons();
+    setState(ReadyForRendering);
 
     showRenderTime(elapsedTime);
     renderingInProgress = false;
@@ -472,26 +517,23 @@ namespace Controller
       else
       {
         showWarning(QSTRING("Nie można otworzyć pliku sceny.<br>"
-            "Sprawdź czy plik istnieje.") + fileName);
+            "Sprawdź czy plik istnieje.")+ fileName);
       }
     }
     catch (std::exception &ex)
     {
       showWarning(
-          QSTRING("Błąd parsowania pliku sceny: ") + fileName
-              + QSTRING("<br><br>") + QSTRING(ex.what()));
+      QSTRING("Błąd parsowania pliku sceny: ") + fileName
+      + QSTRING("<br><br>") + QSTRING(ex.what()));
     }
 
     if (!result)
     {
-      //Important because possibility of changing scene file content
-      //and trying to reload it
-      deactivateButtons(false);
       return;
     }
 
     scene->updateCamera();
-    activateButtons();
+    setState(ReadyForRendering);
 
     //Preserve camera settings
     if (ui->keepCameraSettings->isChecked())
@@ -544,9 +586,9 @@ namespace Controller
     items [col++ ]->setData(0, QVariant(ui->threadCounter->value())); //Thread count
     items [col++ ]->setData(0, QVariant(ui->tileSize->value()));  //Tile size
     items [col++ ]->setData(0, QVariant(ui->refreshTime->value())); //Refresh time
-    items [col++ ]->setData(0, QVariant(time)); //Render time
+    items [col++ ]->setData(0, QVariant(time));  //Render time
     items [col++ ]->setData(0, QVariant(image->imageWidth));  //Image width
-    items [col++ ]->setData(0, QVariant(image->imageHeight)); //Image height
+    items [col++ ]->setData(0, QVariant(image->imageHeight));  //Image height
     delete [] items;
 
     ui->resultList->sortByColumn(0, Qt::AscendingOrder);
@@ -563,22 +605,22 @@ namespace Controller
     switch (button->text() [1].toAscii())
     {
       case Qt::Key_W:
-        scene->getCamera()->move(Model::Z, speed);
+        scene->getCamera().move(Model::Z, speed);
         break;
       case Qt::Key_S:
-        scene->getCamera()->move(Model::Z, -speed);
+        scene->getCamera().move(Model::Z, -speed);
         break;
       case Qt::Key_A:
-        scene->getCamera()->move(Model::X, -speed);
+        scene->getCamera().move(Model::X, -speed);
         break;
       case Qt::Key_D:
-        scene->getCamera()->move(Model::X, speed);
+        scene->getCamera().move(Model::X, speed);
         break;
       case Qt::Key_Q:
-        scene->getCamera()->move(Model::Y, speed);
+        scene->getCamera().move(Model::Y, speed);
         break;
       case Qt::Key_E:
-        scene->getCamera()->move(Model::Y, -speed);
+        scene->getCamera().move(Model::Y, -speed);
         break;
     }
 
@@ -600,24 +642,24 @@ namespace Controller
     switch (button->text() [1].toAscii())
     {
       case 'P':
-        scene->getCamera()->rotate(Model::X, speed);
+        scene->getCamera().rotate(Model::X, speed);
         break;
       case ';':
-        scene->getCamera()->rotate(Model::X, -speed);
+        scene->getCamera().rotate(Model::X, -speed);
         break;
 
       case '[':
-        scene->getCamera()->rotate(Model::Y, speed);
+        scene->getCamera().rotate(Model::Y, speed);
         break;
       case '\'':
-        scene->getCamera()->rotate(Model::Y, -speed);
+        scene->getCamera().rotate(Model::Y, -speed);
         break;
 
       case ']':
-        scene->getCamera()->rotate(Model::Z, speed);
+        scene->getCamera().rotate(Model::Z, speed);
         break;
       case '\\':
-        scene->getCamera()->rotate(Model::Z, -speed);
+        scene->getCamera().rotate(Model::Z, -speed);
         break;
     }
 
@@ -632,14 +674,21 @@ namespace Controller
   void MainWindow::getCameraParameters ()
   {
     //Update data in GUI
-    ui->xPos->setValue(scene->getCamera()->getPosition() [Model::X]);
-    ui->yPos->setValue(scene->getCamera()->getPosition() [Model::Y]);
-    ui->zPos->setValue(scene->getCamera()->getPosition() [Model::Z]);
+    ui->xPos->setValue(scene->getCamera().getPosition() [Model::X]);
+    ui->yPos->setValue(scene->getCamera().getPosition() [Model::Y]);
+    ui->zPos->setValue(scene->getCamera().getPosition() [Model::Z]);
 
-    ui->xAngle->setValue(scene->getCamera()->getAngles() [Model::X]);
-    ui->yAngle->setValue(scene->getCamera()->getAngles() [Model::Y]);
-    ui->zAngle->setValue(scene->getCamera()->getAngles() [Model::Z]);
+    ui->xAngle->setValue(scene->getCamera().getAngles() [Model::X]);
+    ui->yAngle->setValue(scene->getCamera().getAngles() [Model::Y]);
+    ui->zAngle->setValue(scene->getCamera().getAngles() [Model::Z]);
 
-    ui->fov->setValue(scene->getCamera()->getFOV());
+    ui->fov->setValue(scene->getCamera().getFOV());
   }
+
+  void MainWindow::setState (States state)
+  {
+    _currentState = state;
+    states [_currentState]->Activate(*this);
+  }
+
 }

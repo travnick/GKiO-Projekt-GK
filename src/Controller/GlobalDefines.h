@@ -10,18 +10,18 @@ typedef uint8_t colorType;
 //--------------------------------------------------
 
 // Constants for image
-const char BPP = sizeof(colorType) * 3; //Bytes per pixel: 1 byte for each color: R G B
-const int COLOR_COUNT = 256;
-const int COLOR_MAX_VALUE = 255;
+const uint BPP = sizeof(colorType) * 3; //Bytes per pixel: 1 byte for each color: R G B
+const uint COLOR_COUNT = 256;
+const uint COLOR_MAX_VALUE = 255;
 
 const int64_t IMAGE_MAX_DATA_SIZE = 2147483648LL; //2^31 max of int in QImage
 const colorType DEFAULT_RENDER_COLOR = 100;
 //--------------------------------------------------
 
 // Constants for units
-const double KiB = 1024.0;
-const double MiB = 1048576.0;
-const double GiB = 1073741824.0;
+const double KiB = 1024.0L;
+const double MiB = 1048576.0L;
+const double GiB = 1073741824.0L;
 const int KILO = 1000;
 const int MEGA = 1000000;
 const int GIGA = 1000000000;

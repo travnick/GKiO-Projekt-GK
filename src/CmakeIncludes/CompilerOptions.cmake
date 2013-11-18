@@ -9,6 +9,7 @@ if(CMAKE_COMPILER_IS_GNUCC)
   add_definitions(-Wno-pragmas -Wno-unknown-pragmas)
 
   add_definitions(-march=native -ffast-math)
+  add_definitions(-std=c++11)
 
   if(CMAKE_BUILD_TYPE STREQUAL ${Debug})
     # Debugging symbols

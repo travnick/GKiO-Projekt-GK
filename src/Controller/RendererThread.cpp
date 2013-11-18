@@ -7,7 +7,7 @@
 namespace Controller
 {
 
-  RendererThread::RendererThread (const QSharedPointer <RenderParams> &newRenderParams)
+  RendererThread::RendererThread (const std::shared_ptr <RenderParams> &newRenderParams)
       : renderer(new Model::Renderer(*newRenderParams))
   {
   }

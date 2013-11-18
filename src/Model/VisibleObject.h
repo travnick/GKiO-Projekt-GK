@@ -19,7 +19,7 @@ namespace Model
   class VisibleObject: public Object
   {
     private:
-      MaterialPtr material;
+      const Material *material;
 
     public:
 
@@ -31,9 +31,9 @@ namespace Model
        *
        * @return material id
        */
-      inline const MaterialPtr &getMaterial () const
+      inline const Material &getMaterial () const
       {
-        return material;
+        return *material;
       }
 
       /**Returns approximated size of object
@@ -57,7 +57,7 @@ namespace Model
        *
        * @param newMaterialId id of material to set
        */
-      inline void setMaterial (const MaterialPtr &newMaterialId)
+      inline void setMaterial (const Material *newMaterialId)
       {
         material = newMaterialId;
       }

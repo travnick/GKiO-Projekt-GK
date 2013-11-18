@@ -3,10 +3,9 @@
 #pragma once
 
 #include <QScopedPointer>
-#include <QSharedPointer>
-
 #include <QMainWindow>
 
+#include <common.h>
 #include "Controller/GlobalDefines.h"
 
 //Forward declarations -->
@@ -130,10 +129,23 @@ namespace Controller
       void rotateCamera ();
 
     private:
+      class MainWindowState;
+      class RenderingInProgressState;
+      class ReadyForRenderingState;
+      class WaitingForSceneFileState;
+
+      enum States
+      {
+          RenderingInProgress,
+          ReadyForRendering,
+          WaitingForSceneFile,
+          StatesCount
+      };
+
       /**Image data structure
        * It handles image data and image properties
        */
-      QSharedPointer <Model::RenderTileData> image;
+      std::shared_ptr <Model::RenderTileData> image;
 
       /**Stores byte count per line in image
        *
@@ -158,7 +170,7 @@ namespace Controller
       /**Stores 3D scene
        *
        */
-      QSharedPointer <Model::Scene> scene;
+      std::shared_ptr <Model::Scene> scene;
 
       /**Stores timer for rendering time measuring
        *
@@ -178,12 +190,17 @@ namespace Controller
       /**Stores rendering parameters
        *
        */
-      QSharedPointer <RenderParams> renderParams;
+      std::shared_ptr <RenderParams> renderParams;
 
       /**Thread runner object
        *
        */
       QScopedPointer <ThreadRunner> threadRunner;
+
+      States _currentState;
+      std::vector <std::unique_ptr <MainWindowState>> states;
+
+      void setState(States state);
 
       /**Activates buttons in GUI.
        * Sets state to rendering ready.
@@ -207,7 +224,7 @@ namespace Controller
        *
        * @param withSceneLoading disable scene loading ?
        */
-      void deactivateButtons (bool withSceneLoading = true);
+      void deactivateButtons (bool withSceneLoading);
 
       /**Calculates memory requirement for image size width x height
        *

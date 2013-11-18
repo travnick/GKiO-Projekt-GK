@@ -5,11 +5,11 @@
 #include <string>
 #include <vector>
 
-#include <QSharedPointer>
-
 #include "Controller/GlobalDefines.h"
-#include "Model/Camera.h"
 #include "Model/ModelDefines.h"
+#include "Model/Camera.h"
+#include "Model/Light.h"
+#include "Model/Material.h"
 #include "Model/Sphere.h"
 
 //Forward declarations -->
@@ -28,10 +28,10 @@ namespace Model
   class Scene
   {
     public:
-      typedef std::vector <LightPtr> LighContainer;
+      typedef std::vector <Light> LighContainer;
       typedef LighContainer::const_iterator LighIt;
 
-      typedef std::vector <MaterialPtr> MaterialContainer;
+      typedef std::vector <Material> MaterialContainer;
       typedef MaterialContainer::const_iterator MaterialIt;
 
       typedef std::vector <ObjectPtr> ObjectContainer;
@@ -59,7 +59,7 @@ namespace Model
        *
        * @return camera
        */
-      inline const CameraPtr &getCamera () const
+      inline const Camera &getCamera () const
       {
         return camera;
       }
@@ -68,7 +68,7 @@ namespace Model
        *
        * @return camera
        */
-      inline CameraPtr &getCamera ()
+      inline Camera &getCamera ()
       {
         return camera;
       }
@@ -125,7 +125,7 @@ namespace Model
        */
       inline void setImageWidth (imageUnit imageWidth)
       {
-        camera->setImageWidth(imageWidth);
+        camera.setImageWidth(imageWidth);
       }
 
       /**Sets image height
@@ -135,34 +135,36 @@ namespace Model
        */
       inline void setImageHeight (imageUnit imageHeight)
       {
-        camera->setImageHeight(imageHeight);
+        camera.setImageHeight(imageHeight);
       }
 
       /**Sets camera object in scene
        *
        * @param newCamera camera to set in scene
        */
-      inline void setCamera (const CameraPtr &newCamera)
+      inline void setCamera (const Camera &newCamera)
       {
         this->camera = newCamera;
       }
 
-      /**Adds light to scene
-       *
-       * @param object light to add
-       */
-      inline void addLight (const LightPtr &object)
+      inline void addLight (const Light &object)
       {
-        lights.push_back(object);
+        lights.emplace_back(object);
       }
 
-      /**Adds material to scene
-       *
-       * @param object material to add
-       */
-      inline void addMaterial (const MaterialPtr &object)
+      inline void addLight (Light &&object)
       {
-        materials.push_back(object);
+        lights.emplace_back(std::move(object));
+      }
+
+      inline void addMaterial (Material &&object)
+      {
+        materials.emplace_back(std::move(object));
+      }
+
+      inline void addMaterial (const Material &object)
+      {
+        materials.emplace_back(object);
       }
 
       /**Adds visible object to scene
@@ -171,7 +173,7 @@ namespace Model
        */
       inline void addVisibleObject (const ObjectPtr &object)
       {
-        objects.push_back(object);
+        objects.emplace_back(object);
       }
 
       /**Updates camera
@@ -192,10 +194,11 @@ namespace Model
 
     private:
       Sphere world;
-      CameraPtr camera;
+      Camera camera;
       LighContainer lights;
       MaterialContainer materials;
       ObjectContainer objects;
+      MaterialPtr worldMaterial;
       bool loaded;
   };
 }

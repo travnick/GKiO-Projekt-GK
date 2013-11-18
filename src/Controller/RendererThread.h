@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QScopedPointer>
-#include <QSharedPointer>
 
 #include <QObject>
 #include <QRunnable>
@@ -37,7 +36,7 @@ namespace Controller
       /**Initializes renderer
        *
        */
-      RendererThread (const QSharedPointer <RenderParams> &renderParams);
+      RendererThread (const std::shared_ptr <RenderParams> &renderParams);
 
       /**Needed for QScopedPointer
        *
@@ -48,7 +47,7 @@ namespace Controller
        *
        * @param newTile description of image part to render
        */
-      void setTile (const QSharedPointer <Model::RenderTileData> &newTile)
+      void setTile (const std::shared_ptr <Model::RenderTileData> &newTile)
       {
         tile = newTile;
       }
@@ -64,7 +63,7 @@ namespace Controller
       /**Description of image part to render
        *
        */
-      QSharedPointer <Model::RenderTileData> tile;
+      std::shared_ptr <Model::RenderTileData> tile;
 
       /**Renderer
        *

@@ -16,8 +16,13 @@ namespace Model
     public:
       float power;
 
-      Light ()
-          : power(1)
+      Light (const Light &light)
+          : Object(light), Color(light), power(light.power)
+      {
+      }
+
+      Light (const Object &object, const Color &color, float newPower)
+          : Object(object), Color(color), power(newPower)
       {
       }
 

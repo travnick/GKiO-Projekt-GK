@@ -3,8 +3,9 @@
 #pragma once
 
 #include <cmath>
-#include <QSharedPointer>
 #include <QString>
+
+#include <common.h>
 
 // Functions -->
 /**
@@ -19,7 +20,7 @@ inline QString toLowerCase (const char* string)
 // <-- Functions
 
 //Constants -->
-const float PI = M_PI;
+const float PI = 3.14159265358979323846L;
 
 #define FLOAT_PRECISION 6
 
@@ -146,9 +147,9 @@ namespace Model
   class VisibleObject;
   // <-- Forward declarations
 
-  typedef QSharedPointer <Camera> CameraPtr;
-  typedef QSharedPointer <Light> LightPtr;
-  typedef QSharedPointer <Material> MaterialPtr;
-  typedef QSharedPointer <Scene> ScenePtr;
-  typedef QSharedPointer <VisibleObject> ObjectPtr;
+  typedef std::shared_ptr <Camera> CameraPtr;
+  typedef std::shared_ptr <Light> LightPtr;
+  typedef std::shared_ptr <Material> MaterialPtr;
+  typedef std::shared_ptr <Scene> ScenePtr;
+  typedef std::shared_ptr <VisibleObject> ObjectPtr;
 } //namespace Model

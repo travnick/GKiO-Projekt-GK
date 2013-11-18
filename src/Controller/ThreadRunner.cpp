@@ -28,8 +28,8 @@ namespace Controller
     QMutexLocker locker(mutex.data());
   }
 
-  void ThreadRunner::setParams (const QSharedPointer <Model::RenderTileData>& newImage,
-                                const QSharedPointer <RenderParams> &newRenderParams)
+  void ThreadRunner::setParams (const std::shared_ptr <Model::RenderTileData>& newImage,
+                                const std::shared_ptr <RenderParams> &newRenderParams)
   {
     QMutexLocker locker(mutex.data());
     this->image = newImage;
@@ -45,7 +45,7 @@ namespace Controller
     int tileCount = tiles.size();
     for (int i = 0; i < tileCount; ++i)
     {
-      threadPool->start(renderers [i].data());
+      threadPool->start(renderers [i].get());
     }
 
     threadPool->waitForDone();
@@ -59,7 +59,7 @@ namespace Controller
                                         int tileSizeY)
   {
     //Copy common data that are needed to render
-    QSharedPointer <Model::RenderTileData> tile(
+    std::shared_ptr <Model::RenderTileData> tile(
         new Model::RenderTileData(*image));
 
     tile->deleteImageData = false;
@@ -134,7 +134,7 @@ namespace Controller
     { //Create threads if there are more tiles
       do
       {
-        QSharedPointer <RendererThread> renderer(
+        std::shared_ptr <RendererThread> renderer(
             (new RendererThread(renderParams)));
         renderer->setAutoDelete(false);
 

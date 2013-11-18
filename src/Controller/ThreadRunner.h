@@ -3,12 +3,12 @@
 #pragma once
 
 #include <QScopedPointer>
-#include <QSharedPointer>
 
 #include <QList>
 #include <QObject>
 #include <QRunnable>
-#include <QVector>
+
+#include <common.h>
 
 //Forward declarations -->
 class QMutex;
@@ -45,13 +45,13 @@ namespace Controller
        * @param image image description
        * @param newRenderParams rendering parameters
        */
-      void setParams (const QSharedPointer <Model::RenderTileData> &image,
-                      const QSharedPointer <RenderParams> &newRenderParams);
+      void setParams (const std::shared_ptr <Model::RenderTileData> &image,
+                      const std::shared_ptr <RenderParams> &newRenderParams);
 
       /**Runs rendering with threads.
        * Threads above maxThreadCount are added to queue.
        */
-      void run ();
+      virtual void run ();
 
     public slots:
       /**Listener for terminate signal
@@ -87,7 +87,7 @@ namespace Controller
       /**Stores rendering parameters
        *
        */
-      QSharedPointer <RenderParams> renderParams;
+      std::shared_ptr <RenderParams> renderParams;
 
       /**Thread manager
        *
@@ -99,12 +99,12 @@ namespace Controller
       /**Container for tiles that are queued
        *
        */
-      QList <QSharedPointer <Model::RenderTileData> > tiles;
+      QList <std::shared_ptr <Model::RenderTileData> > tiles;
 
-      QList <QSharedPointer <RendererThread> > renderers;
-      QList <QSharedPointer <RendererThread> > renderersRandomized;
+      QList <std::shared_ptr <RendererThread> > renderers;
+      QList <std::shared_ptr <RendererThread> > renderersRandomized;
 
-      QSharedPointer <Model::RenderTileData> image;
+      std::shared_ptr <Model::RenderTileData> image;
 
       /**Creates image tile
        * New tile is added to the end of tile container

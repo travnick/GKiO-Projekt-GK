@@ -24,6 +24,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
   QDomNode node;
   QDomElement root;
   QDomDocument d;
+  bool cameraExists = false;
 
   d.setContent(&io);
   root = d.documentElement();
@@ -37,7 +38,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
     if (!node.isElement())
       continue;
 
-    QSharedPointer <Material> material(new Material());
+    Material material;
     Color color, specularColor;
     float specularPower, reflection, ior, transparency;
 
@@ -64,15 +65,15 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
     if (specularPower < 0)
       throw std::logic_error("\"Moc\" specular mniejszy od 0.");
 
-    material->setColor(color);
-    material->setSpecularColor(specularColor);
-    material->setSpecularPower(specularPower);
-    material->setReflection(reflection);
-    material->setTransparency(transparency);
-    material->setIOR(ior);
-    material->setTexture(texture);
+    material.setColor(color);
+    material.setSpecularColor(specularColor);
+    material.setSpecularPower(specularPower);
+    material.setReflection(reflection);
+    material.setTransparency(transparency);
+    material.setIOR(ior);
+    material.setTexture(texture);
 
-    scene.addMaterial(material);
+    scene.addMaterial(std::move(material));
   }
 
   if (scene.getMaterials().empty())
@@ -87,7 +88,6 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
     if (!node.isElement())
       continue;
 
-    QSharedPointer <Light> object(new Light());
     Point point;
     Color color;
     float power;
@@ -100,11 +100,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
     getColor(node.firstChildElement("color").toElement(), color);
     getVPCommon(node.firstChildElement("position").toElement(), point);
 
-    object->power = power;
-    object->setPosition(point);
-    (*object) = (color);
-
-    scene.addLight(object);
+    scene.addLight(Light(point, color, power));
   }
 
   // Loading objects
@@ -123,7 +119,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
     {
       case Objects::Sphere:
       {
-        QSharedPointer <Sphere> mainbject;
+        std::shared_ptr <Sphere> mainbject;
         Point point;
         worldUnit radius, offset;
         unsigned material;
@@ -158,9 +154,9 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
           multiplyZ = getInt(mulelem, "z");
         }
 
-        mainbject = QSharedPointer <Sphere>(new Sphere(radius));
+        mainbject = std::shared_ptr <Sphere>(new Sphere(radius));
         mainbject->setPosition(point);
-        mainbject->setMaterial(scene.getMaterials() [material]);
+        mainbject->setMaterial(&scene.getMaterials() [material]);
 
         if (multiplyX < 0)
         {
@@ -186,7 +182,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
           {
             for (int k = 0; k < multiplyZ; ++k)
             {
-              QSharedPointer <VisibleObject> object(new Sphere(*mainbject));
+              std::shared_ptr <VisibleObject> object(new Sphere(*mainbject));
               point = object->getPosition();
 
               point [X] += offset * i * multiplyXSign;
@@ -204,7 +200,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
 
       case Objects::Plane:
       {
-        QSharedPointer <Plane> object(new Plane());
+        std::shared_ptr <Plane> object(new Plane());
         Vector angles;
         int material;
 
@@ -215,19 +211,20 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
         material = getInt(elem, "material");
 
         object->setAngles(angles);
-        object->setMaterial(scene.getMaterials() [material]);
+        object->setMaterial(&scene.getMaterials() [material]);
         scene.addVisibleObject(object);
       }
         break;
 
       case Objects::Camera:
       {
-        if (! (scene.getCamera().isNull()))
+        if (cameraExists)
         {
           throw std::logic_error("Może być zdefiniowana tylko jedna kamera.");
         }
+        cameraExists = true;
 
-        QSharedPointer <Camera> object(new Camera());
+        Camera object;
         Point point;
         Vector vector;
         Point::dataType screenWidth;
@@ -253,14 +250,14 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
               "Parametr viewDistance musi być większy od 0.");
 
         cameraType = elem.attribute("type");
-        object->setFOV(FOV);
-        object->setViewDistance(viewDistance);
-        object->setScreenWidth(screenWidth);
-        object->setPosition(point);
-        object->setAngles(vector);
-        object->setType(cameraType);
+        object.setFOV(FOV);
+        object.setViewDistance(viewDistance);
+        object.setScreenWidth(screenWidth);
+        object.setPosition(point);
+        object.setAngles(vector);
+        object.setType(cameraType);
 
-        scene.setCamera(object);
+        scene.setCamera(std::move(object));
       }
         break;
       default:
@@ -268,11 +265,15 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
     }
   }
 
-  if (scene.getCamera().isNull())
+  if (!cameraExists)
+  {
     throw std::logic_error("Brak kamery w scenie");
+  }
 
   if (scene.getLights().empty())
+  {
     throw std::logic_error("Brak świateł w scenie");
+  }
 }
 
 void SceneFileManager::getColor (const QDomElement & value, Color &color)

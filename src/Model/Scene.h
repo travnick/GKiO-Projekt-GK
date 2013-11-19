@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <Model/Object.h>
 #include <string>
 #include <vector>
 
@@ -29,13 +30,8 @@ namespace Model
   {
     public:
       typedef std::vector <Light> LighContainer;
-      typedef LighContainer::const_iterator LighIt;
-
       typedef std::vector <Material> MaterialContainer;
-      typedef MaterialContainer::const_iterator MaterialIt;
-
-      typedef std::vector <ObjectPtr> ObjectContainer;
-      typedef ObjectContainer::const_iterator ObjectIt;
+      typedef std::vector <VisibleObjectUniquePtr> ObjectContainer;
 
       /**Sets loaded = false
        *
@@ -167,19 +163,11 @@ namespace Model
         materials.emplace_back(object);
       }
 
-      /**Adds visible object to scene
-       *
-       * @param object visible object to add
-       */
-      inline void addVisibleObject (const ObjectPtr &object)
+      inline void addVisibleObject (std::unique_ptr <VisibleObject> &&object)
       {
-        objects.emplace_back(object);
+        objects.emplace_back(std::move(object));
       }
 
-      /**Updates camera
-       * It calls camera->calibrate()
-       *
-       */
       void updateCamera ();
 
       /**Returns state of scene.
@@ -198,7 +186,7 @@ namespace Model
       LighContainer lights;
       MaterialContainer materials;
       ObjectContainer objects;
-      MaterialPtr worldMaterial;
+      MaterialUniquePtr worldMaterial;
       bool loaded;
   };
 }

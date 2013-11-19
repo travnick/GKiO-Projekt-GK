@@ -182,7 +182,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
           {
             for (int k = 0; k < multiplyZ; ++k)
             {
-              std::shared_ptr <VisibleObject> object(new Sphere(*mainbject));
+              std::unique_ptr <VisibleObject> object(new Sphere(*mainbject));
               point = object->getPosition();
 
               point [X] += offset * i * multiplyXSign;
@@ -191,7 +191,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
 
               object->setPosition(point);
 
-              scene.addVisibleObject(object);
+              scene.addVisibleObject(std::move(object));
             }
           }
         }
@@ -200,7 +200,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
 
       case Objects::Plane:
       {
-        std::shared_ptr <Plane> object(new Plane());
+        std::unique_ptr <Plane> object(new Plane());
         Vector angles;
         int material;
 
@@ -212,7 +212,7 @@ void SceneFileManager::loadScene (QIODevice & io, Scene &scene)
 
         object->setAngles(angles);
         object->setMaterial(&scene.getMaterials() [material]);
-        scene.addVisibleObject(object);
+        scene.addVisibleObject(std::move(object));
       }
         break;
 

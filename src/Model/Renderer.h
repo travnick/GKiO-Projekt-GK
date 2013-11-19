@@ -120,7 +120,7 @@ namespace Model
                                Vector &correction,
                                Vector &normalAtIntersection,
                                Point &intersection,
-                               VisibleObject &currentObject,
+                               const VisibleObject &currentObject,
                                const VisibleObject *objectWeAreIn) const;
 
       /**Calculates refracted ray direction
@@ -132,9 +132,9 @@ namespace Model
        * @return returns 0 when refraction had place; -1 in other case
        */
       int calculateRefraction (Ray &ray,
-                               VisibleObject &currentObject,
-                               const VisibleObject *objectWeAreIn,
-                               Vector *normalAtIntersection) const;
+                               const VisibleObject &currentObject,
+                               const VisibleObject &objectWeAreIn,
+                               const Vector &normalAtIntersection) const;
 
       Q_DISABLE_COPY (Renderer)
   };

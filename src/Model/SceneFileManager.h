@@ -11,7 +11,7 @@ namespace Model
 {
   //Forward declarations -->
   class Color;
-  class Point;
+  class SSEVector;
   class Scene;
   // <-- Forward declarations
 
@@ -46,7 +46,7 @@ namespace Model
        * @param value xml value
        * @param object object to load data in
        */
-      static void getVPCommon (const QDomElement &value, Point &object);
+      static void getVPCommon (const QDomElement &value, SSEVector &object);
 
       /** Loads integer data from an xml element to the name variable
        *

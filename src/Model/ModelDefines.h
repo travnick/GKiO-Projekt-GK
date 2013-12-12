@@ -147,9 +147,14 @@ namespace Model
   class VisibleObject;
   // <-- Forward declarations
 
-  typedef std::shared_ptr <Camera> CameraPtr;
-  typedef std::shared_ptr <Light> LightPtr;
-  typedef std::shared_ptr <Material> MaterialPtr;
-  typedef std::shared_ptr <Scene> ScenePtr;
-  typedef std::shared_ptr <VisibleObject> ObjectPtr;
+  typedef std::shared_ptr <Camera> CameraSharedPtr;
+  typedef std::shared_ptr <Light> LightSharedPtr;
+  typedef std::shared_ptr <Material> MaterialSharedPtr;
+  typedef std::shared_ptr <Scene> SceneSharedPtr;
+  typedef std::shared_ptr <VisibleObject> VisibleObjectSharedPtr;
+  typedef std::unique_ptr <Camera> CameraUniquePtr;
+  typedef std::unique_ptr <Light> LightUniquePtr;
+  typedef std::unique_ptr <Material> MaterialUniquePtr;
+  typedef std::unique_ptr <Scene> SceneUniquePtr;
+  typedef std::unique_ptr <VisibleObject> VisibleObjectUniquePtr;
 } //namespace Model

@@ -33,7 +33,7 @@ namespace Model
        * @param normalAtIntersection
        * @return color from texture
        */
-      inline Color getTextureColor (const Point &normalAtIntersection) const
+      inline Color getTextureColor (const SSEVector &normalAtIntersection) const
       {
         if (!texture.isNull())
         {

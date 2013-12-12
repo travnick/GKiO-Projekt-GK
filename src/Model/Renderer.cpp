@@ -48,12 +48,12 @@ void Renderer::render (const RenderTileData &tile)
   imageUnit G = R + 1;
   imageUnit B = G + 1;
 
-  startOnScreen.data += camera.screenWidthDelta.data * tile.topLeft.x;
-  startOnScreen.data += camera.screenHeightDelta.data * tile.topLeft.y;
+  startOnScreen += camera.screenWidthDelta * tile.topLeft.x;
+  startOnScreen += camera.screenHeightDelta * tile.topLeft.y;
 
   for (imageUnit iLine = tile.topLeft.y; iLine < tile.bottomRight.y; ++iLine)
   {
-    currentOnScreen.data = startOnScreen.data;
+    currentOnScreen = startOnScreen;
 
     for (imageUnit iCol = tile.topLeft.x;
         renderParams->allowRunning && iCol < tile.bottomRight.x; ++iCol)
@@ -80,10 +80,10 @@ void Renderer::render (const RenderTileData &tile)
       tile.imageData [B] = rayResult.blue();
       B += BPP;
 
-      currentOnScreen.data += camera.screenWidthDelta.data;
+      currentOnScreen += camera.screenWidthDelta;
     }
 
-    startOnScreen.data += camera.screenHeightDelta.data;
+    startOnScreen += camera.screenHeightDelta;
 
     R += diffToNewLine;
     G += diffToNewLine;
@@ -123,18 +123,17 @@ inline void Renderer::shootRay (Ray & ray,
       Vector normalAtIntersection;
       Point intersection;
 
-      ray.getDir().data.multiply(rayStartIntersectDist,
-                                 rayStartIntersect->data);
+      *rayStartIntersect = ray.getDir().multiply(rayStartIntersectDist);
 
       //Calculate intersection point
-      ray.getStart().data.move(rayStartIntersect->data, intersection.data);
+      intersection = ray.getStart().move(*rayStartIntersect);
 
       //Get normal vector at intersection point
       currentObject->getNormal(intersection, normalAtIntersection);
 
       //move intersection point by epsilon, needed for error correction
-      Vector correction(normalAtIntersection.data * FLOAT_EPSILON);
-      intersection.data += correction;
+      Vector correction(normalAtIntersection * FLOAT_EPSILON);
+      intersection += correction;
 
       const Material &currentMaterial = currentObject->getMaterial();
 
@@ -163,17 +162,17 @@ inline void Renderer::shootRay (Ray & ray,
 
       //Calculate reflection vector
       Vector reflectedRay(ray.getDir());
-      Model::SSEVector normalCopy = normalAtIntersection.data;
-      normalCopy *= reflectedRay.dotProduct(normalCopy) * 2;
-      reflectedRay.data -= normalCopy;
+      Model::SSEVector normalCopy = normalAtIntersection;
+      normalCopy *= reflectedRay.dotProduct(normalAtIntersection) * 2;
+      reflectedRay -= normalCopy;
       //reflectedRay is still normalized;
 
       //Calculate light contribution
       for (const Light &light : renderParams->scene->getLights())
       {
-        light.getPosition().data.diff(intersection.data, pointLightDist->data);
+        light.getPosition().diff(intersection, *pointLightDist);
         //if angle between light and normal vector at intersection is higher than 90 degrees
-        if (normalAtIntersection.dotProduct(pointLightDist->data) <= 0.0f)
+        if (normalAtIntersection.dotProduct(*pointLightDist) <= 0.0f)
         {
           continue;
         }
@@ -206,8 +205,7 @@ inline void Renderer::shootRay (Ray & ray,
         if (!inShadow)
         {
           // Lambert lighting model
-          float lambert = lightRay->getDir().dotProduct(
-              normalAtIntersection.data);
+          float lambert = lightRay->getDir().dotProduct(normalAtIntersection);
 
           //light attenuation
           float lightPower = (0.01 * pointLightDist->length
@@ -256,7 +254,7 @@ inline void Renderer::shootRay (Ray & ray,
         break;
       }
 
-      ray.getDir().data = reflectedRay.data;
+      ray.getDir() = reflectedRay;
       ray.setParams(intersection);
       //ray is still normalized;
 
@@ -275,7 +273,7 @@ inline int Renderer::calculateRefraction (Ray &ray,
                                           const Vector &normalAtIntersection) const
 {
 
-  float ior = currentObject.getMaterial().getIOR();
+  const float ior = currentObject.getMaterial().getIOR();
 
   //get cosine between normal and ray going into the sphere
   float cos_alpha = -ray.getDir().dotProduct(normalAtIntersection);
@@ -302,8 +300,8 @@ inline int Renderer::calculateRefraction (Ray &ray,
   //checking if there is no total internal reflection
   if (sin_betha2 < 1.0f)
   {
-    ray.getDir().data = ray.getDir().data * ir
-        - normalAtIntersection.data
+    ray.getDir() = ray.getDir() * ir
+        - normalAtIntersection
             * (a * (ir * cos_alpha + sqrt(1.0f - sin_betha2)));
 
     ray.getDir().normalize();
@@ -344,8 +342,8 @@ inline Color Renderer::shootRefractedRay (const Ray &ray,
       newRay.setParams(intersection);
 
       //adding some corrections to ray start point
-      newRay.getStart().data -= correction.data;
-      newRay.getStart().data += newRay.getDir().data * FLOAT_EPSILON;
+      newRay.getStart() -= correction;
+      newRay.getStart() += newRay.getDir() * FLOAT_EPSILON;
 
       //changing object to the sphere we are going into
       objectWeAreIn = &currentObject;

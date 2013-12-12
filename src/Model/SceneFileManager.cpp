@@ -281,7 +281,7 @@ void SceneFileManager::getColor (const QDomElement & value, Color &color)
   color.setColor(getInt(value, "r"), getInt(value, "g"), getInt(value, "b"));
 }
 
-void SceneFileManager::getVPCommon (const QDomElement & value, Point &object)
+void SceneFileManager::getVPCommon (const QDomElement & value, SSEVector &object)
 {
   object [X] = getFloat(value, "x");
   object [Y] = getFloat(value, "y");

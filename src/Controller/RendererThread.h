@@ -14,7 +14,7 @@ namespace Controller
 
   struct RenderParams
   {
-      Model::ScenePtr scene;
+      Model::SceneSharedPtr scene;
       bool allowRunning;
       bool randomRender;
       bool shadows;

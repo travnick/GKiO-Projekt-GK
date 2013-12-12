@@ -21,8 +21,6 @@ namespace Model
   void Camera::calibrate ()
   {
     Q_ASSERT(imageWidth > 0);
-    Vector tmpVector;
-    QMatrix4x4 transformMatrix;
 
     //Calculate focal length of camera
     worldUnit angle = (180 - FOV) / 2.0f;
@@ -31,8 +29,8 @@ namespace Model
     //Calculate origin of camera
     eyeDirection.normalize();
     origin = position;
-    eyeDirection.data.multiply(focalLength, tmpVector.data);
-    origin.data.negMove(tmpVector.data, origin.data);
+    Vector tmpVector = eyeDirection.multiply(focalLength);
+    origin = origin.negMove(tmpVector);
 
     screenImageRatio = screenWidth / imageWidth;
     screenHeight = imageHeight * screenImageRatio;
@@ -48,16 +46,16 @@ namespace Model
     screenTopRight.rotate(angles);
     screenBottomLeft.rotate(angles);
 
-    screenTopLeft.data += position;
-    screenTopRight.data += position;
-    screenBottomLeft.data += position;
+    screenTopLeft += position;
+    screenTopRight += position;
+    screenBottomLeft += position;
 
     //Vectors used for moving on the projection plane
-    screenWidthDelta.data = screenTopRight.data - screenTopLeft.data;
-    screenHeightDelta.data = screenBottomLeft.data - screenTopLeft.data;
+    screenWidthDelta = screenTopRight - screenTopLeft;
+    screenHeightDelta = screenBottomLeft - screenTopLeft;
 
-    screenWidthDelta.data *= 1.0f / imageWidth;
-    screenHeightDelta.data *= 1.0f / imageHeight;
+    screenWidthDelta *= 1.0f / imageWidth;
+    screenHeightDelta *= 1.0f / imageHeight;
   }
 
   void Camera::setType (const QString & typeName)
@@ -101,7 +99,7 @@ namespace Model
     eyeDirection.set(0, 0, 1);
     eyeDirection.rotate(angles);
 
-    position.data = positionOrig.data;
+    position = positionOrig;
   }
 
   void Camera::move (Axis direction, float speed)
@@ -109,15 +107,15 @@ namespace Model
     switch (direction)
     {
       case X:
-        position.data += screenWidthDelta.toNormal().data * speed;
+        position += screenWidthDelta.toNormal() * speed;
         break;
 
       case Y:
-        position.data += screenHeightDelta.toNormal().data * speed;
+        position += screenHeightDelta.toNormal() * speed;
         break;
 
       case Z:
-        position.data += eyeDirection.toNormal().data * speed;
+        position += eyeDirection.toNormal() * speed;
         break;
 
       case W:

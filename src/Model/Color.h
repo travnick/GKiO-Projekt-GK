@@ -54,7 +54,7 @@ namespace Model
       /**Constructs Color from BaseSSEData
        *
        */
-      inline Color (const BaseSSEData &newData)
+      inline Color (const SSEVector &newData)
           : data(newData)
       {
       }

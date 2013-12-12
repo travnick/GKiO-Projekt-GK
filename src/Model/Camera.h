@@ -60,7 +60,7 @@ namespace Model
       {
         Q_ASSERT(screenImageRatio > 0);
 
-        point.data.diff(origin.data, directionToPoint.data);
+        directionToPoint = point - origin;
 
         directionToPoint.normalize();
       }

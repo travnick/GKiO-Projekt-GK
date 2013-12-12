@@ -38,73 +38,13 @@ namespace Model
 
   enum Axis
   {
-    X = 3, Y = 2, Z = 1, W = 0
+      X = 3,
+      Y = 2,
+      Z = 1,
+      W = 0
   };
 
-  /**Multiplies two vectors
-   *
-   * @param first T
-   * @param other T
-   * @return BaseSSEData
-   */
-  template <typename T>
-  inline BaseSSEData operator * (const T &first, const T &other);
-
-  /**Multiplies vector by a constant
-   *
-   * @param first T
-   * @param constant float
-   * @return BaseSSEData
-   */
-  template <typename T>
-  inline BaseSSEData operator * (const T &first, float constant);
-
-  /**Multiplies vector by a constant
-   *
-   * @param constant float
-   * @param other T
-   * @return BaseSSEData
-   */
-  template <typename T>
-  inline BaseSSEData operator * (float constant, const T &other);
-
-  /**Multiplies two vectors
-   *
-   * @param first BaseSSEData
-   * @param other SSEVector
-   * @return BaseSSEData
-   */
-  inline BaseSSEData operator * (const BaseSSEData &first,
-                                 const SSEVector &other);
-
-  /**Multiplies two vectors
-   *
-   * @param first SSEVector
-   * @param other BaseSSEData
-   * @return BaseSSEData
-   */
-  inline BaseSSEData operator * (const SSEVector &first,
-                                 const BaseSSEData &other);
-
-  /**Adds two vectors
-   *
-   * @param first T
-   * @param other T
-   * @return BaseSSEData
-   */
-  template <typename T>
-  inline BaseSSEData operator + (const T &first, const T &other);
-
-  /**Subtracts two vectors
-   *
-   * @param first T
-   * @param other T
-   * @return BaseSSEData
-   */
-  template <typename T>
-  inline BaseSSEData operator - (const T &first, const T &other);
-
-  //---------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------
 
   /**union that provides aligned data for SSE with easy access to them
    *
@@ -114,7 +54,9 @@ namespace Model
    */
   union SSEData
   {
+#if USE_SSE == 1
       __m128 data;
+#endif
       float dataArray [4];
 
       //------------------
@@ -133,9 +75,7 @@ namespace Model
 #if USE_SSE == 1
         data = other.data;
 #else
-        ( *this) [X] = other [X];
-        ( *this) [Y] = other [Y];
-        ( *this) [Z] = other [Z];
+        set(other [X], other [Y], other [Z]);
 #endif
       }
 
@@ -148,10 +88,7 @@ namespace Model
       inline SSEData (float x, float y, float z)
       {
         setDefaults();
-
-        (*this) [X] = x;
-        (*this) [Y] = y;
-        (*this) [Z] = z;
+        set(x, y, z);
       }
 
 #if USE_SSE == 1
@@ -175,11 +112,9 @@ namespace Model
 #if USE_SSE == 1
         data = other.data;
 #else
-        ( *this) [X] = other [X];
-        ( *this) [Y] = other [Y];
-        ( *this) [Z] = other [Z];
+        set(other [X], other [Y], other [Z]);
 #endif
-        return (*this);
+        return *this;
       }
 
       /**Sets default values
@@ -192,6 +127,124 @@ namespace Model
 #if USE_SSE == 1
         (*this) [W] = 0;
 #endif
+      }
+
+      void set (float x, float y, float z)
+      {
+        (*this) [X] = x;
+        (*this) [Y] = y;
+        (*this) [Z] = z;
+      }
+
+      inline float dotProduct (const SSEData &other) const
+      {
+        float dotProd;
+        IGNORE_WARNINGS_BEGIN
+
+#if __SSE4_1__ == 1 &&  USE_SSE == 1
+        _mm_store_ss(
+            &dotProd,
+            _mm_dp_ps(const_cast <__m128 &>(data), const_cast <__m128 &>(other.data), DOT_PROD_MASK));
+#elif __SSE3__ == 1 &&  USE_SSE == 1
+        __m128 result = _mm_mul_ps( const_cast <__m128 &>(data), const_cast <__m128 &>(other.data));
+        result = _mm_hadd_ps(result, result);
+        result = _mm_hadd_ps(result, result);
+        _mm_store_ss(&dotProd, result);
+#else
+        dotProd = (*this) [X] * other [X] + (*this) [Y] * other [Y]
+            + (*this) [Z] * other [Z];
+#endif
+        IGNORE_WARNINGS_END
+        return dotProd;
+      }
+
+      inline SSEData operator + (const SSEData &other) const
+      {
+#if USE_SSE == 1
+        return _mm_add_ps(const_cast <__m128 &>(data),
+            const_cast <__m128 &>(other.data));
+#else
+        return SSEData( (*this) [X] + other [X], (*this) [Y] + other [Y],
+                       (*this) [Z] + other [Z]);
+#endif
+      }
+
+      inline SSEData &operator += (const SSEData &other)
+      {
+#if USE_SSE == 1
+        data = _mm_add_ps(const_cast <__m128 &>(data),
+            const_cast <__m128 &>(other.data));
+#else
+        (*this) [X] += other [X];
+        (*this) [Y] += other [Y];
+        (*this) [Z] += other [Z];
+#endif
+        return *this;
+      }
+
+      inline SSEData operator - (const SSEData &other) const
+      {
+#if USE_SSE == 1
+        return _mm_sub_ps(const_cast <__m128 &>(data),
+            const_cast <__m128 &>(other.data));
+#else
+        return SSEData( (*this) [X] - other [X], (*this) [Y] - other [Y],
+                       (*this) [Z] - other [Z]);
+#endif
+      }
+
+      inline SSEData &operator -= (const SSEData &other)
+      {
+#if USE_SSE == 1
+        data = _mm_sub_ps(const_cast <__m128 &>(data),
+            const_cast <__m128 &>(other.data));
+#else
+        (*this) [X] -= other [X];
+        (*this) [Y] -= other [Y];
+        (*this) [Z] -= other [Z];
+#endif
+        return *this;
+      }
+
+      SSEData operator * (const SSEData &other) const
+      {
+#if USE_SSE == 1
+        return _mm_mul_ps(const_cast <__m128 &>(data),
+            const_cast <__m128 &>(other.data));
+#else
+        return SSEData( (*this) [X] * other [X], (*this) [Y] * other [Y],
+                       (*this) [Z] * other [Z]);
+#endif
+      }
+
+      SSEData operator *= (const SSEData &other)
+      {
+#if USE_SSE == 1
+        data = _mm_mul_ps(const_cast <__m128 &>(data),
+            const_cast <__m128 &>(other.data));
+#else
+        (*this) [X] *= other [X];
+        (*this) [Y] *= other [Y];
+        (*this) [Z] *= other [Z];
+#endif
+        return *this;
+      }
+
+      SSEData operator * (float other) const
+      {
+        return *this * SSEData(other, other, other);
+      }
+
+      SSEData &operator *= (float other)
+      {
+#if USE_SSE == 1
+        *this *= SSEData(other, other, other);
+#else
+        (*this) [X] *= other;
+        (*this) [Y] *= other;
+        (*this) [Z] *= other;
+#endif
+        return *this;
       }
 
       /**Returns value at given index
@@ -214,7 +267,8 @@ namespace Model
         return dataArray [idx];
       }
 
-      //Some hacks to act like pointer. It's needed in version with pointers
+      //Operators overload to act like pointer.
+      //It's needed in version with pointers
       inline const SSEData *operator -> () const
       {
         return this;
@@ -234,16 +288,6 @@ namespace Model
       {
         return *this;
       }
-      //End of hacks
-
-      /**__m128 typecast operator
-       * It provides typecasting SSEData into __m128
-       *
-       */
-      inline & operator __m128 ()
-      {
-        return data;
-      }
   };
 
   //---------------------------------------------------------------------------------
@@ -254,31 +298,31 @@ namespace Model
   class SSEVector
   {
 #if USE_POINTERS == 1
-      SSEData *internalData;
+      BaseSSEData *internalData;
 #else
-      SSEData internalData;
+      BaseSSEData internalData;
 #endif
 
     public:
 
 #if USE_POINTERS == 1
       SSEVector ()
-      : internalData(new SSEData)
+      : internalData(new BaseSSEData)
       {
       }
 
       SSEVector (const SSEVector &other)
-      : internalData(new SSEData(other.getInternalData()))
+      : internalData(new BaseSSEData(*other.internalData))
       {
       }
 
       SSEVector (const BaseSSEData &other)
-      : internalData(new SSEData(other))
+      : internalData(new BaseSSEData(other))
       {
       }
 
       inline SSEVector (float newX, float newY, float newZ)
-      : internalData(new SSEData(newX, newY, newZ))
+      : internalData(new BaseSSEData(newX, newY, newZ))
       {
       }
 
@@ -289,8 +333,8 @@ namespace Model
 
       inline SSEVector & operator = (const SSEVector &other)
       {
-        *internalData = other.getInternalData();
-        return ( *this);
+        *internalData = *other.internalData;
+        return *this;
       }
 
 #else
@@ -329,7 +373,7 @@ namespace Model
       inline SSEVector & operator = (const BaseSSEData &other)
       {
         *internalData = other;
-        return (*this);
+        return *this;
       }
 
       /**Returns value at given index
@@ -362,7 +406,12 @@ namespace Model
        */
       inline void move (const SSEVector &vector, SSEVector &result) const
       {
-        result = *this + vector;
+        result = *internalData + *vector.internalData;
+      }
+
+      inline SSEVector move (const SSEVector &vector) const
+      {
+        return *internalData + *vector.internalData;
       }
 
       /**Moves point by a reversed vector and save new point in result
@@ -373,7 +422,11 @@ namespace Model
        */
       inline void negMove (const SSEVector &vector, SSEVector &result) const
       {
-        result = *this - vector;
+        result = *internalData - *vector.internalData;
+      }
+      inline SSEVector negMove (const SSEVector &vector) const
+      {
+        return *internalData - *vector.internalData;
       }
 
       /**Calculates distance between two points
@@ -384,7 +437,12 @@ namespace Model
        */
       inline void diff (const SSEVector &point2, SSEVector &result) const
       {
-        result = *this - point2;
+        result = *internalData - *point2.internalData;
+      }
+
+      inline SSEVector diff (const SSEVector &point2) const
+      {
+        return *internalData - *point2.internalData;
       }
 
       /**Adds vector2 to self and store it in result
@@ -395,7 +453,11 @@ namespace Model
        */
       inline void addVectors (const SSEVector &vector2, SSEVector &result) const
       {
-        result = *this + vector2;
+        result = *internalData + *vector2.internalData;
+      }
+      inline SSEVector addVectors (const SSEVector &vector2) const
+      {
+        return *internalData + *vector2.internalData;
       }
 
       /**Subtracts vector2 from self and store it in result
@@ -406,7 +468,11 @@ namespace Model
        */
       inline void subVectors (const SSEVector &vector2, SSEVector &result) const
       {
-        result = *this - vector2;
+        result = *internalData - *vector2.internalData;
+      }
+      inline SSEVector subVectors (const SSEVector &vector2) const
+      {
+        return *internalData - *vector2.internalData;
       }
 
       /**Multiplies self by a constant
@@ -416,7 +482,12 @@ namespace Model
        */
       inline void multiply (float constant, SSEVector &result) const
       {
-        result = *this * constant;
+        result = *internalData * constant;
+      }
+
+      inline SSEVector multiply (float constant) const
+      {
+        return *internalData * constant;
       }
 
       /**Adds vector to self
@@ -427,8 +498,12 @@ namespace Model
        */
       inline SSEVector &operator += (const SSEVector &other)
       {
-        *internalData = *this + other;
+        *internalData += *other.internalData;
         return *this;
+      }
+      SSEVector operator + (const SSEVector &other) const
+      {
+        return *internalData + *other.internalData;
       }
 
       /**Subtracts other vector from this
@@ -439,8 +514,13 @@ namespace Model
        */
       inline SSEVector &operator -= (const SSEVector &other)
       {
-        *internalData = (*this) - other;
+        *internalData -= *other.internalData;
         return *this;
+      }
+
+      inline SSEVector operator - (const SSEVector &other) const
+      {
+        return *internalData - *other.internalData;
       }
 
       /**Multiplies self by a constant
@@ -450,8 +530,18 @@ namespace Model
        */
       inline SSEVector &operator *= (float constant)
       {
-        *internalData = *this * constant;
+        *internalData *= constant;
         return *this;
+      }
+
+      SSEVector operator * (float constant) const
+      {
+        return *internalData * constant;
+      }
+
+      SSEVector operator * (const SSEVector &other) const
+      {
+        return *internalData * *other.internalData;
       }
 
       /**Multiplies self by other vector
@@ -462,7 +552,7 @@ namespace Model
        */
       inline SSEVector &operator *= (const SSEVector &other)
       {
-        *internalData = *this * (other);
+        *internalData *= *other.internalData;
         return *this;
       }
 
@@ -476,33 +566,16 @@ namespace Model
         return dotProduct(*this);
       }
 
-      IGNORE_WARNINGS_BEGIN
       /**Calculates dot product with other vector
        * You should give here Point::date
        *
        * @param other SSEVector secondVector
        * @return dotProduct
        */
-      inline float dotProduct (const BaseSSEData &other) const
+      inline float dotProduct (const SSEVector &other) const
       {
-        float dotProd;
-
-#if __SSE4_1__ == 1 &&  USE_SSE == 1
-        _mm_store_ss(
-            &dotProd,
-            _mm_dp_ps(const_cast <__m128 &>(internalData->data), const_cast <__m128 &>(other.data), DOT_PROD_MASK));
-#elif __SSE3__ == 1 &&  USE_SSE == 1
-        __m128 result = _mm_mul_ps(const_cast <SSEVector&>( *this), const_cast <BaseSSEData&>(other));
-        result = _mm_hadd_ps(result, result);
-        result = _mm_hadd_ps(result, result);
-        _mm_store_ss( &dotProd, result);
-#else
-        dotProd = ( *this) [X] * other [X] + ( *this) [Y] * other [Y]
-        + ( *this) [Z] * other [Z];
-#endif
-        return dotProd;
+        return internalData->dotProduct(*other.internalData);
       }
-      IGNORE_WARNINGS_END
 
       /**Calculates cross product with other vector
        * You should give here Point::data
@@ -512,18 +585,16 @@ namespace Model
        */
       inline SSEVector crossProduct (const SSEVector &other) const
       {
-        SSEVector crossProd;
+        auto x = (*this) [Y] * other [Z] - (*this) [Z] * other [Y];
+        auto y = (*this) [Z] * other [X] - (*this) [X] * other [Z];
+        auto z = (*this) [X] * other [Y] - (*this) [Y] * other [X];
 
-        crossProd [X] = (*this) [Y] * other [Z] - (*this) [Z] * other [Y];
-        crossProd [Y] = (*this) [Z] * other [X] - (*this) [X] * other [Z];
-        crossProd [Z] = (*this) [X] * other [Y] - (*this) [Y] * other [X];
-
-        return crossProd;
+        return SSEVector(x, y, z);
       }
 
-      inline BaseSSEData operator - () const
+      inline SSEVector operator - () const
       {
-        return BaseSSEData(- (*this) [X], - (*this) [Y], - (*this) [Z]);
+        return SSEVector(- (*this) [X], - (*this) [Y], - (*this) [Z]);
       }
 
       /**Negates vector
@@ -537,116 +608,5 @@ namespace Model
       }
 // <-- operations on data
 
-      /**SSEData typecast operator
-       * It provides typecasting SSEVector into SSEData
-       *
-       */
-      inline & operator SSEData ()
-      {
-        return *internalData;
-      }
-
-      /**SSEData typecast operator
-       * It provides typecasting SSEVector into SSEData
-       *
-       */
-      inline & operator const SSEData () const
-      {
-        return *internalData;
-      }
-
-      /**__m128 typecast operator
-       * It provides typecasting SSEVector into __m128
-       *
-       */
-      inline & operator __m128 ()
-      {
-        return internalData->data;
-      }
-
-    private:
-
-      //Some hacks to act like pointer. It's needed in version with pointers
-      inline const SSEVector *operator -> () const
-      {
-        return this;
-      }
-
-      inline SSEVector *operator -> ()
-      {
-        return this;
-      }
-
-      inline SSEVector &operator * ()
-      {
-        return *this;
-      }
-
-      inline const SSEVector &operator * () const
-      {
-        return *this;
-      }
-      //End of hacks
   };
-
-  //---------------------------------------------------------------------------------
-
-  template <typename T>
-  inline BaseSSEData operator * (const T &first, const T &other)
-  {
-#if USE_SSE == 1
-    return _mm_mul_ps(const_cast <T&>(first), const_cast <T&>(other));
-#else
-    return BaseSSEData(first [X] * other [X], first [Y] * other [Y],
-        first [Z] * other [Z]);
-#endif
-  }
-
-  template <typename T>
-  inline BaseSSEData operator * (const T &first, float constant)
-  {
-    T tmpData(constant, constant, constant);
-    return tmpData * first;
-  }
-
-  template <typename T>
-  inline BaseSSEData operator * (float constant, const T &other)
-  {
-    return other * constant;
-  }
-
-  inline BaseSSEData operator * (const BaseSSEData &first,
-                                 const SSEVector &other)
-  {
-    return first * other;
-  }
-
-  inline BaseSSEData operator * (const SSEVector &first,
-                                 const BaseSSEData &other)
-  {
-    return other * first;
-  }
-
-  template <typename T>
-  inline BaseSSEData operator + (const T &first, const T &other)
-  {
-#if USE_SSE == 1
-    return _mm_add_ps(const_cast <T&>(first), const_cast <T&>(other));
-#else
-    return BaseSSEData(first [X] + other [X], first [Y] + other [Y],
-        first [Z] + other [Z]);
-#endif
-  }
-
-  template <typename T>
-  inline BaseSSEData operator - (const T &first, const T &other)
-  {
-#if USE_SSE == 1
-    return _mm_sub_ps(const_cast <T&>(first), const_cast <T&>(other));
-#else
-    return BaseSSEData(first [X] - other [X], first [Y] - other [Y],
-        first [Z] - other [Z]);
-#endif
-  }
-
-} /* namespace Model */
+}

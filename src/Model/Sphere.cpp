@@ -22,17 +22,18 @@ namespace Model
 
   void Sphere::getNormal (const Point& point, Vector &normalAtPoint) const
   {
-    point.data.diff(getPosition().data, normalAtPoint.data);
+    normalAtPoint = point.diff(getPosition());
     normalAtPoint.normalize();
   }
 
   bool Sphere::checkRay (const Ray& ray, worldUnit& range, Vector& dist) const
   {
-    position.data.diff(ray.getStart().data, dist.data);
+    dist = position.diff(ray.getStart());
 
-    worldUnit a = ray.getDir().dotProduct(dist.data);
+    worldUnit a = ray.getDir().dotProduct(dist);
 
-    worldUnit D = squareRadius - dist.dotProduct() + a * a;
+    auto squareLength = dist.dotProduct();
+    worldUnit D = squareRadius - squareLength + a * a;
 
     //There is no intersection with sphere if D < 0
     if (D < 0.f)
@@ -42,7 +43,7 @@ namespace Model
 
     worldUnit t = SQRT(D);
 
-    if (dist.squareLength >= squareRadius)
+    if (squareLength >= squareRadius)
     { //We are outside sphere
       a -= t;
     }

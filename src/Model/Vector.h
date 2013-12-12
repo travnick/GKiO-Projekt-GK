@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Controller/GlobalDefines.h"
-#include "Model/Point.h"
+#include "Model/SSETraits.h"
 
 namespace Model
 {
@@ -11,39 +11,46 @@ namespace Model
   /**3D Vector class
    *
    */
-  class Vector: public Point
+  class VectorPartial
   {
     public:
-      worldUnit length;
+      typedef worldUnit dataType;
+      dataType length;
 
-      /**Square length is equal to dot product with self
-       *
-       */
-      worldUnit squareLength;
-
-      Vector ()
-          : length(0), squareLength(0)
+      VectorPartial ()
+          : length(0)
       {
       }
+  };
 
-      /**Constructs Vector from SSEVector
+  class Vector: public SSEVectorTraits <VectorPartial::dataType, VectorPartial>
+  {
+      typedef SSEVectorTraits <VectorPartial::dataType, VectorPartial> BaseType;
+
+    public:
+      using BaseType::SSEVectorTraits;
+      typedef BaseType::dataType dataType;
+
+      /**Sets parameters of vector
        *
-       * @param other object do copy data from
+       * @param x length on x axis in 3D space
+       * @param y length on y axis in 3D space
+       * @param z length on z axis in 3D space
        */
-      Vector (const SSEVector &other)
-          : Point(other), length(0), squareLength(0)
+      inline void set (dataType x, dataType y, dataType z)
       {
+        BaseType::set(x, y, z);
+
+        //previous data are invalid
+        length = -1;
       }
 
-      /**Constructs object with given parameters
+      /**Calculate length of vector
        *
-       * @param x position on x axis in 3D space
-       * @param y position on y axis in 3D space
-       * @param z position on z axis in 3D space
        */
-      inline Vector (const dataType &x, const dataType &y, const dataType &z)
-          : Point(x, y, z), length(0), squareLength(0)
+      inline void calculateLength ()
       {
+        length = SQRT(dotProduct());
       }
 
       /**Normalizes vector
@@ -56,7 +63,7 @@ namespace Model
 
         worldUnit constant = 1.0f / length;
 
-        data *= constant;
+        SSEVector::operator *=(constant);
       }
 
       /**Creates new normalized vector
@@ -70,48 +77,9 @@ namespace Model
         return other;
       }
 
-      /**Calculate length of vector
-       *
-       */
-      inline void calculateLength ()
+      inline Vector multiply (float constant) const
       {
-        length = SQRT(dotProduct());
-      }
-
-      /**Calculates dot product of vector with self
-       * Result is also stored in squareLength
-       *
-       * @return dotProduct
-       */
-      inline worldUnit dotProduct ()
-      {
-        return squareLength = data.dotProduct();
-      }
-
-      /**Calculates dot product with other vector or point
-       * You should give here Point::data
-       *
-       * @param vector2 other vector or point
-       * @return dotProduct
-       */
-      inline worldUnit dotProduct (const SSEVector &vector2) const
-      {
-        return data.dotProduct(vector2);
-      }
-
-      /**Sets parameters of vector
-       *
-       * @param x length on x axis in 3D space
-       * @param y length on y axis in 3D space
-       * @param z length on z axis in 3D space
-       */
-      inline void set (const dataType &x, const dataType &y, const dataType &z)
-      {
-        Point::set(x, y, z);
-
-        //previous data are invalid
-        length = -1;
-        squareLength = -1;
+        return SSEVector::multiply(constant);
       }
 
       /**Multiplies vector by other and returns result
@@ -121,7 +89,18 @@ namespace Model
        */
       inline Vector operator * (const Vector &other) const
       {
-        return data.crossProduct(other.data);
+        return crossProduct(other);
+      }
+
+      inline Vector operator * (float constant) const
+      {
+        return SSEVector::multiply(constant);
+      }
+
+      inline Vector &operator *= (float constant)
+      {
+        SSEVector::operator *=(constant);
+        return *this;
       }
 
       /**Multiplies vector by other
@@ -131,8 +110,9 @@ namespace Model
        */
       inline Vector &operator *= (const Vector &other)
       {
-        data = data.crossProduct(other.data);
+        *this = crossProduct(other);
         return *this;
       }
   };
+
 }
